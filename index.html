@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>学习总手册</title>
+<title>DeepSeek 架构学习系统</title>
 <style>
 :root{
   --bg:#f7f7f8; --panel:#ffffff; --text:#1f2328; --muted:#6b7280;
@@ -125,7 +125,7 @@ svg{max-width:100%;height:auto}
 </head>
 <body>
 <header>
-  <span class="brand">学习总手册<span>点化学习系统 · 统一入口</span></span>
+  <span class="brand">DeepSeek 架构学习系统<span>R1 / V4 / V4.1 · 交互式学习手册</span></span>
   <span class="tabs" id="tabs"></span>
   <span class="hdr-right">
     <input id="q" type="search" placeholder="全书搜索…">
@@ -309,7 +309,7 @@ function renderCross(){
   const html=CROSS[docId]||'<div class="empty">页面不存在</div>';
   let pre='';
   if(docId===FIRST_DOC){
-    pre = '<h1>学习总手册</h1>'
+    pre = '<h1>DeepSeek 架构学习系统</h1>'
       + '<p>本学习系统把书点化为一套可跟着走的学习内容。顶部切换书籍，或用下方卡片进入；'
       + '每本书含学习路径、章节精讲、概念页、测验、抽认卡、术语表、模式库与速查表，进度自动保存在本机浏览器。</p>'
       + '<div class="book-cards">'
