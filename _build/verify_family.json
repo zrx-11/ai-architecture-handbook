@@ -1,0 +1,492 @@
+[
+ {
+  "check": "书内章 ch01",
+  "pass": true,
+  "extra": "4696 字"
+ },
+ {
+  "check": "书内章公式/图 ch01",
+  "pass": true,
+  "extra": "0 katex / 1 svg"
+ },
+ {
+  "check": "书内章 ch02",
+  "pass": true,
+  "extra": "3058 字"
+ },
+ {
+  "check": "书内章公式/图 ch02",
+  "pass": true,
+  "extra": "10 katex / 1 svg"
+ },
+ {
+  "check": "书内章 ch03",
+  "pass": true,
+  "extra": "2923 字"
+ },
+ {
+  "check": "书内章公式/图 ch03",
+  "pass": true,
+  "extra": "17 katex / 1 svg"
+ },
+ {
+  "check": "书内章 ch04",
+  "pass": true,
+  "extra": "3261 字"
+ },
+ {
+  "check": "书内章公式/图 ch04",
+  "pass": true,
+  "extra": "16 katex / 1 svg"
+ },
+ {
+  "check": "书内章 ch05",
+  "pass": true,
+  "extra": "2758 字"
+ },
+ {
+  "check": "书内章公式/图 ch05",
+  "pass": true,
+  "extra": "6 katex / 1 svg"
+ },
+ {
+  "check": "书内章 ch06",
+  "pass": true,
+  "extra": "2859 字"
+ },
+ {
+  "check": "书内章公式/图 ch06",
+  "pass": true,
+  "extra": "3 katex / 1 svg"
+ },
+ {
+  "check": "书内章 ch07",
+  "pass": true,
+  "extra": "2860 字"
+ },
+ {
+  "check": "书内章公式/图 ch07",
+  "pass": true,
+  "extra": "5 katex / 1 svg"
+ },
+ {
+  "check": "书内章 ch08",
+  "pass": true,
+  "extra": "3874 字"
+ },
+ {
+  "check": "书内章公式/图 ch08",
+  "pass": true,
+  "extra": "11 katex / 1 svg"
+ },
+ {
+  "check": "书内章 ch09",
+  "pass": true,
+  "extra": "4948 字"
+ },
+ {
+  "check": "书内章公式/图 ch09",
+  "pass": true,
+  "extra": "11 katex / 1 svg"
+ },
+ {
+  "check": "书内章 ch10",
+  "pass": true,
+  "extra": "3262 字"
+ },
+ {
+  "check": "书内章公式/图 ch10",
+  "pass": true,
+  "extra": "0 katex / 1 svg"
+ },
+ {
+  "check": "书内章 ch11",
+  "pass": true,
+  "extra": "3790 字"
+ },
+ {
+  "check": "书内章公式/图 ch11",
+  "pass": true,
+  "extra": "0 katex / 1 svg"
+ },
+ {
+  "check": "书内章 ch12",
+  "pass": true,
+  "extra": "8214 字"
+ },
+ {
+  "check": "书内章公式/图 ch12",
+  "pass": true,
+  "extra": "0 katex / 1 svg"
+ },
+ {
+  "check": "书内章 ch13",
+  "pass": true,
+  "extra": "6637 字"
+ },
+ {
+  "check": "书内章公式/图 ch13",
+  "pass": true,
+  "extra": "73 katex / 0 svg"
+ },
+ {
+  "check": "书内章 ch14",
+  "pass": true,
+  "extra": "5480 字"
+ },
+ {
+  "check": "书内章公式/图 ch14",
+  "pass": true,
+  "extra": "0 katex / 1 svg"
+ },
+ {
+  "check": "概念 c01",
+  "pass": true,
+  "extra": "868 字"
+ },
+ {
+  "check": "概念 c02",
+  "pass": true,
+  "extra": "870 字"
+ },
+ {
+  "check": "概念 c03",
+  "pass": true,
+  "extra": "715 字"
+ },
+ {
+  "check": "概念 c04",
+  "pass": true,
+  "extra": "791 字"
+ },
+ {
+  "check": "概念 c05",
+  "pass": true,
+  "extra": "701 字"
+ },
+ {
+  "check": "概念 c06",
+  "pass": true,
+  "extra": "617 字"
+ },
+ {
+  "check": "概念 c07",
+  "pass": true,
+  "extra": "630 字"
+ },
+ {
+  "check": "概念 c08",
+  "pass": true,
+  "extra": "689 字"
+ },
+ {
+  "check": "概念 c09",
+  "pass": true,
+  "extra": "578 字"
+ },
+ {
+  "check": "概念 c10",
+  "pass": true,
+  "extra": "744 字"
+ },
+ {
+  "check": "概念 c11",
+  "pass": true,
+  "extra": "726 字"
+ },
+ {
+  "check": "概念 c12",
+  "pass": true,
+  "extra": "610 字"
+ },
+ {
+  "check": "概念 c13",
+  "pass": true,
+  "extra": "656 字"
+ },
+ {
+  "check": "测验页 ch01",
+  "pass": true,
+  "extra": "3/3"
+ },
+ {
+  "check": "测验页 ch02",
+  "pass": true,
+  "extra": "3/3"
+ },
+ {
+  "check": "测验页 ch03",
+  "pass": true,
+  "extra": "3/3"
+ },
+ {
+  "check": "测验页 ch04",
+  "pass": true,
+  "extra": "3/3"
+ },
+ {
+  "check": "测验页 ch05",
+  "pass": true,
+  "extra": "3/3"
+ },
+ {
+  "check": "测验页 ch06",
+  "pass": true,
+  "extra": "3/3"
+ },
+ {
+  "check": "测验页 ch07",
+  "pass": true,
+  "extra": "3/3"
+ },
+ {
+  "check": "测验页 ch08",
+  "pass": true,
+  "extra": "3/3"
+ },
+ {
+  "check": "测验页 ch09",
+  "pass": true,
+  "extra": "4/4"
+ },
+ {
+  "check": "测验页 ch10",
+  "pass": true,
+  "extra": "4/4"
+ },
+ {
+  "check": "测验页 ch11",
+  "pass": true,
+  "extra": "4/4"
+ },
+ {
+  "check": "测验页 ch12",
+  "pass": true,
+  "extra": "0/0"
+ },
+ {
+  "check": "测验页 ch13",
+  "pass": true,
+  "extra": "4/4"
+ },
+ {
+  "check": "测验页 ch14",
+  "pass": true,
+  "extra": "2/2"
+ },
+ {
+  "check": "移动端宽 ch01",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "移动端宽 ch02",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "移动端宽 ch03",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "移动端宽 ch04",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "移动端宽 ch05",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "移动端宽 ch06",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "移动端宽 ch07",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "移动端宽 ch08",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "移动端宽 ch09",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "移动端宽 ch10",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "移动端宽 ch11",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "移动端宽 ch12",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "移动端宽 ch13",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "移动端宽 ch14",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "独立章 ch01",
+  "pass": true,
+  "extra": "4696 字"
+ },
+ {
+  "check": "独立章 ch02",
+  "pass": true,
+  "extra": "3058 字"
+ },
+ {
+  "check": "独立章 ch03",
+  "pass": true,
+  "extra": "2923 字"
+ },
+ {
+  "check": "独立章 ch04",
+  "pass": true,
+  "extra": "3261 字"
+ },
+ {
+  "check": "独立章 ch05",
+  "pass": true,
+  "extra": "2758 字"
+ },
+ {
+  "check": "独立章 ch06",
+  "pass": true,
+  "extra": "2859 字"
+ },
+ {
+  "check": "独立章 ch07",
+  "pass": true,
+  "extra": "2860 字"
+ },
+ {
+  "check": "独立章 ch08",
+  "pass": true,
+  "extra": "3874 字"
+ },
+ {
+  "check": "独立章 ch09",
+  "pass": true,
+  "extra": "4948 字"
+ },
+ {
+  "check": "独立章 ch10",
+  "pass": true,
+  "extra": "3262 字"
+ },
+ {
+  "check": "独立章 ch11",
+  "pass": true,
+  "extra": "3790 字"
+ },
+ {
+  "check": "独立章 ch12",
+  "pass": true,
+  "extra": "8214 字"
+ },
+ {
+  "check": "独立章 ch13",
+  "pass": true,
+  "extra": "6637 字"
+ },
+ {
+  "check": "独立章 ch14",
+  "pass": true,
+  "extra": "5480 字"
+ },
+ {
+  "check": "独立概念 c01",
+  "pass": true,
+  "extra": "868 字"
+ },
+ {
+  "check": "独立概念 c02",
+  "pass": true,
+  "extra": "870 字"
+ },
+ {
+  "check": "独立概念 c03",
+  "pass": true,
+  "extra": "715 字"
+ },
+ {
+  "check": "独立概念 c04",
+  "pass": true,
+  "extra": "791 字"
+ },
+ {
+  "check": "独立概念 c05",
+  "pass": true,
+  "extra": "701 字"
+ },
+ {
+  "check": "独立概念 c06",
+  "pass": true,
+  "extra": "617 字"
+ },
+ {
+  "check": "独立概念 c07",
+  "pass": true,
+  "extra": "630 字"
+ },
+ {
+  "check": "独立概念 c08",
+  "pass": true,
+  "extra": "689 字"
+ },
+ {
+  "check": "独立概念 c09",
+  "pass": true,
+  "extra": "578 字"
+ },
+ {
+  "check": "独立概念 c10",
+  "pass": true,
+  "extra": "744 字"
+ },
+ {
+  "check": "独立概念 c11",
+  "pass": true,
+  "extra": "726 字"
+ },
+ {
+  "check": "独立概念 c12",
+  "pass": true,
+  "extra": "610 字"
+ },
+ {
+  "check": "独立概念 c13",
+  "pass": true,
+  "extra": "656 字"
+ },
+ {
+  "check": "独立综合测验",
+  "pass": true,
+  "extra": "42"
+ },
+ {
+  "check": "控制台",
+  "pass": true,
+  "extra": ""
+ }
+]

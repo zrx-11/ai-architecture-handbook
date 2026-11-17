@@ -17,6 +17,7 @@ FILES = [
     ROOT / "04-machine-learning/machine-learning学习伴侣.html",
     ROOT / "05-neural-networks/neural-networks学习伴侣.html",
     ROOT / "06-deep-learning/deep-learning学习伴侣.html",
+    ROOT / "09-deepseek-family/deepseek-family学习伴侣.html",
     ROOT / "index.html",
 ]
 

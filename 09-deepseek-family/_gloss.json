@@ -1,0 +1,342 @@
+[
+ {
+  "term": "Transformer",
+  "def": "由自注意力 + FFN + 残差组成的序列模型骨架",
+  "chapterId": "ch01"
+ },
+ {
+  "term": "稠密模型",
+  "def": "每个 token 都走同一套 FFN 的模型",
+  "chapterId": "ch01"
+ },
+ {
+  "term": "MoE",
+  "def": "混合专家：FFN 拆成多个专家，每个 token 只走 top-k",
+  "chapterId": "ch01"
+ },
+ {
+  "term": "路由专家",
+  "def": "由门控选择是否激活的专家",
+  "chapterId": "ch01"
+ },
+ {
+  "term": "共享专家",
+  "def": "始终激活、负责通用知识的专家",
+  "chapterId": "ch03"
+ },
+ {
+  "term": "门控",
+  "def": "给 token 和专家打分、决定路由的模块",
+  "chapterId": "ch03"
+ },
+ {
+  "term": "top-k",
+  "def": "每个 token 只选分数最高的 k 个专家",
+  "chapterId": "ch03"
+ },
+ {
+  "term": "总参数",
+  "def": "模型全部权重数量，决定显存",
+  "chapterId": "ch01"
+ },
+ {
+  "term": "激活参数",
+  "def": "每个 token 实际参与计算的权重数量，决定算力",
+  "chapterId": "ch01"
+ },
+ {
+  "term": "专家并行",
+  "def": "把不同专家放到不同设备上的并行方式",
+  "chapterId": "ch03"
+ },
+ {
+  "term": "负载均衡",
+  "def": "让各专家处理量接近，避免专家塌缩",
+  "chapterId": "ch03"
+ },
+ {
+  "term": "专家塌缩",
+  "def": "门控总选少数专家，其余专家学不到东西",
+  "chapterId": "ch03"
+ },
+ {
+  "term": "辅助损失",
+  "def": "加在主损失外、用来拉平专家负载的损失项",
+  "chapterId": "ch03"
+ },
+ {
+  "term": "无辅助损失均衡",
+  "def": "用可学习专家偏置代替辅助损失的均衡方法",
+  "chapterId": "ch05"
+ },
+ {
+  "term": "MHA",
+  "def": "多头注意力：每个头有独立 Q/K/V",
+  "chapterId": "ch02"
+ },
+ {
+  "term": "GQA",
+  "def": "分组查询注意力：多个查询头共享一组 K/V",
+  "chapterId": "ch02"
+ },
+ {
+  "term": "MQA",
+  "def": "多查询注意力：所有查询头共享一组 K/V",
+  "chapterId": "ch02"
+ },
+ {
+  "term": "KV cache",
+  "def": "解码时缓存历史 K/V，避免重复计算",
+  "chapterId": "ch02"
+ },
+ {
+  "term": "MLA",
+  "def": "多头潜在注意力：缓存低维潜向量 + RoPE key",
+  "chapterId": "ch04"
+ },
+ {
+  "term": "潜向量",
+  "def": "低维压缩表示，MLA 缓存的核心",
+  "chapterId": "ch04"
+ },
+ {
+  "term": "RoPE",
+  "def": "旋转位置编码，把位置信息编码进 Q/K",
+  "chapterId": "ch04"
+ },
+ {
+  "term": "解耦 RoPE",
+  "def": "MLA 中单独保留的 RoPE key 部分",
+  "chapterId": "ch04"
+ },
+ {
+  "term": "上下文长度",
+  "def": "模型一次能处理的 token 数",
+  "chapterId": "ch04"
+ },
+ {
+  "term": "FIM",
+  "def": "中间填空：挖掉中间片段让模型补回",
+  "chapterId": "ch02"
+ },
+ {
+  "term": "代码续写",
+  "def": "根据前缀继续生成代码",
+  "chapterId": "ch02"
+ },
+ {
+  "term": "Coder-V2",
+  "def": "V2 骨架的代码继续预训练模型",
+  "chapterId": "ch04"
+ },
+ {
+  "term": "V2-Lite",
+  "def": "V2 的 16B/2.4B 缩小版",
+  "chapterId": "ch04"
+ },
+ {
+  "term": "MTP",
+  "def": "多 token 预测：额外预测 t+2",
+  "chapterId": "ch05"
+ },
+ {
+  "term": "投机解码",
+  "def": "小模型先猜、大模型验证的加速方法",
+  "chapterId": "ch05"
+ },
+ {
+  "term": "FP8",
+  "def": "8 位浮点训练/推理精度",
+  "chapterId": "ch05"
+ },
+ {
+  "term": "FP4",
+  "def": "4 位浮点精度，V4/V4.1 用于权重/KV",
+  "chapterId": "ch08"
+ },
+ {
+  "term": "DualPipe",
+  "def": "双向流水线并行",
+  "chapterId": "ch05"
+ },
+ {
+  "term": "EPLB",
+  "def": "专家并行负载均衡",
+  "chapterId": "ch05"
+ },
+ {
+  "term": "3FS",
+  "def": "DeepSeek 的分布式文件系统",
+  "chapterId": "ch05"
+ },
+ {
+  "term": "R1-Zero",
+  "def": "不做冷启动、直接纯 RL 的推理模型",
+  "chapterId": "ch06"
+ },
+ {
+  "term": "GRPO",
+  "def": "组相对策略优化：组内标准化算优势",
+  "chapterId": "ch06"
+ },
+ {
+  "term": "规则奖励",
+  "def": "用可验证规则给回答打分，不训练奖励模型",
+  "chapterId": "ch06"
+ },
+ {
+  "term": "冷启动 SFT",
+  "def": "先用少量高质量长 CoT 数据做监督微调",
+  "chapterId": "ch06"
+ },
+ {
+  "term": "拒绝采样",
+  "def": "只保留答案正确/格式合格的采样结果",
+  "chapterId": "ch06"
+ },
+ {
+  "term": "蒸馏",
+  "def": "用大模型输出微调小模型，学生架构可不同",
+  "chapterId": "ch06"
+ },
+ {
+  "term": "长 CoT",
+  "def": "长链思维：先写推理过程再给答案",
+  "chapterId": "ch06"
+ },
+ {
+  "term": "混合推理",
+  "def": "一个模型同时支持思考/非思考模式",
+  "chapterId": "ch07"
+ },
+ {
+  "term": "DSA",
+  "def": "DeepSeek 稀疏注意力：索引器 + top-k",
+  "chapterId": "ch07"
+ },
+ {
+  "term": "索引器",
+  "def": "给 query-历史 token 打分的小模块",
+  "chapterId": "ch07"
+ },
+ {
+  "term": "Agent",
+  "def": "能多轮调工具、观察结果、继续行动的系统",
+  "chapterId": "ch07"
+ },
+ {
+  "term": "Agent RL",
+  "def": "用环境反馈训练 Agent 的强化学习",
+  "chapterId": "ch07"
+ },
+ {
+  "term": "V3.2-Speciale",
+  "def": "V3.2 的长思考增强版，偏评测",
+  "chapterId": "ch07"
+ },
+ {
+  "term": "CSA",
+  "def": "压缩稀疏注意力：每 m 个 token 压一个条目",
+  "chapterId": "ch08"
+ },
+ {
+  "term": "HCA",
+  "def": "重度压缩注意力：每 m′ 个 token 压一个块",
+  "chapterId": "ch08"
+ },
+ {
+  "term": "SWA",
+  "def": "滑动窗口注意力：只算最近窗口",
+  "chapterId": "ch08"
+ },
+ {
+  "term": "mHC",
+  "def": "流形约束超连接：残差流扩容 + 双随机混合",
+  "chapterId": "ch08"
+ },
+ {
+  "term": "Sinkhorn",
+  "def": "交替行/列归一化，逼近双随机矩阵",
+  "chapterId": "ch08"
+ },
+ {
+  "term": "双随机矩阵",
+  "def": "每行和 1、每列和 1、元素非负的矩阵",
+  "chapterId": "ch08"
+ },
+ {
+  "term": "Muon",
+  "def": "对矩阵参数做正交化的优化器",
+  "chapterId": "ch08"
+ },
+ {
+  "term": "CED",
+  "def": "非对称编码器-解码器：20 层编码 + 20 层解码",
+  "chapterId": "ch09"
+ },
+ {
+  "term": "CSA2",
+  "def": "跨层复用 KV/索引的压缩稀疏注意力",
+  "chapterId": "ch09"
+ },
+ {
+  "term": "Reuse",
+  "def": "复用 KV 和上一层 top-k 索引",
+  "chapterId": "ch09"
+ },
+ {
+  "term": "Reindex",
+  "def": "复用 KV 但重建索引",
+  "chapterId": "ch09"
+ },
+ {
+  "term": "Engram",
+  "def": "N-gram 哈希查表记忆模块",
+  "chapterId": "ch09"
+ },
+ {
+  "term": "DSpark",
+  "def": "独立训练的投机解码 drafter",
+  "chapterId": "ch09"
+ },
+ {
+  "term": "VL2",
+  "def": "基于 DeepSeekMoE-27B 的视觉语言模型",
+  "chapterId": "ch10"
+ },
+ {
+  "term": "Janus",
+  "def": "解耦视觉编码的理解+生成统一模型",
+  "chapterId": "ch10"
+ },
+ {
+  "term": "光学压缩",
+  "def": "把整页图压成少量视觉 token",
+  "chapterId": "ch10"
+ },
+ {
+  "term": "Prover-V2",
+  "def": "用 V3 主干做 Lean 形式化证明的模型",
+  "chapterId": "ch10"
+ },
+ {
+  "term": "Math-V2",
+  "def": "基于 V3.2-Exp-Base 的自验证数学证明模型",
+  "chapterId": "ch10"
+ },
+ {
+  "term": "模型卡",
+  "def": "HuggingFace 上描述权重、配置、许可证的页面",
+  "chapterId": "ch11"
+ },
+ {
+  "term": "开放权重",
+  "def": "权重公开，但训练数据/流程未必公开",
+  "chapterId": "ch11"
+ },
+ {
+  "term": "DeepSeek Model License",
+  "def": "DeepSeek 自定义开放权重许可证",
+  "chapterId": "ch11"
+ }
+]

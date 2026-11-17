@@ -2,3 +2,6 @@
 _merge_sources/
 _work/
 *.zip
+
+# 验证截图体积较大，保留在 full 交付包，不进公开仓库
+_build/shots/

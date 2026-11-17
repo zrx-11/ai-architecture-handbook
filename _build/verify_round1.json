@@ -1,0 +1,302 @@
+[
+ {
+  "check": "7 本书",
+  "pass": true,
+  "extra": "7"
+ },
+ {
+  "check": "首页 7 步",
+  "pass": true,
+  "extra": "7"
+ },
+ {
+  "check": "首页主线标题",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "资料库 9 项",
+  "pass": true,
+  "extra": "9"
+ },
+ {
+  "check": "deepseek-foundations 章节数",
+  "pass": true,
+  "extra": "6"
+ },
+ {
+  "check": "deepseek-foundations 首章",
+  "pass": true,
+  "extra": "3594 字"
+ },
+ {
+  "check": "deepseek-foundations 末章",
+  "pass": true,
+  "extra": "4755 字"
+ },
+ {
+  "check": "deepseek-foundations 测验",
+  "pass": true,
+  "extra": "15 题"
+ },
+ {
+  "check": "deepseek-foundations 作答反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "deepseek-papers 章节数",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "deepseek-papers 首章",
+  "pass": true,
+  "extra": "4063 字"
+ },
+ {
+  "check": "deepseek-papers 末章",
+  "pass": true,
+  "extra": "3850 字"
+ },
+ {
+  "check": "deepseek-papers 测验",
+  "pass": true,
+  "extra": "12 题"
+ },
+ {
+  "check": "deepseek-papers 作答反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "deepseek-architecture 章节数",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "deepseek-architecture 首章",
+  "pass": true,
+  "extra": "3737 字"
+ },
+ {
+  "check": "deepseek-architecture 末章",
+  "pass": true,
+  "extra": "2490 字"
+ },
+ {
+  "check": "deepseek-architecture 测验",
+  "pass": true,
+  "extra": "12 题"
+ },
+ {
+  "check": "deepseek-architecture 作答反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "machine-learning 章节数",
+  "pass": true,
+  "extra": "16"
+ },
+ {
+  "check": "machine-learning 首章",
+  "pass": true,
+  "extra": "1479 字"
+ },
+ {
+  "check": "machine-learning 末章",
+  "pass": true,
+  "extra": "1875 字"
+ },
+ {
+  "check": "machine-learning 测验",
+  "pass": true,
+  "extra": "47 题"
+ },
+ {
+  "check": "machine-learning 作答反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "neural-networks 章节数",
+  "pass": true,
+  "extra": "13"
+ },
+ {
+  "check": "neural-networks 首章",
+  "pass": true,
+  "extra": "2726 字"
+ },
+ {
+  "check": "neural-networks 末章",
+  "pass": true,
+  "extra": "3933 字"
+ },
+ {
+  "check": "neural-networks 测验",
+  "pass": true,
+  "extra": "32 题"
+ },
+ {
+  "check": "neural-networks 作答反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "deep-learning-scratch 章节数",
+  "pass": true,
+  "extra": "8"
+ },
+ {
+  "check": "deep-learning-scratch 首章",
+  "pass": true,
+  "extra": "2091 字"
+ },
+ {
+  "check": "deep-learning-scratch 末章",
+  "pass": true,
+  "extra": "1703 字"
+ },
+ {
+  "check": "deep-learning-scratch 测验",
+  "pass": true,
+  "extra": "21 题"
+ },
+ {
+  "check": "deep-learning-scratch 作答反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "deepseek-family 章节数",
+  "pass": true,
+  "extra": "14"
+ },
+ {
+  "check": "deepseek-family 首章",
+  "pass": true,
+  "extra": "4696 字"
+ },
+ {
+  "check": "deepseek-family 末章",
+  "pass": true,
+  "extra": "5480 字"
+ },
+ {
+  "check": "deepseek-family 测验",
+  "pass": true,
+  "extra": "42 题"
+ },
+ {
+  "check": "deepseek-family 作答反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "09 chapter/ch01",
+  "pass": true,
+  "extra": "4696 字"
+ },
+ {
+  "check": "09 chapter/ch04",
+  "pass": true,
+  "extra": "3261 字"
+ },
+ {
+  "check": "09 chapter/ch09",
+  "pass": true,
+  "extra": "4948 字"
+ },
+ {
+  "check": "09 chapter/ch11",
+  "pass": true,
+  "extra": "3790 字"
+ },
+ {
+  "check": "09 chapter/ch13",
+  "pass": true,
+  "extra": "6637 字"
+ },
+ {
+  "check": "09 chapter/ch14",
+  "pass": true,
+  "extra": "5480 字"
+ },
+ {
+  "check": "09 concept/c04",
+  "pass": true,
+  "extra": "791 字"
+ },
+ {
+  "check": "09 concept/c11",
+  "pass": true,
+  "extra": "726 字"
+ },
+ {
+  "check": "09 抽认卡",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "09 术语表 68",
+  "pass": true,
+  "extra": "68"
+ },
+ {
+  "check": "09 诊断页",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "搜索 MLA",
+  "pass": true,
+  "extra": "40 条"
+ },
+ {
+  "check": "桌面主栏宽度",
+  "pass": true,
+  "extra": "[290, 883.75, 593.75]"
+ },
+ {
+  "check": "移动端无横向溢出",
+  "pass": true,
+  "extra": "[0, 390, 390]"
+ },
+ {
+  "check": "移动端导航限高",
+  "pass": true,
+  "extra": "388.24px"
+ },
+ {
+  "check": "09 伴侣打开",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "09 伴侣 14 章",
+  "pass": true,
+  "extra": "14"
+ },
+ {
+  "check": "09 伴侣测验 42",
+  "pass": true,
+  "extra": "42"
+ },
+ {
+  "check": "09 伴侣 KaTeX",
+  "pass": true,
+  "extra": "16"
+ },
+ {
+  "check": "09 伴侣 Mermaid",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "控制台无错误",
+  "pass": true,
+  "extra": ""
+ }
+]

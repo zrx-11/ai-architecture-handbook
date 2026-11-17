@@ -1,0 +1,334 @@
+[
+ {
+  "id": "f01",
+  "chapterId": "ch01",
+  "front": "DeepSeek 四代结构主线",
+  "back": "dense → MoE → MLA + MoE → DSA/CSA + 百万上下文",
+  "tags": "主线,代际"
+ },
+ {
+  "id": "f02",
+  "chapterId": "ch01",
+  "front": "671B/37B 各指什么",
+  "back": "671B 总参数（显存），37B 每 token 激活（算力）",
+  "tags": "参数,MoE"
+ },
+ {
+  "id": "f03",
+  "chapterId": "ch02",
+  "front": "DeepSeek-LLM 67B 的注意力",
+  "back": "64 查询头 / 8 KV 头，GQA",
+  "tags": "LLM,GQA"
+ },
+ {
+  "id": "f04",
+  "chapterId": "ch02",
+  "front": "Coder 的 FIM 是什么",
+  "back": "中间填空：挖掉代码中间，按前后文补回",
+  "tags": "Coder,FIM"
+ },
+ {
+  "id": "f05",
+  "chapterId": "ch02",
+  "front": "Coder-V2 属于哪个家族",
+  "back": "V2 家族，236B/21B 的代码继续预训练",
+  "tags": "Coder-V2,V2"
+ },
+ {
+  "id": "f06",
+  "chapterId": "ch03",
+  "front": "DeepSeekMoE 的两个设计",
+  "back": "细粒度专家分割 + 共享专家隔离",
+  "tags": "MoE,专家"
+ },
+ {
+  "id": "f07",
+  "chapterId": "ch03",
+  "front": "DeepSeekMoE 16B 路由配置",
+  "back": "64 路由 + 2 共享，top-6，激活约 2.8B",
+  "tags": "MoE,配置"
+ },
+ {
+  "id": "f08",
+  "chapterId": "ch04",
+  "front": "MLA 缓存什么",
+  "back": "512 维潜向量 c + 64 维 RoPE key，不缓存完整 K/V",
+  "tags": "MLA,KV"
+ },
+ {
+  "id": "f09",
+  "chapterId": "ch04",
+  "front": "V2 的专家配置",
+  "back": "160 路由 + 2 共享，top-6，60 层，5120 维",
+  "tags": "V2,配置"
+ },
+ {
+  "id": "f10",
+  "chapterId": "ch04",
+  "front": "V2-Lite 的规模",
+  "back": "16B 总 / 2.4B 激活，保留 MLA + MoE",
+  "tags": "V2-Lite"
+ },
+ {
+  "id": "f11",
+  "chapterId": "ch05",
+  "front": "V3 的专家配置",
+  "back": "256 路由 + 1 共享，top-8，61 层，7168 维",
+  "tags": "V3,配置"
+ },
+ {
+  "id": "f12",
+  "chapterId": "ch05",
+  "front": "V3 的 685B 是什么",
+  "back": "671B 主模型 + 14B MTP",
+  "tags": "V3,MTP"
+ },
+ {
+  "id": "f13",
+  "chapterId": "ch05",
+  "front": "MTP 预测哪个位置",
+  "back": "在 t 额外预测 t+2，损失两项相加",
+  "tags": "MTP"
+ },
+ {
+  "id": "f14",
+  "chapterId": "ch05",
+  "front": "无辅助损失均衡怎么做",
+  "back": "给每个专家可学习偏置，按负载调高/调低，不加辅助损失",
+  "tags": "MoE,均衡"
+ },
+ {
+  "id": "f15",
+  "chapterId": "ch06",
+  "front": "R1-Zero 与 R1 的区别",
+  "back": "R1-Zero 纯 RL 无冷启动；R1 四阶段含冷启动/拒绝采样/再对齐",
+  "tags": "R1,RL"
+ },
+ {
+  "id": "f16",
+  "chapterId": "ch06",
+  "front": "GRPO 优势公式",
+  "back": "(r_i - 组均值) / 组标准差",
+  "tags": "GRPO"
+ },
+ {
+  "id": "f17",
+  "chapterId": "ch06",
+  "front": "R1 蒸馏学生架构",
+  "back": "Qwen2.5 / Llama dense，不是 DeepSeek MoE",
+  "tags": "R1,蒸馏"
+ },
+ {
+  "id": "f18",
+  "chapterId": "ch07",
+  "front": "V3.1 的核心变化",
+  "back": "同结构，混合推理模板：思考/非思考一个模型",
+  "tags": "V3.1"
+ },
+ {
+  "id": "f19",
+  "chapterId": "ch07",
+  "front": "V3.2-Exp 的核心变化",
+  "back": "DSA 稀疏注意力，architectures 变 DeepseekV32ForCausalLM",
+  "tags": "V3.2,DSA"
+ },
+ {
+  "id": "f20",
+  "chapterId": "ch07",
+  "front": "V3.2 的 Agent 训练规模",
+  "back": "1800+ 环境、85k+ 指令，思考嵌入工具调用",
+  "tags": "V3.2,Agent"
+ },
+ {
+  "id": "f21",
+  "chapterId": "ch07",
+  "front": "V3.2-Speciale 的限制",
+  "back": "只支持长思考，不支持工具调用，临时 API",
+  "tags": "V3.2-Speciale"
+ },
+ {
+  "id": "f22",
+  "chapterId": "ch08",
+  "front": "V4-Pro 配置",
+  "back": "1.6T/49B，61 层，384 路由 + 1 共享，top-6，1M",
+  "tags": "V4,配置"
+ },
+ {
+  "id": "f23",
+  "chapterId": "ch08",
+  "front": "V4-Flash 配置",
+  "back": "284B/13B，43 层，256 路由 + 1 共享，top-6，1M",
+  "tags": "V4,配置"
+ },
+ {
+  "id": "f24",
+  "chapterId": "ch08",
+  "front": "CSA 的 m=4",
+  "back": "每 4 个 token 的 KV 压成一个条目，再做 top-k",
+  "tags": "V4,CSA"
+ },
+ {
+  "id": "f25",
+  "chapterId": "ch08",
+  "front": "mHC 的约束",
+  "back": "残差流扩 4 倍，混合矩阵用 Sinkhorn 约束成双随机",
+  "tags": "V4,mHC"
+ },
+ {
+  "id": "f26",
+  "chapterId": "ch09",
+  "front": "V4.1 的参数口径",
+  "back": "552B 主干 + 196B Engram，HF 约 763B，8B/16B 激活",
+  "tags": "V4.1,配置"
+ },
+ {
+  "id": "f27",
+  "chapterId": "ch09",
+  "front": "CED 的 KV 来源",
+  "back": "解码器全局 KV = 编码器第 20 层隐藏状态投影",
+  "tags": "V4.1,CED"
+ },
+ {
+  "id": "f28",
+  "chapterId": "ch09",
+  "front": "CSA2 三模式",
+  "back": "Full / Reindex / Reuse",
+  "tags": "V4.1,CSA2"
+ },
+ {
+  "id": "f29",
+  "chapterId": "ch09",
+  "front": "890 B/token 指什么",
+  "back": "每 token 全局 KV 稳态占用，1M 单序列约 890 MB",
+  "tags": "V4.1,KV"
+ },
+ {
+  "id": "f30",
+  "chapterId": "ch10",
+  "front": "VL2 的激活参数",
+  "back": "Tiny/Small/Base 分别 1.0B/2.8B/4.5B",
+  "tags": "VL2"
+ },
+ {
+  "id": "f31",
+  "chapterId": "ch10",
+  "front": "Janus 的解耦",
+  "back": "理解用语义编码器，生成用 VQ tokenizer",
+  "tags": "Janus"
+ },
+ {
+  "id": "f32",
+  "chapterId": "ch10",
+  "front": "OCR 的核心",
+  "back": "光学压缩：整页图 → 少量视觉 token → 语言模型恢复",
+  "tags": "OCR"
+ },
+ {
+  "id": "f33",
+  "chapterId": "ch10",
+  "front": "Prover-V2 与 Math-V2 分工",
+  "back": "Prover 做 Lean 形式化；Math-V2 做自然语言自验证",
+  "tags": "Prover,Math-V2"
+ },
+ {
+  "id": "f34",
+  "chapterId": "ch11",
+  "front": "首次引入 MLA 的模型",
+  "back": "V2",
+  "tags": "MLA,V2"
+ },
+ {
+  "id": "f35",
+  "chapterId": "ch11",
+  "front": "首次引入 DSA 的模型",
+  "back": "V3.2-Exp",
+  "tags": "DSA,V3.2"
+ },
+ {
+  "id": "f36",
+  "chapterId": "ch11",
+  "front": "许可证三档",
+  "back": "MIT / Apache 2.0 / DeepSeek Model License",
+  "tags": "许可证"
+ },
+ {
+  "id": "f37",
+  "chapterId": "ch13",
+  "front": "dense 参数量粗估公式",
+  "back": "12Ld²（注意力 4d² + FFN 8d²）",
+  "tags": [
+   "手算",
+   "参数"
+  ]
+ },
+ {
+  "id": "f38",
+  "chapterId": "ch13",
+  "front": "V3 的 671B 大致由哪三块组成",
+  "back": "注意力约 12.54B + 路由专家约 653.9B + 共享约 2.55B",
+  "tags": [
+   "V3",
+   "手算"
+  ]
+ },
+ {
+  "id": "f39",
+  "chapterId": "ch13",
+  "front": "V3 每 token 每层 MLA 缓存多少字节",
+  "back": "(512+64)×2 = 1152 B",
+  "tags": [
+   "MLA",
+   "KV"
+  ]
+ },
+ {
+  "id": "f40",
+  "chapterId": "ch13",
+  "front": "V3 的 128K 单序列 KV 约多少",
+  "back": "70,272 B/token × 131,072 ≈ 9.21 GB",
+  "tags": [
+   "KV",
+   "V3"
+  ]
+ },
+ {
+  "id": "f41",
+  "chapterId": "ch13",
+  "front": "V4.1 的 1M 单序列全局 KV 约多少",
+  "back": "890 B × 1M = 890 MB；50 并发约 44.5 GB",
+  "tags": [
+   "V4.1",
+   "KV"
+  ]
+ },
+ {
+  "id": "f42",
+  "chapterId": "ch13",
+  "front": "GRPO 奖励 [1,1,0,0] 的优势",
+  "back": "均值 0.5，标准差 0.5，优势 [1,1,-1,-1]",
+  "tags": [
+   "GRPO",
+   "手算"
+  ]
+ },
+ {
+  "id": "f43",
+  "chapterId": "ch14",
+  "front": "`first_k_dense_replace=3` 意味着什么",
+  "back": "前 3 层是 dense FFN，从第 4 层起才是 MoE",
+  "tags": [
+   "config",
+   "MoE"
+  ]
+ },
+ {
+  "id": "f44",
+  "chapterId": "ch14",
+  "front": "MLA 缓存哪两个张量",
+  "back": "潜向量 c 和 RoPE key k_pe；k_nope/v 计算时还原",
+  "tags": [
+   "MLA",
+   "源码"
+  ]
+ }
+]

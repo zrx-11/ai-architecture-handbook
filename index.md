@@ -12,6 +12,7 @@
 | 机器学习基础：从任务到评估 | 16 | 2 | 47 | 68 | [machine-learning学习伴侣.html](04-machine-learning/machine-learning学习伴侣.html) |
 | 神经网络：从一条直线推到反向传播 | 13 | 12 | 32 | 34 | [neural-networks学习伴侣.html](05-neural-networks/neural-networks学习伴侣.html) |
 | 深度学习入门：从零手写神经网络 | 8 | 2 | 21 | 38 | [deep-learning学习伴侣.html](06-deep-learning/deep-learning学习伴侣.html) |
+| DeepSeek 模型全谱 | 14 | 13 | 42 | 44 | [deepseek-family学习伴侣.html](09-deepseek-family/deepseek-family学习伴侣.html) |
 
 ## 跨书总览
 
