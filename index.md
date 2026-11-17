@@ -1,4 +1,4 @@
-# DeepSeek 架构学习系统
+# AI 架构学习系统：从机器学习到 DeepSeek
 
 **[打开总学习手册（index.html）](index.html)** —— 统一入口，单文件可离线；顶部切换书籍，左侧按学习路径/章节/概念/测验/抽认卡/术语/模式/速查浏览，进度自动保存。
 
@@ -6,15 +6,21 @@
 
 | 书 | 章节 | 概念 | 测验 | 抽认卡 | 学习伴侣 |
 |---|---|---|---|---|---|
-| 基础篇：从零到 Transformer | 5 | 16 | 15 | 20 | [deepseek-foundations学习伴侣.html](01-foundations/deepseek-foundations学习伴侣.html) |
-| 论文拆解：R1 / V4 / V4.1 | 4 | 15 | 12 | 16 | [deepseek-papers学习伴侣.html](02-paper-teardown/deepseek-papers学习伴侣.html) |
-| 架构阐释：三代模型的设计逻辑 | 4 | 5 | 12 | 16 | [deepseek-architecture学习伴侣.html](03-architecture/deepseek-architecture学习伴侣.html) |
+| 基础篇：从零到 Transformer | 6 | 16 | 15 | 20 | [deepseek-foundations学习伴侣.html](01-foundations/deepseek-foundations学习伴侣.html) |
+| 论文拆解：R1 / V4 / V4.1 | 5 | 15 | 12 | 16 | [deepseek-papers学习伴侣.html](02-paper-teardown/deepseek-papers学习伴侣.html) |
+| 架构阐释：三代模型的设计逻辑 | 5 | 5 | 12 | 16 | [deepseek-architecture学习伴侣.html](03-architecture/deepseek-architecture学习伴侣.html) |
+| 机器学习基础：从任务到评估 | 16 | 2 | 47 | 68 | [machine-learning学习伴侣.html](04-machine-learning/machine-learning学习伴侣.html) |
+| 神经网络：从一条直线推到反向传播 | 13 | 12 | 32 | 34 | [neural-networks学习伴侣.html](05-neural-networks/neural-networks学习伴侣.html) |
+| 深度学习入门：从零手写神经网络 | 8 | 2 | 21 | 38 | [deep-learning学习伴侣.html](06-deep-learning/deep-learning学习伴侣.html) |
 
 ## 跨书总览
 
-- [跨书总览：DeepSeek 架构学习路线](00-跨书总览/README.md)
+- [跨书总览：从机器学习到 DeepSeek 架构](00-跨书总览/README.md)
 - [跨书概念映射表](00-跨书总览/跨书概念映射表.md)
 - [综合检验建议](00-跨书总览/综合检验建议.md)
+- [学习节点地图](00-跨书总览/学习节点地图.md)
+- [跨书术语总表](00-跨书总览/术语总表.md)
+- [深潜专题：Transformer 与 SVM](00-跨书总览/深潜专题.md)
 
 ## 使用方法
 

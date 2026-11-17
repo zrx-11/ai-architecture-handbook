@@ -14,6 +14,9 @@ FILES = [
     ROOT / "01-foundations/deepseek-foundations学习伴侣.html",
     ROOT / "02-paper-teardown/deepseek-papers学习伴侣.html",
     ROOT / "03-architecture/deepseek-architecture学习伴侣.html",
+    ROOT / "04-machine-learning/machine-learning学习伴侣.html",
+    ROOT / "05-neural-networks/neural-networks学习伴侣.html",
+    ROOT / "06-deep-learning/deep-learning学习伴侣.html",
     ROOT / "index.html",
 ]
 
@@ -147,6 +150,19 @@ def main() -> int:
             continue
         text = f.read_text(encoding="utf-8")
         new, notes = patch(text)
+        if f.name == "index.html":
+            pairs = [
+                ("<title>学习总手册</title>", "<title>AI 架构学习系统：从机器学习到 DeepSeek</title>"),
+                ('<span class="brand">学习总手册<span>点化学习系统 · 统一入口</span></span>',
+                 '<span class="brand">AI 架构学习系统<span>从机器学习到 DeepSeek · 学习总手册</span></span>'),
+                ("pre = '<h1>学习总手册</h1>'", "pre = '<h1>AI 架构学习系统</h1>'"),
+                ("+ '<p>本学习系统把书点化为一套可跟着走的学习内容。",
+                 "+ '<p>学习总手册：把书点化为一套可跟着走的学习内容。"),
+            ]
+            for a, b in pairs:
+                if a in new:
+                    new = new.replace(a, b)
+                    notes.append(f"brand: {a[:24]}")
         if new != text:
             f.write_text(new, encoding="utf-8")
             print(f"✓ {f.name}: " + ", ".join(notes))

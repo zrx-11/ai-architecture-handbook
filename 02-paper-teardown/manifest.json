@@ -45,6 +45,14 @@
         "ch09"
       ],
       "checkpoint": "能解释 prefill 8B 与 decode 16B 的来源"
+    },
+    {
+      "step": "05",
+      "title": "附录：论文公式逐项拆解",
+      "chapterIds": [
+        "ch10"
+      ],
+      "checkpoint": "能复算 GRPO、CSA、mHC 与 KV 字节"
     }
   ],
   "chapters": [
@@ -73,7 +81,6 @@
       "difficulty": 3,
       "source": "DeepSeek-V4 技术报告（arXiv:2606.19348）§2–§5",
       "prerequisites": [
-        "ch05",
         "ch07"
       ]
     },
@@ -85,6 +92,16 @@
       "source": "DeepSeek-V4.1-Flash 论文（arXiv:2609.19969）§2–§5",
       "prerequisites": [
         "ch08"
+      ]
+    },
+    {
+      "id": "ch10",
+      "title": "附录：论文公式逐项拆解",
+      "file": "chapters/ch10-formulas.md",
+      "difficulty": 3,
+      "source": "本课程整理 · 公式附录",
+      "prerequisites": [
+        "ch09"
       ]
     }
   ],

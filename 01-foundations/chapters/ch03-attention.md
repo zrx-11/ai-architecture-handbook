@@ -139,3 +139,7 @@ A. Query B. Key C. Value D. 掩码
 - Q 找信息、K 提供标签、V 提供内容，输出是 V 的加权和。
 - 注意力分数是 Q 与 K 的点积，softmax 后变成权重。
 - 多头并行捕捉不同关系，因果掩码禁止看未来。
+
+## 想继续深入
+
+标准 Transformer 的位置编码、多头、掩码和训练目标，见 [Transformer 从零推导深潜课](../07-transformer-deep/index.html)。

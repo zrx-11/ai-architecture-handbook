@@ -46,6 +46,14 @@
         "ch13"
       ],
       "checkpoint": "完成一份有数字支撑的选型报告"
+    },
+    {
+      "step": "05",
+      "title": "附录：1M 上下文选型算例",
+      "chapterIds": [
+        "ch14"
+      ],
+      "checkpoint": "能独立算出单序列与并发 KV，并写出选型报告"
     }
   ],
   "chapters": [
@@ -85,6 +93,16 @@
       "source": "本课程整理 · 综合任务",
       "prerequisites": [
         "ch12"
+      ]
+    },
+    {
+      "id": "ch14",
+      "title": "附录：1M 上下文选型算例",
+      "file": "chapters/ch14-selection.md",
+      "difficulty": 2,
+      "source": "本课程整理 · 选型附录",
+      "prerequisites": [
+        "ch13"
       ]
     }
   ],

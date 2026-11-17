@@ -53,6 +53,14 @@
         "ch05"
       ],
       "checkpoint": "能说出 MLA、MoE、MTP 各解决什么问题"
+    },
+    {
+      "step": "06",
+      "title": "附录：形状、公式与手算",
+      "chapterIds": [
+        "ch06"
+      ],
+      "checkpoint": "能手算注意力、梯度与 KV cache 字节"
     }
   ],
   "chapters": [
@@ -104,6 +112,16 @@
       "prerequisites": [
         "ch03",
         "ch04"
+      ]
+    },
+    {
+      "id": "ch06",
+      "title": "附录：形状、公式与手算清单",
+      "file": "chapters/ch06-shapes-formulas.md",
+      "difficulty": 2,
+      "source": "本课程整理 · 手算附录",
+      "prerequisites": [
+        "ch05"
       ]
     }
   ],

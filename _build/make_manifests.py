@@ -24,6 +24,7 @@ BOOKS.append({
    {"step":"03","title":"注意力机制","chapterIds":["ch03"],"checkpoint":"能手算 3 个 token 的注意力权重"},
    {"step":"04","title":"Transformer 一层楼","chapterIds":["ch04"],"checkpoint":"能画出一次前向的 shape 变化"},
    {"step":"05","title":"V3 的三块地基","chapterIds":["ch05"],"checkpoint":"能说出 MLA、MoE、MTP 各解决什么问题"},
+   {"step":"06","title":"附录：形状、公式与手算","chapterIds":["ch06"],"checkpoint":"能手算注意力、梯度与 KV cache 字节"},
  ],
  "chapters": [
    {"id":"ch01","title":"第 1 章：数字怎么变成“意思”：向量、矩阵与 softmax","file":"chapters/ch01-vectors-matrices-softmax.md","difficulty":1,"source":"本课程整理 · 基础数学","prerequisites":[]},
@@ -31,6 +32,7 @@ BOOKS.append({
    {"id":"ch03","title":"第 3 章：注意力机制：一句话里谁该看谁","file":"chapters/ch03-attention.md","difficulty":2,"source":"本课程整理 · 注意力机制","prerequisites":["ch01","ch02"]},
    {"id":"ch04","title":"第 4 章：Transformer 一层一层拆","file":"chapters/ch04-transformer-block.md","difficulty":2,"source":"本课程整理 · Transformer","prerequisites":["ch03"]},
    {"id":"ch05","title":"第 5 章：DeepSeek-V3 的三块地基","file":"chapters/ch05-v3-foundations.md","difficulty":3,"source":"DeepSeek-V3 技术报告（arXiv:2412.19437）§2","prerequisites":["ch03","ch04"]},
+   {"id":"ch06","title":"附录：形状、公式与手算清单","file":"chapters/ch06-shapes-formulas.md","difficulty":2,"source":"本课程整理 · 手算附录","prerequisites":["ch05"]},
  ],
  "concepts": [
    {"id":"c01","title":"向量","file":"concepts/c01-vector.md","chapterIds":["ch01"],"difficulty":"基础","source":"本课程整理 · 基础数学","prerequisites":[]},
@@ -173,12 +175,14 @@ BOOKS.append({
    {"step":"02","title":"R1 下：四阶段与蒸馏","chapterIds":["ch07"],"checkpoint":"能画出 R1 完整训练流程并说出局限"},
    {"step":"03","title":"V4：CSA/HCA、mHC、Muon","chapterIds":["ch08"],"checkpoint":"能说出 1M 上下文省的是哪两项成本"},
    {"step":"04","title":"V4.1：CED、CSA2、Engram、DSpark","chapterIds":["ch09"],"checkpoint":"能解释 prefill 8B 与 decode 16B 的来源"},
+   {"step":"05","title":"附录：论文公式逐项拆解","chapterIds":["ch10"],"checkpoint":"能复算 GRPO、CSA、mHC 与 KV 字节"},
  ],
  "chapters": [
    {"id":"ch06","title":"第 6 章：R1 论文拆解（上）：先学会读论文，再看 R1-Zero","file":"chapters/ch06-r1-part1.md","difficulty":2,"source":"DeepSeek-R1 论文（arXiv:2501.12948）§1–§3","prerequisites":[]},
    {"id":"ch07","title":"第 7 章：R1 论文拆解（下）：四阶段流水线、蒸馏与局限","file":"chapters/ch07-r1-part2.md","difficulty":3,"source":"DeepSeek-R1 论文 §2–§4、§6","prerequisites":["ch06"]},
-   {"id":"ch08","title":"第 8 章：V4 论文拆解：百万上下文的成本怎么砍","file":"chapters/ch08-v4.md","difficulty":3,"source":"DeepSeek-V4 技术报告（arXiv:2606.19348）§2–§5","prerequisites":["ch05","ch07"]},
+   {"id":"ch08","title":"第 8 章：V4 论文拆解：百万上下文的成本怎么砍","file":"chapters/ch08-v4.md","difficulty":3,"source":"DeepSeek-V4 技术报告（arXiv:2606.19348）§2–§5","prerequisites":["ch07"]},
    {"id":"ch09","title":"第 9 章：V4.1 论文拆解：非对称 CED 与 KV cache 极限","file":"chapters/ch09-v41.md","difficulty":3,"source":"DeepSeek-V4.1-Flash 论文（arXiv:2609.19969）§2–§5","prerequisites":["ch08"]},
+   {"id":"ch10","title":"附录：论文公式逐项拆解","file":"chapters/ch10-formulas.md","difficulty":3,"source":"本课程整理 · 公式附录","prerequisites":["ch09"]},
  ],
  "concepts": [
    {"id":"c17","title":"GRPO（组相对策略优化）","file":"concepts/c17-grpo.md","chapterIds":["ch06"],"difficulty":"高难","source":"DeepSeek-R1 论文 §2.2","prerequisites":[],"depthFragment":"concepts/c17-grpo-depth.md"},
@@ -322,12 +326,14 @@ BOOKS.append({
    {"step":"02","title":"效率组件的设计逻辑","chapterIds":["ch11"],"checkpoint":"能解释 MoE、mHC、Muon、Engram 各自的分工"},
    {"step":"03","title":"训练与后训练","chapterIds":["ch12"],"checkpoint":"能对比 R1 的 RL 与 V4/V4.1 的 OPD"},
    {"step":"04","title":"综合检验：架构评审","chapterIds":["ch13"],"checkpoint":"完成一份有数字支撑的选型报告"},
+   {"step":"05","title":"附录：1M 上下文选型算例","chapterIds":["ch14"],"checkpoint":"能独立算出单序列与并发 KV，并写出选型报告"},
  ],
  "chapters": [
    {"id":"ch10","title":"第 10 章：三代架构总览：瓶颈迁移与注意力演进","file":"chapters/ch10-overview.md","difficulty":3,"source":"DeepSeek-V3/V4/V4.1 技术报告","prerequisites":[]},
    {"id":"ch11","title":"第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark","file":"chapters/ch11-components.md","difficulty":3,"source":"DeepSeek-V4/V4.1 技术报告","prerequisites":["ch10"]},
    {"id":"ch12","title":"第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程","file":"chapters/ch12-training.md","difficulty":3,"source":"DeepSeek-R1/V4/V4.1 技术报告","prerequisites":["ch11"]},
    {"id":"ch13","title":"第 13 章：综合检验：写一份架构评审报告","file":"chapters/ch13-review.md","difficulty":3,"source":"本课程整理 · 综合任务","prerequisites":["ch12"]},
+   {"id":"ch14","title":"附录：1M 上下文选型算例","file":"chapters/ch14-selection.md","difficulty":2,"source":"本课程整理 · 选型附录","prerequisites":["ch13"]},
  ],
  "concepts": [
    {"id":"c32","title":"推理 FLOPs","file":"concepts/c32-inference-flops.md","chapterIds":["ch10","ch13"],"difficulty":"高难","source":"DeepSeek-V4/V4.1 技术报告","prerequisites":[]},
