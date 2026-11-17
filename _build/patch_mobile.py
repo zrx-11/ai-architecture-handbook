@@ -33,14 +33,17 @@ js = """function wrapWideTables(){
   document.querySelectorAll('#view table').forEach(t=>{
     if(t.closest('.table-scroll')) return;
     const cols=t.rows.length?t.rows[0].cells.length:0;
-    if(cols>=5){
+    const wide=cols>=5;
+    const parent=t.parentElement;
+    if(wide || (parent && t.scrollWidth>parent.clientWidth+2)){
       const hint=document.createElement('p');
       hint.className='scroll-hint';
       hint.textContent='表格较宽，可左右滑动 →';
-      t.parentNode.insertBefore(hint,t);
+      parent.insertBefore(hint,t);
       const w=document.createElement('div');
       w.className='table-scroll';
-      t.parentNode.insertBefore(w,t);
+      w.dataset.wide=wide?'1':'0';
+      parent.insertBefore(w,t);
       w.appendChild(t);
     }
   });
