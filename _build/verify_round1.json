@@ -15,9 +15,9 @@
   "extra": ""
  },
  {
-  "check": "资料库 9 项",
+  "check": "资料库 27 项",
   "pass": true,
-  "extra": "9"
+  "extra": "27"
  },
  {
   "check": "deepseek-foundations 章节数",
@@ -27,7 +27,7 @@
  {
   "check": "deepseek-foundations 首章",
   "pass": true,
-  "extra": "3594 字"
+  "extra": "3497 字"
  },
  {
   "check": "deepseek-foundations 末章",
@@ -77,12 +77,12 @@
  {
   "check": "deepseek-architecture 首章",
   "pass": true,
-  "extra": "3737 字"
+  "extra": "3752 字"
  },
  {
   "check": "deepseek-architecture 末章",
   "pass": true,
-  "extra": "2490 字"
+  "extra": "2505 字"
  },
  {
   "check": "deepseek-architecture 测验",
@@ -132,7 +132,7 @@
  {
   "check": "neural-networks 末章",
   "pass": true,
-  "extra": "3933 字"
+  "extra": "3948 字"
  },
  {
   "check": "neural-networks 测验",
@@ -177,7 +177,7 @@
  {
   "check": "deepseek-family 首章",
   "pass": true,
-  "extra": "4696 字"
+  "extra": "4711 字"
  },
  {
   "check": "deepseek-family 末章",
@@ -187,7 +187,7 @@
  {
   "check": "deepseek-family 测验",
   "pass": true,
-  "extra": "42 题"
+  "extra": "84 题"
  },
  {
   "check": "deepseek-family 作答反馈",
@@ -197,7 +197,7 @@
  {
   "check": "09 chapter/ch01",
   "pass": true,
-  "extra": "4696 字"
+  "extra": "4711 字"
  },
  {
   "check": "09 chapter/ch04",
@@ -212,12 +212,12 @@
  {
   "check": "09 chapter/ch11",
   "pass": true,
-  "extra": "3790 字"
+  "extra": "3805 字"
  },
  {
   "check": "09 chapter/ch13",
   "pass": true,
-  "extra": "6637 字"
+  "extra": "6652 字"
  },
  {
   "check": "09 chapter/ch14",

@@ -1,0 +1,166 @@
+<section id="intro" data-title="课程概览">
+<h2><span class="num">00</span>课程概览：把模型真正跑起来</h2>
+<p>训练完的模型只是权重文件。线上服务要处理请求排队、KV cache、批处理、并行、量化、限流和监控。这门课讲清楚一次请求从进来到吐字，钱花在哪。</p>
+<h3>学完你能做到</h3>
+<ul>
+<li>画出一条请求的 prefill/decode 生命周期。</li>
+<li>解释 PagedAttention 为什么能省显存碎片。</li>
+<li>说清 continuous batching 和静态 batch 的区别。</li>
+<li>给定显存、模型大小、上下文长度，估算能开多少并发。</li>
+</ul>
+<div class="note">前置：知道 KV cache、注意力、显存、FLOPs。训练账本在 `13-train-infer-deep`，这里偏线上服务。</div>
+<h3>路线</h3>
+<div class="flow">
+<div class="box">请求</div><div class="arrow">→</div><div class="box">prefill</div><div class="arrow">→</div><div class="box">decode</div><div class="arrow">→</div><div class="box">KV 管理</div><div class="arrow">→</div><div class="box">批处理</div><div class="arrow">→</div><div class="box">并行/量化</div>
+</div>
+</section>
+
+<section id="lifecycle" data-title="1. 一次请求的生命周期">
+<h2><span class="num">01</span>一次请求的生命周期</h2>
+<p>用户发来 prompt，服务端做四件事：</p>
+<ol>
+<li>分词，把文本变成 token id。</li>
+<li>prefill：一次前向处理整段 prompt，生成首 token 和 KV cache。</li>
+<li>decode：每次前向生成一个 token，把新 token 的 KV 追加到 cache。</li>
+<li> detokenize，把 token id 变回文本，流式返回。</li>
+</ol>
+<table>
+<tr><th>阶段</th><th>计算特征</th><th>瓶颈</th></tr>
+<tr><td>prefill</td><td>矩阵乘为主，并行度高</td><td>算力</td></tr>
+<tr><td>decode</td><td>每步只生成一个 token，batch 小</td><td>显存带宽</td></tr>
+</table>
+<p>首 token 延迟（TTFT）主要看 prefill；每 token 延迟（TPOT）主要看 decode。两个指标要分开报。</p>
+<div class="warn">“吞吐高”和“延迟低”经常冲突。把 batch 拉大能提高总吞吐，但单条请求要等更久。</div>
+</section>
+
+<section id="kv" data-title="2. KV cache 与 PagedAttention">
+<h2><span class="num">02</span>KV cache 与 PagedAttention</h2>
+<p>自回归生成要缓存历史 token 的 K/V，否则每生成一个 token 都要重算整段历史。KV cache 大小：</p>
+<div class="formula">$$\text{KV bytes}=2\times \text{seq_len}\times n_{\text{layers}}\times n_{\text{kv-heads}}\times d_{\text{head}}\times \text{bytes\_per\_element}$$</div>
+<p>实际实现按模型布局算。以 V3 的 MLA 为例，每 token 每层 576 个数，BF16 下 1152 B；128K、61 层约 9.21 GB。</p>
+<h3>显存碎片</h3>
+<p>如果每个请求预分配最大长度的连续显存，短请求会浪费大量空间。PagedAttention 把 KV cache 切成固定大小的块，按需分配，类似操作系统的分页。</p>
+<p>好处：碎片少、共享前缀可以复用、并发能开更多。代价：块表管理、注意力 kernel 要支持非连续内存。</p>
+<div class="good">PagedAttention 不是“让 KV 变小”，而是“让 KV 的显存利用率变高”。模型本身的缓存公式没变。</div>
+</section>
+
+<section id="batching" data-title="3. continuous batching">
+<h2><span class="num">03</span>continuous batching</h2>
+<p>静态 batch：等一批请求齐了，一起跑到结束。短请求被长请求拖住，GPU 空闲。</p>
+<p>continuous batching：每步都检查，有请求结束就立刻把新请求插进来。GPU 尽量一直有活干。</p>
+<table>
+<tr><th>方式</th><th>优点</th><th>缺点</th></tr>
+<tr><td>静态 batch</td><td>实现简单</td><td>短请求等待，吞吐低</td></tr>
+<tr><td>continuous batching</td><td>吞吐高，尾部延迟低</td><td>调度复杂，显存管理难</td></tr>
+</table>
+<p>vLLM、SGLang、TensorRT-LLM 都支持 continuous batching。它不是模型结构，是服务调度策略。</p>
+<div class="note">线上常见组合：PagedAttention 管显存 + continuous batching 管调度 + 前缀缓存复用 system prompt。</div>
+</section>
+
+<section id="parallel" data-title="4. 张量并行、流水并行与专家并行">
+<h2><span class="num">04</span>张量并行、流水并行与专家并行</h2>
+<p>单卡装不下时，要把模型切开。三种切法：</p>
+<table>
+<tr><th>并行</th><th>切什么</th><th>通信</th><th>适合</th></tr>
+<tr><td>张量并行 TP</td><td>同一层的权重矩阵</td><td>每层都要 all-reduce，通信重</td><td>单机多卡、低延迟</td></tr>
+<tr><td>流水并行 PP</td><td>按层切成多段</td><td>段间传激活，气泡多</td><td>跨机、大模型</td></tr>
+<tr><td>专家并行 EP</td><td>MoE 专家分到不同卡</td><td>路由要 all-to-all</td><td>MoE 模型</td></tr>
+</table>
+<p>数据并行 DP 是每张卡放一份模型、处理不同 batch，适合模型能单卡装下的情况。</p>
+<div class="formula">$$\text{总显存}\approx\text{权重}+\text{KV cache}+\text{激活/临时缓冲}$$</div>
+<p>MoE 的权重显存按总参数算，激活按 top-k 算；EP 把专家分散，但路由通信变重。</p>
+<div class="warn">TP 不是越多越好。跨机 TP 的 all-reduce 延迟会吃掉收益；通常 TP 放机内，PP/EP 放机间。</div>
+</section>
+
+<section id="quant" data-title="5. 量化：FP16、FP8、FP4">
+<h2><span class="num">05</span>量化：FP16、FP8、FP4</h2>
+<p>量化是用更少的位表示权重/激活，省显存、提带宽。代价是精度损失。</p>
+<table>
+<tr><th>精度</th><th>每数位数</th><th>相对 FP16 显存</th><th>典型用途</th></tr>
+<tr><td>FP16/BF16</td><td>16</td><td>1×</td><td>训练/推理基线</td></tr>
+<tr><td>FP8</td><td>8</td><td>0.5×</td><td>训练、推理加速</td></tr>
+<tr><td>FP4</td><td>4</td><td>0.25×</td><td>推理、边缘部署</td></tr>
+</table>
+<p>量化不只是“把数截断”。需要 scale、zero-point、分组、校准数据。FP8 有 E4M3/E5M2 两种格式，动态范围不同。</p>
+<div class="warn">量化后精度掉得最多的是长尾 token、罕见词、数学符号。评测要在目标任务上跑，不能只看 perplexity。</div>
+</section>
+
+<section id="engines" data-title="6. 推理引擎怎么选">
+<h2><span class="num">06</span>推理引擎怎么选</h2>
+<table>
+<tr><th>引擎</th><th>强项</th><th>注意</th></tr>
+<tr><td>vLLM</td><td>PagedAttention、continuous batching、生态广</td><td>新模型支持要看版本</td></tr>
+<tr><td>SGLang</td><td>结构化生成、前缀缓存、调度优化</td><td>算子覆盖要验证</td></tr>
+<tr><td>TensorRT-LLM</td><td>NVIDIA 平台极致性能</td><td>编译链复杂，模型转换成本高</td></tr>
+<tr><td>llama.cpp</td><td>CPU/边缘、量化格式多</td><td>高并发不如 GPU 引擎</td></tr>
+</table>
+<p>选型先看模型支持、硬件、并发量、延迟 SLA，再看 benchmark。不要只看社区 star 数。</p>
+<div class="note">MoE 模型要确认引擎支持专家并行和路由 kernel；长上下文要确认 PagedAttention 和前缀缓存的实现。</div>
+</section>
+
+<section id="sla" data-title="7. 吞吐、延迟与容量规划">
+<h2><span class="num">07</span>吞吐、延迟与容量规划</h2>
+<p>线上容量按三个指标规划：</p>
+<ul>
+<li><strong>QPS</strong>：每秒能处理多少请求。</li>
+<li><strong>TTFT</strong>：首 token 延迟，影响“感觉快不快”。</li>
+<li><strong>TPOT</strong>：每 token 延迟，影响“吐字快不快”。</li>
+</ul>
+<h3>粗略估算并发</h3>
+<p>可用显存 = 总显存 - 权重 - 临时缓冲。每请求 KV = 每 token KV × 平均上下文长度。并发上限约：</p>
+<div class="formula">$$N_{\max}\approx\frac{\text{可用显存}}{\text{每请求 KV}}$$</div>
+<p>实际还要留碎片、峰值、调度余量，通常只用到 70%–80%。</p>
+<div class="warn">按最大上下文给每个请求预留显存，会把并发压得很低。PagedAttention + 按需分配就是为解决这个。</div>
+</section>
+
+<section id="mistakes" data-title="8. 常见误解与自测">
+<h2><span class="num">08</span>常见误解与自测</h2>
+<h3>四个误解</h3>
+<ul>
+<li><strong>“batch 越大吞吐越高，所以越大越好”</strong>：延迟会炸，显存也不够。</li>
+<li><strong>“量化一定掉点，不能上线”</strong>：目标任务上校准后，FP8 常能保持效果。</li>
+<li><strong>“PagedAttention 能减少 KV 计算”</strong>：它省的是显存碎片，不减少注意力计算。</li>
+<li><strong>“TP 放在跨机也没关系”</strong>：跨机 all-reduce 延迟很高，通常不划算。</li>
+</ul>
+<h3>自测</h3>
+<div class="quiz" data-answer="1" data-explain="prefill 一次处理整段 prompt，计算密集；decode 逐 token 生成，访存密集。">
+<p class="q">1. 首 token 延迟主要受哪个阶段影响？</p>
+<button class="opt">A. decode</button>
+<button class="opt">B. prefill</button>
+<button class="opt">C. 分词</button>
+<button class="opt">D. 监控</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="2" data-explain="PagedAttention 把 KV cache 分块按需分配，减少显存碎片，提高并发。">
+<p class="q">2. PagedAttention 主要解决什么？</p>
+<button class="opt">A. 减少注意力计算</button>
+<button class="opt">B. 提高模型精度</button>
+<button class="opt">C. 减少 KV cache 显存碎片</button>
+<button class="opt">D. 替代 tokenizer</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="0" data-explain="continuous batching 每一步都调度，请求结束就换新请求进来，减少 GPU 空闲。">
+<p class="q">3. continuous batching 的核心优势？</p>
+<button class="opt">A. 请求结束立刻换新请求，减少空闲</button>
+<button class="opt">B. 让模型变小</button>
+<button class="opt">C. 去掉 KV cache</button>
+<button class="opt">D. 不需要 GPU</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="3" data-explain="MoE 权重按总参数占显存，激活按 top-k 算；专家并行把专家分到不同卡。">
+<p class="q">4. MoE 模型的显存估算，哪个说法对？</p>
+<button class="opt">A. 只按激活参数算权重</button>
+<button class="opt">B. 权重和激活都按总参数</button>
+<button class="opt">C. 不需要 KV cache</button>
+<button class="opt">D. 权重按总参数，激活按 top-k</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="2" data-explain="FP8 每数 8 位，相对 FP16 显存约 0.5 倍，不是 0.25 倍。">
+<p class="q">5. FP8 相对 FP16，权重大约省多少显存？</p>
+<button class="opt">A. 0.25 倍</button>
+<button class="opt">B. 0.75 倍</button>
+<button class="opt">C. 0.5 倍</button>
+<button class="opt">D. 不变</button>
+<div class="fb"></div>
+</div>
+</section>

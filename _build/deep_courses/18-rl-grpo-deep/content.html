@@ -1,0 +1,178 @@
+<section id="intro" data-title="课程概览">
+<h2><span class="num">00</span>课程概览：R1 的 RL 到底在优化什么</h2>
+<p>这门课把强化学习的最小必要知识串起来：状态、动作、奖励、策略梯度、PPO，然后落到 DeepSeek-R1 用的 GRPO。重点不是背算法名，而是看懂“没有价值网络时，优势怎么估”。</p>
+<h3>学完你能做到</h3>
+<ul>
+<li>把一个大模型生成 token 的过程写成 MDP。</li>
+<li>解释策略梯度为什么用 log 概率乘以回报。</li>
+<li>说清 PPO 的 clip 在限制什么。</li>
+<li>手算一组奖励的 GRPO 优势，并解释 KL 项的作用。</li>
+</ul>
+<div class="note">前置：知道概率、期望、softmax、交叉熵。没学过动态规划也能读，价值函数第一次出现会解释。</div>
+<h3>路线</h3>
+<div class="flow">
+<div class="box">MDP</div><div class="arrow">→</div><div class="box">策略梯度</div><div class="arrow">→</div><div class="box">PPO</div><div class="arrow">→</div><div class="box">奖励模型</div><div class="arrow">→</div><div class="box">GRPO</div><div class="arrow">→</div><div class="box">R1</div>
+</div>
+</section>
+
+<section id="mdp" data-title="1. MDP：状态、动作、奖励">
+<h2><span class="num">01</span>MDP：状态、动作、奖励</h2>
+<p>强化学习的基本设定是马尔可夫决策过程，四件事：状态 $s$、动作 $a$、转移 $P(s'\mid s,a)$、奖励 $r$。</p>
+<p>智能体在状态 $s_t$ 选动作 $a_t$，环境给奖励 $r_t$，转到下一个状态 $s_{t+1}$。目标是让长期累计奖励最大。</p>
+<div class="formula">$$G_t=r_t+\gamma r_{t+1}+\gamma^2r_{t+2}+\cdots$$</div>
+<p>$\gamma\in[0,1]$ 是折扣因子。越远期的奖励权重越小。</p>
+<h3>语言模型怎么套进去</h3>
+<p>把“生成一个 token”看成一步：</p>
+<table>
+<tr><th>RL 概念</th><th>语言模型里</th></tr>
+<tr><td>状态 $s_t$</td><td>已经生成的 prompt + 前面的 token</td></tr>
+<tr><td>动作 $a_t$</td><td>从词表里选下一个 token</td></tr>
+<tr><td>策略 $\pi_\theta(a\mid s)$</td><td>模型输出的下一个 token 概率</td></tr>
+<tr><td>奖励 $r$</td><td>整条回答结束后，由奖励模型或规则给分</td></tr>
+</table>
+<p>注意：语言模型通常只在整条回答结束时拿一个奖励，中间 token 没有即时奖励。</p>
+</section>
+
+<section id="policy" data-title="2. 策略、价值与优势">
+<h2><span class="num">02</span>策略、价值与优势</h2>
+<p>策略 $\pi(a\mid s)$ 是在状态 $s$ 选动作 $a$ 的概率。价值函数衡量“从某个状态出发，按当前策略能拿多少回报”：</p>
+<div class="formula">$$V^\pi(s)=E_{\pi}[G_t\mid s_t=s]$$</div>
+<p>动作价值 $Q^\pi(s,a)$ 是“先选动作 a，再按策略走”的期望回报。</p>
+<h3>优势</h3>
+<p>优势 $A(s,a)=Q(s,a)-V(s)$：这个动作比“平均动作”好多少。</p>
+<p>策略梯度的直觉：优势为正，提高该动作概率；优势为负，降低该动作概率。</p>
+<div class="formula">$$\nabla_\theta J(\theta)=E[\nabla_\theta\log\pi_\theta(a\mid s)A(s,a)]$$</div>
+<div class="note">$A$ 只影响方向和权重，$\nabla\log\pi$ 负责告诉参数“怎么改才能提高这个动作的概率”。</div>
+</section>
+
+<section id="pg" data-title="3. 策略梯度与 REINFORCE">
+<h2><span class="num">03</span>策略梯度与 REINFORCE</h2>
+<p>最朴素的策略梯度算法叫 REINFORCE：采样一整条轨迹，用回报 $G_t$ 当优势，更新策略。</p>
+<pre><code>for each episode:
+    sample trajectory (s0,a0,r0,...,sT)
+    for each step t:
+        G_t = sum of discounted rewards from t
+        loss += -log_prob(a_t|s_t) * G_t
+    update parameters</code></pre>
+<p>负号是因为框架默认最小化损失；我们要最大化 $\log\pi\cdot G$。</p>
+<h3>方差问题</h3>
+<p>一条轨迹的回报噪声很大。同一个状态，采样不同，$G_t$ 可能差很多。减一个基线 $b(s)$ 不改变期望，但能降低方差：</p>
+<div class="formula">$$\nabla J=E[\nabla\log\pi(a\mid s)(G_t-b(s))]$$</div>
+<p>常用基线就是价值函数 $V(s)$。减去它，得到的就是优势。</p>
+<div class="warn">策略梯度是“采样估计”，不是精确求导。batch 太小、奖励噪声太大，训练会抖。</div>
+</section>
+
+<section id="ppo" data-title="4. PPO：别一步改太狠">
+<h2><span class="num">04</span>PPO：别一步改太狠</h2>
+<p>策略梯度更新一次，策略变了，旧数据就不再来自当前策略。PPO 用重要性采样，让旧数据能多用几次，同时限制更新幅度。</p>
+<div class="formula">$$r_t(\theta)=\frac{\pi_\theta(a_t\mid s_t)}{\pi_{\theta_{\text{old}}}(a_t\mid s_t)}$$</div>
+<div class="formula">$$L^{\text{CLIP}}=\min\left(r_tA_t,\ \mathrm{clip}(r_t,1-\epsilon,1+\epsilon)A_t\right)$$</div>
+<p>$r_t$ 是新旧策略的概率比。 clip 把比值限制在 $[1-\epsilon,1+\epsilon]$，防止一次更新把某个动作概率拉得太高或压得太低。</p>
+<h3>直观理解</h3>
+<p>如果优势为正，PPO 想提高这个动作概率，但最多提高到旧概率的 $1+\epsilon$ 倍；优势为负，最多降到 $1-\epsilon$ 倍。一步只走一点。</p>
+<div class="note">PPO 通常还要加价值损失和熵奖励。价值网络帮助估优势；熵奖励鼓励探索，防止策略过早变确定。</div>
+</section>
+
+<section id="reward" data-title="5. 奖励模型与 RLHF">
+<h2><span class="num">05</span>奖励模型与 RLHF</h2>
+<p>大模型 RL 的奖励通常不是环境给的，而是人偏好训出来的奖励模型。流程：</p>
+<ol>
+<li>让模型对同一个 prompt 生成多条回答。</li>
+<li>人给回答排序：A 比 B 好。</li>
+<li>训练奖励模型 $r_\phi(x,y)$，让好回答得分高。</li>
+<li>用 RL 优化策略，让奖励模型给高分。</li>
+</ol>
+<p>奖励模型的损失常写成 Bradley-Terry：</p>
+<div class="formula">$$L=-\log\sigma(r_\phi(x,y_w)-r_\phi(x,y_l))$$</div>
+<p>$y_w$ 是偏好回答，$y_l$ 是被拒回答。差值越大，越确信。</p>
+<div class="warn">奖励模型会被“钻空子”。策略可能找到得分高但人看着很差的回答，这叫 reward hacking。所以还要加 KL 约束，别让策略离原模型太远。</div>
+</section>
+
+<section id="grpo" data-title="6. GRPO：用组内相对分当优势">
+<h2><span class="num">06</span>GRPO：用组内相对分当优势</h2>
+<p>PPO 需要一个和策略同样大的价值网络，显存翻倍。GRPO 换了个估优势的办法：对同一个问题采样一组回答，用组内奖励的相对位置当优势。</p>
+<p>设一组奖励 $r_1,\dots,r_G$，组均值 $\bar r$，标准差 $\sigma_r$：</p>
+<div class="formula">$$A_i=\frac{r_i-\bar r}{\sigma_r+\epsilon}$$</div>
+<p>奖励高于组平均，优势为正；低于平均，优势为负。不需要价值网络。</p>
+<h3>手算</h3>
+<p>同一道数学题采样 4 条回答，奖励 $[1,0,1,0]$。均值 0.5，标准差 0.5。优势：$[1,-1,1,-1]$。两条正确被推高，两条错误被压低。</p>
+<div class="good">GRPO 的核心不是“组内归一化”这一个技巧，而是整条链路：组采样、规则/模型奖励、相对优势、KL 约束、策略更新。少了任何一环都不成立。</div>
+</section>
+
+<section id="kl" data-title="7. KL、熵与训练稳定性">
+<h2><span class="num">07</span>KL、熵与训练稳定性</h2>
+<p>RL 微调会让模型偏离原来的语言模型。偏离太远，可能语言崩坏、胡说八道。KL 惩罚把新策略拉住在参考模型附近：</p>
+<div class="formula">$$L=L^{\text{RL}}+\beta\,\mathrm{KL}(\pi_\theta\|\pi_{\text{ref}})$$</div>
+<p>$\beta$ 越大，越不敢偏离。KL 不是距离，不满足对称性，但能衡量两个分布的差异。</p>
+<h3>熵</h3>
+<div class="formula">$$H(\pi)=-\sum_a\pi(a)\log\pi(a)$$</div>
+<p>熵高，分布平，探索多；熵低，分布尖，利用多。训练初期常加熵奖励鼓励探索，后期降低。</p>
+<div class="warn">KL 估计有偏，采样太少时噪声大。实际实现常用 k3 估计器，并对 β 做自适应。</div>
+</section>
+
+<section id="r1" data-title="8. R1 的训练映射">
+<h2><span class="num">08</span>R1 的训练映射</h2>
+<p>R1 的技术报告把 RL 放在后训练阶段，核心目标是让模型学会长链推理。把前面的概念对上去：</p>
+<table>
+<tr><th>R1 里的环节</th><th>对应本课概念</th></tr>
+<tr><td>同一个问题采样多条回答</td><td>组采样</td></tr>
+<tr><td>答案对错、格式规则给奖励</td><td>规则奖励</td></tr>
+<tr><td>组内相对分</td><td>GRPO 优势</td></tr>
+<tr><td>限制模型别跑偏</td><td>KL 惩罚</td></tr>
+<tr><td>冷启动、拒绝采样、蒸馏</td><td>数据与策略初始化，不是单一 RL 算法</td></tr>
+</table>
+<p>R1-Zero 直接从基座做 RL，不先做监督微调，能看到推理能力自己长出来，但输出可读性差。R1 加了冷启动数据和多阶段训练，把可读性和稳定性补上。</p>
+<div class="note">“纯 RL 就能变强”是简化说法。R1 的完整流水线仍包含数据构造、SFT、RL、拒绝采样和蒸馏。</div>
+</section>
+
+<section id="mistakes" data-title="9. 常见误解与自测">
+<h2><span class="num">09</span>常见误解与自测</h2>
+<h3>四个误解</h3>
+<ul>
+<li><strong>“RL 就是给奖励，模型自己会学”</strong>：奖励设计、采样、优势估计、KL 约束缺一不可。</li>
+<li><strong>“GRPO 完全不用价值函数，所以比 PPO 简单很多”</strong>：省掉价值网络，但组采样和奖励设计更吃工程。</li>
+<li><strong>“KL 越大越安全”</strong>：太大模型不敢学新东西，奖励信号被压死。</li>
+<li><strong>“R1 是一个全新架构”</strong>：R1 主要换训练目标与数据流程，骨架仍是 DeepSeek 系列模型。</li>
+</ul>
+<h3>自测</h3>
+<div class="quiz" data-answer="1" data-explain="优势 $A=Q-V$，表示动作比平均水平好多少；为正就提高该动作概率。">
+<p class="q">1. 策略梯度里，优势为正说明什么？</p>
+<button class="opt">A. 这个动作概率应该降低</button>
+<button class="opt">B. 这个动作比平均好，应提高概率</button>
+<button class="opt">C. 模型已经收敛</button>
+<button class="opt">D. 奖励一定为负</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="2" data-explain="PPO 的 clip 把新旧策略概率比限制在 $[1-\epsilon,1+\epsilon]$，防止一步更新过猛。">
+<p class="q">2. PPO 的 clip 限制的是什么？</p>
+<button class="opt">A. 奖励大小</button>
+<button class="opt">B. 学习率</button>
+<button class="opt">C. 新旧策略的概率比</button>
+<button class="opt">D. 模型参数量</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="3" data-explain="GRPO 对同一问题采样一组回答，用组内奖励均值/标准差归一化得到优势，不需要价值网络。">
+<p class="q">3. GRPO 用什么估计优势？</p>
+<button class="opt">A. 单独的价值网络</button>
+<button class="opt">B. 人工标注</button>
+<button class="opt">C. 未来奖励折扣</button>
+<button class="opt">D. 组内奖励的相对位置</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="0" data-explain="奖励 [1,0,1,0] 均值 0.5、标准差 0.5，归一化后 [1,-1,1,-1]。">
+<p class="q">4. 奖励 $[1,0,1,0]$ 的 GRPO 优势是？</p>
+<button class="opt">A. $[1,-1,1,-1]$</button>
+<button class="opt">B. $[1,0,1,0]$</button>
+<button class="opt">C. $[0.5,0.5,0.5,0.5]$</button>
+<button class="opt">D. $[-1,1,-1,1]$</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="2" data-explain="KL 惩罚限制新策略偏离参考模型，防止语言崩坏和 reward hacking。">
+<p class="q">5. RL 微调里 KL 项的主要作用？</p>
+<button class="opt">A. 提高学习率</button>
+<button class="opt">B. 增加参数量</button>
+<button class="opt">C. 拉住策略，别离参考模型太远</button>
+<button class="opt">D. 替代奖励模型</button>
+<div class="fb"></div>
+</div>
+</section>

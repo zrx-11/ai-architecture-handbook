@@ -1,0 +1,208 @@
+<section id="intro" data-title="课程概览">
+<h2><span class="num">00</span>课程概览：把 DeepSeek 的结构件串成一条线</h2>
+<p>这门课只讲架构，不重复论文里的实验表格。主线是：dense → DeepSeekMoE → MLA → MTP → DSA → V4 的 CSA/HCA → V4.1 的 CED/CSA2/Engram/DSpark。每一节都回答两个问题：解决什么瓶颈，代价是什么。</p>
+<h3>学完你能做到</h3>
+<ul>
+<li>用参数量、激活参数、KV cache 三个数字描述一代模型。</li>
+<li>说清 MoE 的路由、共享专家、负载均衡各自解决什么问题。</li>
+<li>手算 MLA 每 token 每层缓存多少字节，以及 128K 上下文的总账。</li>
+<li>解释 DSA、CSA、HCA、CED 分别在压缩什么。</li>
+</ul>
+<div class="note">前置：知道注意力、FFN、KV cache、softmax。没读过论文也能跟，但建议先看 `02-paper-teardown` 和 `03-architecture` 的对应章节。</div>
+<h3>路线</h3>
+<div class="flow">
+<div class="box">家族</div><div class="arrow">→</div><div class="box">MoE</div><div class="arrow">→</div><div class="box">MLA</div><div class="arrow">→</div><div class="box">MTP</div><div class="arrow">→</div><div class="box">DSA</div><div class="arrow">→</div><div class="box">CSA/HCA</div><div class="arrow">→</div><div class="box">V4.1</div>
+</div>
+</section>
+
+<section id="family" data-title="1. 家族时间线与三代骨架">
+<h2><span class="num">01</span>家族时间线与三代骨架</h2>
+<p>先把代际和结构件对齐。不要背模型名，先记每一代解决了什么瓶颈。</p>
+<table>
+<tr><th>代际</th><th>总参数 / 激活</th><th>层数</th><th>路由专家</th><th>top-k</th><th>上下文</th><th>核心结构件</th></tr>
+<tr><td>V3</td><td>671B / 37B</td><td>61</td><td>256 + 1 共享</td><td>8</td><td>128K</td><td>MLA、DeepSeekMoE、MTP</td></tr>
+<tr><td>V4-Pro</td><td>约 1.6T / 49B</td><td>61</td><td>384 + 1 共享</td><td>6</td><td>1M</td><td>CSA、HCA、mHC、Muon、FP4</td></tr>
+<tr><td>V4-Flash</td><td>284B / 13B</td><td>43</td><td>256 + 1 共享</td><td>6</td><td>1M</td><td>同上，规模缩小</td></tr>
+<tr><td>V4.1-Flash</td><td>552B 主干 + 196B Engram</td><td>40</td><td>384 + 1 共享</td><td>6</td><td>1M</td><td>CED、CSA2、Engram、DSpark</td></tr>
+</table>
+<p>V3 的关键是“用 MoE 把总参数做大，用 MLA 把 KV cache 压小”。V4 的关键是“在 1M 上下文下，把注意力和缓存再压一层”。V4.1 的关键是“非对称压缩 + 外部记忆”。</p>
+<div class="warn">“总参数”不等于“每个 token 都算”。MoE 只激活 top-k 个专家，激活参数远小于总参数。看到 1.6T 先问激活是多少。</div>
+</section>
+
+<section id="moe" data-title="2. MoE：把 FFN 拆成专家">
+<h2><span class="num">02</span>MoE：把 FFN 拆成专家</h2>
+<p>Transformer 每层有两个大块：注意力 + FFN。FFN 通常占参数的大头。MoE 把一个大 FFN 拆成很多小专家，每个 token 只走其中几个。</p>
+<div class="formula">$$y=\sum_{i\in\text{top-}k}g_iE_i(x)$$</div>
+<p>$E_i$ 是第 i 个专家，$g_i$ 是路由权重。V3 有 256 个路由专家 + 1 个共享专家，top-8。</p>
+<h3>三个设计点</h3>
+<ul>
+<li><strong>细粒度专家</strong>：专家多而小，组合更灵活。</li>
+<li><strong>共享专家</strong>：每个 token 都过一个共享专家，兜住通用知识，减少路由专家之间的重复。</li>
+<li><strong>负载均衡</strong>：如果所有 token 都挤向少数专家，其他专家白占显存。训练时加辅助损失，逼路由分散。</li>
+</ul>
+<h3>参数量账</h3>
+<p>假设每个专家参数量 $P_e$，路由专家 $N$ 个，共享专家 1 个：总 FFN 参数约 $(N+1)P_e$，每 token 激活约 $(k+1)P_e$。V3 的 37B 激活里，大部分不是全部专家。</p>
+<div class="good">MoE 省的是“每 token 的计算”，不是“显存”。总参数仍要装进显存/内存，所以 MoE 模型通常需要多卡或大内存。</div>
+</section>
+
+<section id="mla" data-title="3. MLA：把 KV cache 压小">
+<h2><span class="num">03</span>MLA：把 KV cache 压小</h2>
+<p>标准多头注意力要缓存每个 token 的 K 和 V。层数越多、头越多、上下文越长，缓存越爆。</p>
+<p>V3 的 MLA 不直接缓存完整 K/V，而是缓存一个低秩潜向量，再投影出 K/V。论文口径下，每 token 每层缓存 512 + 64 = 576 个数。</p>
+<div class="formula">$$\text{每 token 每层字节}=576\times2=1152\ \text{B（BF16）}$$</div>
+<p>128K 上下文、61 层、单序列：</p>
+<div class="formula">$$128000\times61\times1152\approx9.21\ \text{GB}$$</div>
+<p>如果不压缩，同样配置下缓存会大得多。MLA 的代价是多了投影矩阵和计算，但省下的是显存和带宽。</p>
+<div class="note">576 这个数不是“所有头加起来 576 维”，而是论文里每 token 每层的缓存元素数。不同实现可能有布局差异，算账时以 config 和代码为准。</div>
+</section>
+
+<section id="mtp" data-title="4. MTP：一次预测多个 token">
+<h2><span class="num">04</span>MTP：一次预测多个 token</h2>
+<p>标准语言模型一次只预测下一个 token。MTP（多 token 预测）让模型在一次前向里预测未来多个 token，训练信号更密，也表示规划能力。</p>
+<p>DeepSeek 的 MTP 不是简单加几个独立输出头，而是让第 $k$ 个预测头看前面已经预测出的 token 表示，形成链式依赖。</p>
+<div class="formula">$$p(x_{t+1},x_{t+2}\mid x_{\le t})=p(x_{t+1}\mid x_{\le t})\cdot p(x_{t+2}\mid x_{\le t},x_{t+1})$$</div>
+<h3>推理时怎么用</h3>
+<p>MTP 头可以拿来做投机解码：先草拟多个 token，再用主模型验证。验证通过就一次接受多个，提升吞吐。不是所有部署都会开，取决于实现和负载。</p>
+<div class="warn">MTP 增加训练计算和显存。它的收益主要在训练信号和推理加速，不是“白送”。</div>
+</section>
+
+<section id="dsa" data-title="5. DSA：稀疏注意力">
+<h2><span class="num">05</span>DSA：稀疏注意力</h2>
+<p>全注意力每个 token 要看前面所有 token。1M 上下文、单序列的注意力配对数约：</p>
+<div class="formula">$$10^6\times10^6=10^{12}$$</div>
+<p>DSA 只选 top-k 个最相关的历史 token 参与注意力。论文口径 top-k=2048：</p>
+<div class="formula">$$10^6\times2048\approx2.048\times10^9$$</div>
+<p>两者相差约 488 倍。这就是“百万上下文能不能跑”的关键。</p>
+<h3>怎么选 top-k</h3>
+<p>需要一个轻量的打分器，快速估计每个历史 token 的相关性，再取前 k 个。打分器不能太重，否则省下的注意力又被它吃掉。</p>
+<div class="note">稀疏注意力不是免费的：选错 token 会丢信息；top-k 太小，长文档问答会漏关键段落。k 是精度和成本的旋钮。</div>
+</section>
+
+<section id="csa" data-title="6. CSA：压缩稀疏注意力">
+<h2><span class="num">06</span>CSA：压缩稀疏注意力</h2>
+<p>V4 的 CSA 在 DSA 的基础上再压一层：先把历史 token 的 KV 压成块级表示，再在块上做稀疏选择。这样打分和注意力的对象都变少。</p>
+<p>直观理解：DSA 是“在 token 级别挑 top-k”，CSA 是“先把 token 分块压缩，再在块级别挑 top-k”。块内信息被池化，块间用稀疏注意力。</p>
+<h3>代价</h3>
+<ul>
+<li>压缩会丢细粒度信息，块太小省不了，块太大丢细节。</li>
+<li>块级选择可能漏掉块内的关键 token。</li>
+<li>实现复杂，训练和推理的 kernel 要配套。</li>
+</ul>
+<div class="good">CSA 的收益在长上下文：把“看所有 token”变成“看少量块”，计算和缓存一起降。短上下文时收益不明显。</div>
+</section>
+
+<section id="hca" data-title="7. HCA：混合压缩注意力">
+<h2><span class="num">07</span>HCA：混合压缩注意力</h2>
+<p>HCA 把不同粒度的注意力混在一起：一部分头/层做局部精细注意力，一部分做块级压缩注意力。局部头保住细节，压缩头管长程。</p>
+<p>这解决的是“全压缩丢细节、全精细太贵”的两难。混合的比例是设计参数，按任务和上下文长度调。</p>
+<table>
+<tr><th>结构</th><th>看什么</th><th>适合</th></tr>
+<tr><td>局部注意力</td><td>近处 token</td><td>语法、局部指代</td></tr>
+<tr><td>压缩/稀疏注意力</td><td>远处块</td><td>长文档、全局主题</td></tr>
+<tr><td>HCA</td><td>两者混合</td><td>既要细节又要长程</td></tr>
+</table>
+<div class="note">“混合”不是把所有机制简单相加。头数、层数、路由和缓存布局都要一起设计，否则省下的算力会被额外分支吃回去。</div>
+</section>
+
+<section id="mhc" data-title="8. mHC 与 Muon">
+<h2><span class="num">08</span>mHC 与 Muon</h2>
+<p>mHC 可以理解为“多头超连接”一类的结构件，目标是让信息在层间走多条路径，改善深层训练的信号传播。具体实现论文有定义，课程里不逐行复刻 kernel。</p>
+<p>Muon 是优化器方向的改动，核心是对动量矩阵做正交化/归一化，让更新方向更稳。它不等于“又一个 Adam 变体”，而是改更新矩阵的几何性质。</p>
+<h3>为什么架构课要讲优化器</h3>
+<p>同一副骨架，换优化器和初始化，训练稳定性和最终效果会差很多。DeepSeek 的技术报告把结构件和训练技巧放在一起讲，是有原因的。</p>
+<div class="warn">mHC 和 Muon 的细节在论文里没有全部展开到 kernel 级。看到二手解读里给出“精确公式”时，先回去核对原文，别把推测当事实。</div>
+</section>
+
+<section id="engram" data-title="9. Engram 与 DSpark">
+<h2><span class="num">09</span>Engram 与 DSpark</h2>
+<p>Engram 是 V4.1 引入的外部记忆/查表结构。它把一部分知识从“参数里算出来”变成“按索引查出来”，主干参数不必把所有事实都背进去。</p>
+<p>V4.1-Flash 的口径是 552B 主干 + 196B Engram，总参数约 763B，但 prefill 激活 8B、decode 激活 16B。注意 prefill 和 decode 的激活不一样，因为两者计算模式不同。</p>
+<p>DSpark 是 V4.1 的推理/稀疏化相关结构件，目标是进一步降低长上下文解码的成本。论文里对它的公开细节有限，课程里只讲它解决的问题，不编造实现。</p>
+<div class="note">Engram 的“查表”不是普通 embedding 查找。它和主干的交互、路由、训练目标都需要设计，不能简单理解成“外挂一个知识库”。</div>
+</section>
+
+<section id="v41" data-title="10. V4.1 的 CED 与 CSA2">
+<h2><span class="num">10</span>V4.1 的 CED 与 CSA2</h2>
+<p>V4.1 的核心叙事是“非对称压缩”：prefill 和 decode 的瓶颈不同，不用同一套压缩策略。</p>
+<ul>
+<li><strong>Prefill</strong>：一次处理整段 prompt，计算密集，重点是吞吐。</li>
+<li><strong>Decode</strong>：一次生成一个 token，访存密集，重点是 KV cache 带宽。</li>
+</ul>
+<p>CED 可以理解为面向 decode 的缓存压缩/驱逐策略：把不重要的 KV 压掉或赶出快速缓存，保住关键 token。CSA2 是 CSA 的迭代版，进一步优化块级选择。</p>
+<p>V4.1-Flash 的全局 KV 账约 890 B/token，相比 V3 的 1152 B/token 又降了一截。1M 上下文下单序列缓存仍然是 GB 级，不是“压到零”。</p>
+<div class="formula">$$10^6\times890\approx0.89\ \text{GB（单序列，未计层数细节的口径换算）}$$</div>
+<p>具体总账要乘层数、头数等布局参数，课程里给的是量级，不是部署报价。</p>
+</section>
+
+<section id="selection" data-title="11. 选型与成本">
+<h2><span class="num">11</span>选型与成本</h2>
+<p>选型不要只看参数量。按顺序问五个问题：</p>
+<ol>
+<li>任务需不需要 1M 上下文？不需要就别为长上下文付缓存钱。</li>
+<li>延迟敏感还是吞吐敏感？decode 重访存，prefill 重算力。</li>
+<li>显存能装下总参数吗？MoE 总参数大，激活小，但权重仍要装。</li>
+<li>能不能用量化？FP8/FP4 省显存，但精度和 kernel 支持要验证。</li>
+<li>许可证和数据合规能不能接受？</li>
+</ol>
+<table>
+<tr><th>场景</th><th>倾向</th><th>理由</th></tr>
+<tr><td>长文档问答、代码库级上下文</td><td>V4/V4.1 长上下文档</td><td>DSA/CSA/CED 省 KV</td></tr>
+<tr><td>高并发短对话</td><td>V4-Flash / V3 类小激活</td><td>激活小，decode 便宜</td></tr>
+<tr><td>离线批量生成</td><td>大模型 + 高吞吐并行</td><td>prefill 吞吐优先</td></tr>
+<tr><td>单卡/边缘</td><td>dense 小模型或蒸馏版</td><td>MoE 权重装不下</td></tr>
+</table>
+<div class="good">架构选型的本质是“把瓶颈放在便宜的资源上”。长上下文把瓶颈推给 KV cache，MoE 把瓶颈推给显存和路由，CSA 把瓶颈推给压缩质量。</div>
+</section>
+
+<section id="mistakes" data-title="12. 常见误解与自测">
+<h2><span class="num">12</span>常见误解与自测</h2>
+<h3>五个误解</h3>
+<ul>
+<li><strong>“MoE 总参数大，所以推理一定慢”</strong>：每 token 只激活 top-k，算力不一定大；但权重显存大。</li>
+<li><strong>“MLA 把 KV cache 压没了”</strong>：只是压到 576 个数/ token/层，仍有 GB 级开销。</li>
+<li><strong>“DSA 的 top-k 越大越好”</strong>：越大越准，也越贵；k 是精度—成本旋钮。</li>
+<li><strong>“V4.1 只是 V4 加参数”</strong>：它改的是压缩策略和记忆结构，不是单纯放大。</li>
+<li><strong>“论文没写 = 不存在”</strong>：论文没展开的实现细节，不能靠二手解读补成事实。</li>
+</ul>
+<h3>自测</h3>
+<div class="quiz" data-answer="1" data-explain="V3 是 671B 总参数、37B 激活，61 层，256 路由 + 1 共享，top-8。">
+<p class="q">1. V3 的激活参数是多少？</p>
+<button class="opt">A. 671B</button>
+<button class="opt">B. 37B</button>
+<button class="opt">C. 13B</button>
+<button class="opt">D. 49B</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="2" data-explain="576 个数，BF16 每数 2 字节，得到 1152 B/token/层。">
+<p class="q">2. MLA 每 token 每层缓存 576 个数，BF16 下多少字节？</p>
+<button class="opt">A. 576 B</button>
+<button class="opt">B. 288 B</button>
+<button class="opt">C. 1152 B</button>
+<button class="opt">D. 2304 B</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="3" data-explain="1M 全注意力约 $10^{12}$ 对，DSA top-k=2048 约 $2.048\times10^9$，差约 488 倍。">
+<p class="q">3. 1M 上下文，DSA top-k=2048，配对数约降多少倍？</p>
+<button class="opt">A. 8 倍</button>
+<button class="opt">B. 64 倍</button>
+<button class="opt">C. 2048 倍</button>
+<button class="opt">D. 约 488 倍</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="0" data-explain="CSA 先把 KV 压成块，再在块级做稀疏选择，计算和缓存一起降。">
+<p class="q">4. CSA 相比 DSA 多做了什么？</p>
+<button class="opt">A. 块级压缩后再稀疏选择</button>
+<button class="opt">B. 完全去掉注意力</button>
+<button class="opt">C. 增加全连接层</button>
+<button class="opt">D. 只做局部注意力</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="1" data-explain="MoE 省每 token 计算，不省权重显存；总参数仍要装下。">
+<p class="q">5. MoE 主要省什么？</p>
+<button class="opt">A. 权重显存</button>
+<button class="opt">B. 每 token 激活计算</button>
+<button class="opt">C. 训练数据</button>
+<button class="opt">D. 上下文长度</button>
+<div class="fb"></div>
+</div>
+</section>

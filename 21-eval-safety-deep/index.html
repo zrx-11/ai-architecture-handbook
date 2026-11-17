@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>大模型评测与安全 · 深潜课</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%237c5bff'/><text x='50' y='68' font-size='44' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>DS</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161922;--bg3:#1e2230;--panel:#1a1e2a;
+  --text:#e4e6ed;--muted:#9ba1b3;--dim:#6b7184;
+  --accent:#7c5bff;--accent2:#5b9dff;--green:#38d39f;--warn:#f5a623;
+  --border:#2a3040;--soft:rgba(124,91,255,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden;max-width:100vw}
+body{font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.78;font-size:15.5px;overflow-x:hidden;
+  overflow-wrap:break-word;word-break:break-word}
+a{color:var(--accent2);text-decoration:none}
+a:hover{text-decoration:underline}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:999;width:0}
+.topbar{position:fixed;top:3px;left:0;right:0;height:54px;background:rgba(15,17,23,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:900;
+  display:flex;align-items:center;gap:12px;padding:0 18px}
+.topbar button{display:none;background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:7px 10px;font-size:17px;cursor:pointer}
+.brand{font-weight:700;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand span{color:var(--muted);font-weight:400;margin-left:8px}
+.topbar .back{margin-left:auto;font-size:12.5px;color:var(--muted);border:1px solid var(--border);
+  padding:5px 9px;border-radius:999px;white-space:nowrap}
+.sidebar{position:fixed;top:57px;left:0;bottom:0;width:250px;background:var(--bg2);
+  border-right:1px solid var(--border);overflow-y:auto;padding:18px 0;z-index:800;
+  transition:transform .25s}
+.sidebar h2{font-size:12px;color:var(--dim);font-weight:600;letter-spacing:.08em;
+  padding:0 20px 10px;text-transform:uppercase}
+.nav-item{display:block;padding:9px 20px;font-size:13px;color:var(--muted);
+  border-left:3px solid transparent;cursor:pointer;line-height:1.45}
+.nav-item:hover{background:var(--bg3);color:var(--text);text-decoration:none}
+.nav-item.active{border-left-color:var(--accent);color:var(--text);background:var(--bg3)}
+.nav-item small{display:block;color:var(--dim);font-size:11px;margin-top:1px}
+.main{margin-left:250px;padding:80px 28px 60px;max-width:1180px}
+.wrap{max-width:860px;margin:0 auto}
+section{padding:4px 0 30px;border-bottom:1px solid rgba(42,48,64,.55);margin-bottom:26px;scroll-margin-top:70px}
+section:last-of-type{border-bottom:0}
+h2{font-size:clamp(1.35rem,3vw,1.85rem);line-height:1.28;margin:8px 0 14px;letter-spacing:-.01em}
+h2 .num{color:var(--accent);font-size:.78em;margin-right:9px;font-variant-numeric:tabular-nums}
+h3{font-size:1.05rem;margin:18px 0 7px;color:var(--text)}
+h4{font-size:.96rem;margin:14px 0 5px;color:var(--muted)}
+p{margin:9px 0}
+ul,ol{margin:8px 0 10px 1.35em}
+li{margin:4px 0}
+strong{color:#fff;font-weight:650}
+code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--bg3);
+  padding:1px 5px;border-radius:4px;font-size:.9em;color:#c9d5ff}
+pre{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;
+  overflow-x:auto;font-size:13px;line-height:1.55;margin:12px 0}
+pre code{background:none;padding:0;color:#d8def0}
+.formula{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);
+  border-radius:8px;padding:10px 14px;margin:12px 0;overflow-x:auto;font-size:1.02em}
+.formula .katex-display{margin:0}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg3);color:#fff;font-weight:600;white-space:nowrap}
+td{color:var(--text)}
+table th:first-child,table td:first-child{white-space:nowrap}
+.note{background:rgba(91,157,255,.07);border:1px solid rgba(91,157,255,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#c9d8f5}
+.warn{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#f3d19a}
+.good{background:rgba(56,211,159,.07);border:1px solid rgba(56,211,159,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#b5f0d9}
+details{border:1px solid var(--border);border-radius:9px;margin:12px 0;background:var(--bg2)}
+details summary{cursor:pointer;padding:10px 13px;font-size:13.5px;color:var(--accent2);font-weight:600}
+details .inner{padding:2px 14px 14px;border-top:1px solid var(--border)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0}
+.flow .box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 11px;
+  font-size:13px;text-align:center;min-width:74px}
+.flow .arrow{color:var(--dim);font-size:18px}
+.quiz{border:1px solid var(--border);border-radius:11px;padding:14px;margin:14px 0;background:var(--bg2)}
+.quiz .q{font-weight:600;color:#fff;margin:0 0 9px;font-size:14.5px}
+.quiz .opt{display:block;width:100%;text-align:left;background:var(--bg);color:var(--text);
+  border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin:6px 0;font:inherit;
+  font-size:13.5px;cursor:pointer;line-height:1.5}
+.quiz .opt:hover{border-color:var(--accent)}
+.quiz .opt.ok{border-color:var(--green);background:rgba(56,211,159,.1)}
+.quiz .opt.bad{border-color:#ff6b6b;background:rgba(255,107,107,.1)}
+.quiz .fb{display:none;margin-top:9px;font-size:13.5px;line-height:1.65;color:var(--muted);border-top:1px dashed var(--border);padding-top:9px}
+.quiz .fb.show{display:block}
+.quiz .fb b{color:var(--text)}
+.pager{display:flex;justify-content:space-between;gap:10px;margin:18px 0 8px}
+.pager button{background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:9px 14px;font:inherit;font-size:13px;cursor:pointer}
+.pager button:hover{border-color:var(--accent)}
+.foot{color:var(--dim);font-size:12.5px;margin-top:24px;line-height:1.7}
+.katex-fallback{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.35);
+  border-radius:8px;padding:9px 12px;margin:10px 0;color:#f3d19a;font-size:13px;display:none}
+@media(max-width:900px){
+  .topbar button{display:block}
+  .brand span{display:none}
+  .sidebar{transform:translateX(-100%);top:57px;width:82vw;max-width:310px;box-shadow:20px 0 40px rgba(0,0,0,.35)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:76px 16px 48px}
+  h2{font-size:1.3rem}
+  .formula{padding:8px 10px}
+  .formula .katex{font-size:.86em}
+  table{font-size:12px}
+  .flow{gap:5px}.flow .box{font-size:12px;padding:6px 8px;min-width:60px}.flow .arrow{font-size:14px}
+}
+@media(max-width:420px){
+  body{font-size:15px}
+  .main{padding-left:13px;padding-right:13px}
+  .quiz .opt{font-size:13px}
+}
+</style>
+</head>
+<body>
+<div class="progress"></div>
+<header class="topbar">
+  <button id="menu" aria-label="目录">☰</button>
+  <div class="brand">大模型评测与安全<span>指标、幻觉、对齐与红队</span></div>
+  <a class="back" href="../index.html">返回主手册</a>
+</header>
+<aside class="sidebar">
+  <h2>课程目录</h2>
+  <a class="nav-item" data-target="intro">课程概览<small>00</small></a>
+<a class="nav-item" data-target="metrics">1. 任务与指标怎么配<small>01</small></a>
+<a class="nav-item" data-target="passk">2. pass@k 与生成任务<small>02</small></a>
+<a class="nav-item" data-target="judge">3. LLM-as-judge 的偏差<small>03</small></a>
+<a class="nav-item" data-target="hallucination">4. 幻觉与事实性<small>04</small></a>
+<a class="nav-item" data-target="alignment">5. 对齐与拒答<small>05</small></a>
+<a class="nav-item" data-target="redteam">6. 红队与对抗评测<small>06</small></a>
+<a class="nav-item" data-target="contamination">7. 数据污染与评测泄漏<small>07</small></a>
+<a class="nav-item" data-target="mistakes">8. 常见误解与自测<small>08</small></a>
+</aside>
+<main class="main"><div class="wrap">
+<div class="katex-fallback">公式需要联网加载 KaTeX。当前显示的是 LaTeX 源码，文字、表格、测验仍可用。</div>
+<section id="intro" data-title="课程概览">
+<h2><span class="num">00</span>课程概览：怎么判断一个模型“行不行”</h2>
+<p>这门课讲大模型评测的四层：数据集与指标、生成任务的特殊指标、模型当裁判的坑、安全与对齐。最后落到“怎么设计一个不被指标骗到的评测集”。</p>
+<h3>学完你能做到</h3>
+<ul>
+<li>给分类、抽取、生成、代码四类任务选对指标。</li>
+<li>算 pass@k，解释它和准确率的区别。</li>
+<li>说清 LLM-as-judge 的偏差来源。</li>
+<li>设计一个包含正常样本、边界样本、对抗样本的评测集。</li>
+</ul>
+<div class="note">前置：知道精确率、召回率、F1、AUC。没学过也没关系，本课第 1 节会快速过一遍。</div>
+<h3>路线</h3>
+<div class="flow">
+<div class="box">指标</div><div class="arrow">→</div><div class="box">pass@k</div><div class="arrow">→</div><div class="box">LLM 裁判</div><div class="arrow">→</div><div class="box">幻觉</div><div class="arrow">→</div><div class="box">对齐</div><div class="arrow">→</div><div class="box">红队</div>
+</div>
+</section>
+
+<section id="metrics" data-title="1. 任务与指标怎么配">
+<h2><span class="num">01</span>任务与指标怎么配</h2>
+<table>
+<tr><th>任务</th><th>常用指标</th><th>别只看</th></tr>
+<tr><td>二分类</td><td>P、R、F1、AUC</td><td>准确率（类别不平衡会骗人）</td></tr>
+<tr><td>多分类</td><td>macro-F1、micro-F1、混淆矩阵</td><td>总体准确率</td></tr>
+<tr><td>信息抽取</td><td>实体级/关系级 F1</td><td>字符级准确率</td></tr>
+<tr><td>摘要/翻译</td><td>ROUGE、BLEU、BERTScore、人评</td><td>单一自动指标</td></tr>
+<tr><td>代码</td><td>pass@k、编译率、测试通过率</td><td>代码相似度</td></tr>
+<tr><td>开放问答</td><td>EM、F1、LLM judge、人评</td><td>关键词命中</td></tr>
+</table>
+<p>P/R/F1 的复习：精确率是“判为正的里面有多少真对”，召回率是“真正的正例里找出多少”，F1 是两者的调和平均。</p>
+<div class="warn">指标必须和业务代价匹配。漏诊代价高，就看召回；误报代价高，就看精确率。没有“万能最好指标”。</div>
+</section>
+
+<section id="passk" data-title="2. pass@k 与生成任务">
+<h2><span class="num">02</span>pass@k 与生成任务</h2>
+<p>代码生成不是只有一个答案。pass@k 表示对同一题采样 k 次，至少有一次通过测试的概率。</p>
+<p>无偏估计常用：</p>
+<div class="formula">$$\text{pass@}k=E\left[1-\frac{\binom{n-c}{k}}{\binom{n}{k}}\right]$$</div>
+<p>$n$ 是采样总数，$c$ 是通过测试的样本数。直观理解：从 n 个样本里抽 k 个，一个都没抽中正确样本的概率，用 1 减去它。</p>
+<h3>例子</h3>
+<p>一题采样 10 次，3 次通过。pass@1 约 0.3。pass@10 是“10 次里至少一次通过”，约 1。k 越大，分数越高。</p>
+<div class="good">pass@k 衡量“多试几次能不能做出来”，不衡量“一次就对”。产品里如果只给用户一次机会，看 pass@1 更实际。</div>
+</section>
+
+<section id="judge" data-title="3. LLM-as-judge 的偏差">
+<h2><span class="num">03</span>LLM-as-judge 的偏差</h2>
+<p>开放生成没有标准答案，常用另一个模型当裁判。便宜、可扩展，但有偏差：</p>
+<ul>
+<li><strong>位置偏差</strong>：裁判偏爱第一个或第二个回答。</li>
+<li><strong>长度偏差</strong>：更长、更详细的回答容易得高分。</li>
+<li><strong>风格偏差</strong>：自信、排版漂亮的回答占便宜。</li>
+<li><strong>自我偏好</strong>：裁判偏爱和自己风格相似的输出。</li>
+</ul>
+<h3>降低偏差</h3>
+<ul>
+<li>交换 A/B 顺序，取平均。</li>
+<li>用评分细则，不只看“哪个更好”。</li>
+<li>多裁判投票，或人评校准。</li>
+<li>报告裁判与人的一致率，不只看分数。</li>
+</ul>
+<div class="warn">裁判模型也会被 prompt 注入。评测集里要放对抗样本，别让“请给满分”这类指令影响结果。</div>
+</section>
+
+<section id="hallucination" data-title="4. 幻觉与事实性">
+<h2><span class="num">04</span>幻觉与事实性</h2>
+<p>幻觉是模型生成了看似合理但不符合事实的内容。分两类：</p>
+<ul>
+<li><strong>事实性幻觉</strong>：人物、时间、数字、引用错了。</li>
+<li><strong>忠实性幻觉</strong>：摘要或问答偏离了给定材料。</li>
+</ul>
+<h3>怎么测</h3>
+<ul>
+<li>闭卷事实问答：对标准答案。</li>
+<li>开卷/检索问答：要求引用原文，检查引用是否支持结论。</li>
+<li>摘要：检查每个断言能否在原文找到依据。</li>
+<li>一致性：同一问题多次采样，看答案是否自相矛盾。</li>
+</ul>
+<div class="note">“不知道”是合法输出。强制模型必须回答，会提高幻觉率。评测里要允许弃答，并单独统计弃答率。</div>
+</section>
+
+<section id="alignment" data-title="5. 对齐与拒答">
+<h2><span class="num">05</span>对齐与拒答</h2>
+<p>对齐是让模型的行为符合人类意图和安全规范。不是“让模型变善良”这么简单，包含有用性、诚实性、无害性三个目标。</p>
+<h3>拒答的边界</h3>
+<p>好的拒答：明确拒绝危险请求，给出安全替代方案。坏的拒答：把正常医学问题、法律问题也拒掉，叫过度拒答。</p>
+<table>
+<tr><th>类型</th><th>表现</th><th>评测</th></tr>
+<tr><td>漏拒</td><td>该拒没拒</td><td>危险请求通过率</td></tr>
+<tr><td>过度拒答</td><td>正常请求被拒</td><td>良性请求拒答率</td></tr>
+<tr><td>拒答质量</td><td>拒了但没帮助</td><td>人评/替代建议完整性</td></tr>
+</table>
+<div class="warn">只看“危险请求通过率”会把模型训成什么都拒。必须同时测良性请求的通过率。</div>
+</section>
+
+<section id="redteam" data-title="6. 红队与对抗评测">
+<h2><span class="num">06</span>红队与对抗评测</h2>
+<p>红队是主动找模型的漏洞：越狱、提示注入、数据泄露、工具滥用。评测集要覆盖正常、边界、对抗三层。</p>
+<h3>常见攻击面</h3>
+<ul>
+<li>角色扮演绕过安全策略。</li>
+<li>把恶意指令藏在文档/网页里，诱导模型执行。</li>
+<li>多轮对话逐步逼近，单轮看都正常。</li>
+<li>编码、翻译、拆字绕过关键词过滤。</li>
+</ul>
+<p>防御不能只靠关键词。要在输入、工具调用、输出三层做检查，并对高风险动作做权限隔离。</p>
+<div class="note">红队报告要写清攻击目标、成功率、误伤率、复现步骤。只给“发现漏洞”没有复现，工程上没法修。</div>
+</section>
+
+<section id="contamination" data-title="7. 数据污染与评测泄漏">
+<h2><span class="num">07</span>数据污染与评测泄漏</h2>
+<p>如果评测题出现在训练数据里，分数会虚高。这叫数据污染或评测泄漏。</p>
+<h3>检查方法</h3>
+<ul>
+<li>n-gram 重叠：评测题和训练语料是否有长片段重合。</li>
+<li>嵌入相似度：语义相近的样本是否大量出现。</li>
+<li>时间切分：用训练截止日期之后的题。</li>
+<li>私有保留集：不公开、不进入训练。</li>
+</ul>
+<p>公开 benchmark 用久了必然被“卷”。真正可信的是私有集 + 定期换题 + 人评。</p>
+<div class="warn">“在某某榜上第一”不等于实际最好。先问榜单题有没有进训练数据、评测 prompt 是否统一、是否只报了好任务。</div>
+</section>
+
+<section id="mistakes" data-title="8. 常见误解与自测">
+<h2><span class="num">08</span>常见误解与自测</h2>
+<h3>四个误解</h3>
+<ul>
+<li><strong>“一个总分就能代表模型能力”</strong>：总分是多个任务的加权，权重换了排名就变。</li>
+<li><strong>“LLM 裁判比人便宜，所以更客观”</strong>：便宜不等于客观，裁判有自己的偏差。</li>
+<li><strong>“拒答率越高越安全”</strong>：过度拒答会毁掉可用性。</li>
+<li><strong>“公开榜单一上升就是模型变强”</strong>：可能是污染、prompt 调优或任务选择。</li>
+</ul>
+<h3>自测</h3>
+<div class="quiz" data-answer="1" data-explain="pass@k 衡量采样 k 次至少一次通过，k 越大分数越高。">
+<p class="q">1. pass@k 衡量的是什么？</p>
+<button class="opt">A. 一次生成就对的概率</button>
+<button class="opt">B. 采样 k 次至少一次通过的概率</button>
+<button class="opt">C. 模型参数量</button>
+<button class="opt">D. 训练损失</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="3" data-explain="交换 A/B 顺序并取平均，可以降低裁判的位置偏差。">
+<p class="q">2. 怎么降低 LLM 裁判的位置偏差？</p>
+<button class="opt">A. 只用一个裁判</button>
+<button class="opt">B. 把回答改长</button>
+<button class="opt">C. 去掉评分细则</button>
+<button class="opt">D. 交换 A/B 顺序，取平均</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="0" data-explain="忠实性幻觉是摘要/问答偏离给定材料，事实性幻觉是与世界事实不符。">
+<p class="q">3. 摘要偏离原文，属于哪类幻觉？</p>
+<button class="opt">A. 忠实性幻觉</button>
+<button class="opt">B. 事实性幻觉</button>
+<button class="opt">C. 位置偏差</button>
+<button class="opt">D. 数据污染</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="2" data-explain="只测危险请求通过率会导致过度拒答，必须同时测良性请求通过率。">
+<p class="q">4. 安全评测只看“危险请求通过率”会导致什么？</p>
+<button class="opt">A. 模型更聪明</button>
+<button class="opt">B. 训练更快</button>
+<button class="opt">C. 过度拒答，正常请求也被拒</button>
+<button class="opt">D. 没有影响</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="1" data-explain="评测题出现在训练语料里叫数据污染，会让分数虚高。">
+<p class="q">5. 评测题出现在训练数据里，叫什么？</p>
+<button class="opt">A. 过拟合</button>
+<button class="opt">B. 数据污染/评测泄漏</button>
+<button class="opt">C. 正则化</button>
+<button class="opt">D. 对齐</button>
+<div class="fb"></div>
+</div>
+</section>
+
+<div class="pager"><button id="prev">← 上一节</button><button id="next">下一节 →</button></div>
+<div class="foot">这套深潜课是独立单文件页，进度存在本机浏览器。公式用 KaTeX 渲染；离线时显示源码，不影响阅读正文。<br>
+相关分册：<a href="../index.html">主学习手册</a> · <a href="../00-跨书总览/深潜专题.md">深潜专题</a></div>
+</div></main>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+const sections=[...document.querySelectorAll('section')];
+const nav=[...document.querySelectorAll('.nav-item')];
+const bar=document.querySelector('.progress');
+const key='deep:'+location.pathname.split('/').filter(Boolean).slice(-2,-1)[0];
+let cur=0;
+function show(i,push){
+  i=Math.max(0,Math.min(sections.length-1,i));
+  sections.forEach((s,k)=>s.style.display=(k===i?'block':'none'));
+  nav.forEach((n,k)=>n.classList.toggle('active',k===i));
+  cur=i;
+  bar.style.width=((i+1)/sections.length*100)+'%';
+  try{localStorage.setItem(key,String(i))}catch(e){}
+  if(push) history.replaceState(null,'','#'+sections[i].id);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+nav.forEach((n,i)=>n.addEventListener('click',()=>{show(i,true);document.querySelector('.sidebar').classList.remove('open')}));
+document.querySelector('#menu').addEventListener('click',()=>document.querySelector('.sidebar').classList.toggle('open'));
+document.addEventListener('click',e=>{if(e.target.closest('.sidebar')||e.target.closest('#menu'))return;document.querySelector('.sidebar').classList.remove('open')});
+document.querySelector('#prev').addEventListener('click',()=>show(cur-1,true));
+document.querySelector('#next').addEventListener('click',()=>show(cur+1,true));
+try{const saved=localStorage.getItem(key);if(saved!==null)cur=+saved||0}catch(e){}
+const hash=location.hash.slice(1);const hi=sections.findIndex(s=>s.id===hash);if(hi>=0)cur=hi;
+show(cur,false);
+setTimeout(()=>window.scrollTo({top:0,behavior:"auto"}),0);
+
+document.querySelectorAll('.quiz').forEach(q=>{
+  const opts=[...q.querySelectorAll('.opt')], ans=+q.dataset.answer, fb=q.querySelector('.fb');
+  opts.forEach((o,i)=>o.addEventListener('click',()=>{
+    opts.forEach(x=>x.classList.remove('ok','bad'));
+    if(i===ans){o.classList.add('ok')}else{o.classList.add('bad');opts[ans].classList.add('ok')}
+    fb.innerHTML=(i===ans?'<b>正确。</b> ':'<b>不对。</b> ')+(q.dataset.explain||'');
+    fb.classList.add('show');
+    if(window.renderMathInElement){
+      try{renderMathInElement(fb,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});}catch(e){}
+    }
+  }));
+});
+
+function render(){
+  if(!window.renderMathInElement){
+    const el=document.querySelector('.katex-fallback'); if(el) el.style.display='block'; return;
+  }
+  try{
+    renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});
+  }catch(e){const el=document.querySelector('.katex-fallback'); if(el) el.style.display='block';}
+}
+window.addEventListener('load',render);
+</script>
+</body>
+</html>

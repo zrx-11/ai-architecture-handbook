@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python 与 NumPy · 深潜课</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%237c5bff'/><text x='50' y='68' font-size='44' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>DS</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161922;--bg3:#1e2230;--panel:#1a1e2a;
+  --text:#e4e6ed;--muted:#9ba1b3;--dim:#6b7184;
+  --accent:#7c5bff;--accent2:#5b9dff;--green:#38d39f;--warn:#f5a623;
+  --border:#2a3040;--soft:rgba(124,91,255,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden;max-width:100vw}
+body{font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.78;font-size:15.5px;overflow-x:hidden;
+  overflow-wrap:break-word;word-break:break-word}
+a{color:var(--accent2);text-decoration:none}
+a:hover{text-decoration:underline}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:999;width:0}
+.topbar{position:fixed;top:3px;left:0;right:0;height:54px;background:rgba(15,17,23,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:900;
+  display:flex;align-items:center;gap:12px;padding:0 18px}
+.topbar button{display:none;background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:7px 10px;font-size:17px;cursor:pointer}
+.brand{font-weight:700;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand span{color:var(--muted);font-weight:400;margin-left:8px}
+.topbar .back{margin-left:auto;font-size:12.5px;color:var(--muted);border:1px solid var(--border);
+  padding:5px 9px;border-radius:999px;white-space:nowrap}
+.sidebar{position:fixed;top:57px;left:0;bottom:0;width:250px;background:var(--bg2);
+  border-right:1px solid var(--border);overflow-y:auto;padding:18px 0;z-index:800;
+  transition:transform .25s}
+.sidebar h2{font-size:12px;color:var(--dim);font-weight:600;letter-spacing:.08em;
+  padding:0 20px 10px;text-transform:uppercase}
+.nav-item{display:block;padding:9px 20px;font-size:13px;color:var(--muted);
+  border-left:3px solid transparent;cursor:pointer;line-height:1.45}
+.nav-item:hover{background:var(--bg3);color:var(--text);text-decoration:none}
+.nav-item.active{border-left-color:var(--accent);color:var(--text);background:var(--bg3)}
+.nav-item small{display:block;color:var(--dim);font-size:11px;margin-top:1px}
+.main{margin-left:250px;padding:80px 28px 60px;max-width:1180px}
+.wrap{max-width:860px;margin:0 auto}
+section{padding:4px 0 30px;border-bottom:1px solid rgba(42,48,64,.55);margin-bottom:26px;scroll-margin-top:70px}
+section:last-of-type{border-bottom:0}
+h2{font-size:clamp(1.35rem,3vw,1.85rem);line-height:1.28;margin:8px 0 14px;letter-spacing:-.01em}
+h2 .num{color:var(--accent);font-size:.78em;margin-right:9px;font-variant-numeric:tabular-nums}
+h3{font-size:1.05rem;margin:18px 0 7px;color:var(--text)}
+h4{font-size:.96rem;margin:14px 0 5px;color:var(--muted)}
+p{margin:9px 0}
+ul,ol{margin:8px 0 10px 1.35em}
+li{margin:4px 0}
+strong{color:#fff;font-weight:650}
+code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--bg3);
+  padding:1px 5px;border-radius:4px;font-size:.9em;color:#c9d5ff}
+pre{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;
+  overflow-x:auto;font-size:13px;line-height:1.55;margin:12px 0}
+pre code{background:none;padding:0;color:#d8def0}
+.formula{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);
+  border-radius:8px;padding:10px 14px;margin:12px 0;overflow-x:auto;font-size:1.02em}
+.formula .katex-display{margin:0}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg3);color:#fff;font-weight:600;white-space:nowrap}
+td{color:var(--text)}
+table th:first-child,table td:first-child{white-space:nowrap}
+.note{background:rgba(91,157,255,.07);border:1px solid rgba(91,157,255,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#c9d8f5}
+.warn{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#f3d19a}
+.good{background:rgba(56,211,159,.07);border:1px solid rgba(56,211,159,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#b5f0d9}
+details{border:1px solid var(--border);border-radius:9px;margin:12px 0;background:var(--bg2)}
+details summary{cursor:pointer;padding:10px 13px;font-size:13.5px;color:var(--accent2);font-weight:600}
+details .inner{padding:2px 14px 14px;border-top:1px solid var(--border)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0}
+.flow .box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 11px;
+  font-size:13px;text-align:center;min-width:74px}
+.flow .arrow{color:var(--dim);font-size:18px}
+.quiz{border:1px solid var(--border);border-radius:11px;padding:14px;margin:14px 0;background:var(--bg2)}
+.quiz .q{font-weight:600;color:#fff;margin:0 0 9px;font-size:14.5px}
+.quiz .opt{display:block;width:100%;text-align:left;background:var(--bg);color:var(--text);
+  border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin:6px 0;font:inherit;
+  font-size:13.5px;cursor:pointer;line-height:1.5}
+.quiz .opt:hover{border-color:var(--accent)}
+.quiz .opt.ok{border-color:var(--green);background:rgba(56,211,159,.1)}
+.quiz .opt.bad{border-color:#ff6b6b;background:rgba(255,107,107,.1)}
+.quiz .fb{display:none;margin-top:9px;font-size:13.5px;line-height:1.65;color:var(--muted);border-top:1px dashed var(--border);padding-top:9px}
+.quiz .fb.show{display:block}
+.quiz .fb b{color:var(--text)}
+.pager{display:flex;justify-content:space-between;gap:10px;margin:18px 0 8px}
+.pager button{background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:9px 14px;font:inherit;font-size:13px;cursor:pointer}
+.pager button:hover{border-color:var(--accent)}
+.foot{color:var(--dim);font-size:12.5px;margin-top:24px;line-height:1.7}
+.katex-fallback{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.35);
+  border-radius:8px;padding:9px 12px;margin:10px 0;color:#f3d19a;font-size:13px;display:none}
+@media(max-width:900px){
+  .topbar button{display:block}
+  .brand span{display:none}
+  .sidebar{transform:translateX(-100%);top:57px;width:82vw;max-width:310px;box-shadow:20px 0 40px rgba(0,0,0,.35)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:76px 16px 48px}
+  h2{font-size:1.3rem}
+  .formula{padding:8px 10px}
+  .formula .katex{font-size:.86em}
+  table{font-size:12px}
+  .flow{gap:5px}.flow .box{font-size:12px;padding:6px 8px;min-width:60px}.flow .arrow{font-size:14px}
+}
+@media(max-width:420px){
+  body{font-size:15px}
+  .main{padding-left:13px;padding-right:13px}
+  .quiz .opt{font-size:13px}
+}
+</style>
+</head>
+<body>
+<div class="progress"></div>
+<header class="topbar">
+  <button id="menu" aria-label="目录">☰</button>
+  <div class="brand">Python 与 NumPy<span>从变量到手写梯度下降</span></div>
+  <a class="back" href="../index.html">返回主手册</a>
+</header>
+<aside class="sidebar">
+  <h2>课程目录</h2>
+  <a class="nav-item" data-target="intro">课程概览<small>00</small></a>
+<a class="nav-item" data-target="basics">1. 变量、类型与表达式<small>01</small></a>
+<a class="nav-item" data-target="containers">2. 列表、字典与循环<small>02</small></a>
+<a class="nav-item" data-target="functions">3. 函数与作用域<small>03</small></a>
+<a class="nav-item" data-target="numpy">4. NumPy 数组与形状<small>04</small></a>
+<a class="nav-item" data-target="broadcast">5. 索引、切片与广播<small>05</small></a>
+<a class="nav-item" data-target="matmul">6. 矩阵乘法与批量线性层<small>06</small></a>
+<a class="nav-item" data-target="layer">7. 用 NumPy 写一个线性层<small>07</small></a>
+<a class="nav-item" data-target="train">8. 手写一次梯度下降<small>08</small></a>
+<a class="nav-item" data-target="mistakes">9. 常见错误与自测<small>09</small></a>
+</aside>
+<main class="main"><div class="wrap">
+<div class="katex-fallback">公式需要联网加载 KaTeX。当前显示的是 LaTeX 源码，文字、表格、测验仍可用。</div>
+<section id="intro" data-title="课程概览">
+<h2><span class="num">00</span>课程概览：代码零基础也能跑起来</h2>
+<p>这门课只教你读懂并写出神经网络需要的那部分 Python：变量、列表、循环、函数、NumPy 数组、矩阵乘法和一次完整的梯度下降。不碰 Web、爬虫、类和装饰器。</p>
+<h3>学完你能做到</h3>
+<ul>
+<li>看懂一段 NumPy 代码，说出每个数组的形状。</li>
+<li>用循环和向量化两种方式写线性层。</li>
+<li>手写一个两层网络的训练循环，损失真的下降。</li>
+<li>遇到 shape、broadcast、原地修改这三类报错，能自己定位。</li>
+</ul>
+<div class="note">前置：会加减乘除。没装 Python 也能读，代码都配了输出。要跑代码，装 Python 3.10+ 和 NumPy 即可。</div>
+<h3>路线</h3>
+<div class="flow">
+<div class="box">变量</div><div class="arrow">→</div><div class="box">列表/字典</div><div class="arrow">→</div><div class="box">函数</div><div class="arrow">→</div><div class="box">NumPy</div><div class="arrow">→</div><div class="box">广播</div><div class="arrow">→</div><div class="box">矩阵乘</div><div class="arrow">→</div><div class="box">训练循环</div>
+</div>
+</section>
+
+<section id="basics" data-title="1. 变量、类型与表达式">
+<h2><span class="num">01</span>变量、类型与表达式</h2>
+<p>变量是给一个值起名字。Python 不需要声明类型，直接赋值：</p>
+<pre><code>x = 3          # 整数
+y = 2.5        # 浮点数
+name = "deep"  # 字符串
+flag = True    # 布尔值</code></pre>
+<p>算术运算符：<code>+ - * /</code>，整除 <code>//</code>，取余 <code>%</code>，乘方 <code>**</code>。</p>
+<pre><code>print(7 / 2)    # 3.5
+print(7 // 2)   # 3
+print(2 ** 10)  # 1024</code></pre>
+<h3>类型会互相转换</h3>
+<pre><code>a = "3"
+b = int(a)      # 字符串转整数
+c = float(a)    # 转浮点
+print(b + 1)    # 4
+print(c + 1)    # 4.0</code></pre>
+<div class="warn">`"3" + 1` 会报 TypeError。字符串和数字不能直接相加，先转换。</div>
+<p>Python 的缩进是语法。同一代码块必须缩进相同格数，通常 4 个空格。</p>
+</section>
+
+<section id="containers" data-title="2. 列表、字典与循环">
+<h2><span class="num">02</span>列表、字典与循环</h2>
+<p>列表是有顺序的一组值，用方括号：</p>
+<pre><code>losses = [2.3, 1.8, 1.2, 0.9]
+print(losses[0])      # 2.3，下标从 0 开始
+print(losses[-1])     # 0.9，最后一项
+losses.append(0.7)    # 末尾追加</code></pre>
+<p>字典是“键 → 值”的映射，用花括号：</p>
+<pre><code>config = {"layers": 12, "hidden": 768, "vocab": 50000}
+print(config["hidden"])   # 768
+config["heads"] = 12      # 新增键</code></pre>
+<h3>for 循环</h3>
+<pre><code>total = 0
+for x in [1, 2, 3, 4]:
+    total = total + x
+print(total)   # 10</code></pre>
+<p>配合 <code>range</code> 控制次数：</p>
+<pre><code>for step in range(5):
+    print(step)   # 0 1 2 3 4</code></pre>
+<div class="note">`range(5)` 从 0 开始，到 5 之前结束。训练循环里常写成 `for step in range(num_steps):`。</div>
+</section>
+
+<section id="functions" data-title="3. 函数与作用域">
+<h2><span class="num">03</span>函数与作用域</h2>
+<p>函数把一段代码打包，给它名字和输入：</p>
+<pre><code>def mse(pred, target):
+    diff = pred - target
+    return diff * diff
+
+print(mse(0.8, 1.0))   # 0.04000000000000001</code></pre>
+<p><code>def</code> 定义函数，<code>return</code> 把结果交回去。没有 return 的函数返回 <code>None</code>。</p>
+<h3>多个返回值</h3>
+<pre><code>def forward(x, w, b):
+    z = x * w + b
+    return z, z * z
+
+z, loss = forward(2.0, 3.0, 1.0)
+print(z, loss)   # 7.0 49.0</code></pre>
+<h3>作用域</h3>
+<p>函数内部定义的变量外面看不到。想改外面的值，要么用返回值，要么用 <code>global</code>（不推荐）。</p>
+<div class="warn">函数里别偷偷修改传入的列表。需要副本时写 `x = x.copy()`，否则调用方的数据也会变。</div>
+</section>
+
+<section id="numpy" data-title="4. NumPy 数组与形状">
+<h2><span class="num">04</span>NumPy 数组与形状</h2>
+<p>NumPy 把一组数放进一个数组，支持批量运算。先导入：</p>
+<pre><code>import numpy as np
+
+a = np.array([1.0, 2.0, 3.0])
+print(a.shape)    # (3,)
+print(a.dtype)    # float64</code></pre>
+<p>二维数组：</p>
+<pre><code>X = np.array([[1.0, 2.0],
+              [3.0, 4.0],
+              [5.0, 6.0]])
+print(X.shape)    # (3, 2)，3 行 2 列</code></pre>
+<h3>创建常用数组</h3>
+<pre><code>np.zeros((2, 3))        # 全 0
+np.ones((2, 3))         # 全 1
+np.arange(6)            # [0 1 2 3 4 5]
+np.random.randn(2, 3)   # 标准正态随机数</code></pre>
+<div class="good">看到数组先问三件事：形状是什么、数据类型是什么、是不是原地修改。这三件事能解释大部分报错。</div>
+</section>
+
+<section id="broadcast" data-title="5. 索引、切片与广播">
+<h2><span class="num">05</span>索引、切片与广播</h2>
+<p>索引取单个元素，切片取一段：</p>
+<pre><code>X = np.arange(12).reshape(3, 4)
+print(X[0, 1])     # 第 0 行第 1 列
+print(X[:, 1])     # 所有行的第 1 列
+print(X[1, :])     # 第 1 行所有列
+print(X[1:3, 2:4]) # 行 1 到 2，列 2 到 3</code></pre>
+<h3>广播</h3>
+<p>形状不同的数组做运算时，NumPy 会按规则自动扩展：</p>
+<pre><code>X = np.ones((3, 4))
+b = np.array([1, 2, 3, 4])
+Y = X + b          # b 广播到每一行，结果 (3, 4)</code></pre>
+<p>规则：从右往左对齐维度，维度相等或其中一个为 1 才能广播。</p>
+<div class="warn">`X` 形状 (3,4)，`b` 形状 (3,) 时不能直接加到列上；需要 `b.reshape(3,1)` 或 `b[:, None]`。</div>
+</section>
+
+<section id="matmul" data-title="6. 矩阵乘法与批量线性层">
+<h2><span class="num">06</span>矩阵乘法与批量线性层</h2>
+<p>NumPy 用 <code>@</code> 做矩阵乘法，用 <code>*</code> 做逐项乘法。这两个不是一回事。</p>
+<pre><code>X = np.array([[1.0, 2.0]])          # (1, 2)
+W = np.array([[3.0, 4.0],
+              [5.0, 6.0]])          # (2, 2)
+b = np.array([0.0, 1.0])            # (2,)
+
+Y = X @ W + b
+print(Y)   # [[13. 17.]]</code></pre>
+<p>批量版：$B$ 个样本，每个 $d$ 维，权重 $d\times h$。</p>
+<pre><code>B, d, h = 4, 3, 2
+X = np.random.randn(B, d)
+W = np.random.randn(d, h)
+b = np.zeros(h)
+
+Y = X @ W + b
+print(Y.shape)   # (4, 2)</code></pre>
+<div class="note">`X @ W` 的形状是 $(B\times d)(d\times h)=(B\times h)$。如果写成 `W @ X`，内部维度对不上，直接报错。</div>
+</section>
+
+<section id="layer" data-title="7. 用 NumPy 写一个线性层">
+<h2><span class="num">07</span>用 NumPy 写一个线性层</h2>
+<p>线性层做三件事：矩阵乘、加偏置、过激活。先写 ReLU：</p>
+<pre><code>def relu(z):
+    return np.maximum(0, z)</code></pre>
+<p>再写一层：</p>
+<pre><code>def linear(x, w, b):
+    return x @ w + b
+
+def layer(x, w, b):
+    z = linear(x, w, b)
+    h = relu(z)
+    return h, z</code></pre>
+<p>两层网络：</p>
+<pre><code>def net(x, w1, b1, w2, b2):
+    h, z1 = layer(x, w1, b1)
+    y = linear(h, w2, b2)
+    return y, h, z1</code></pre>
+<h3>形状检查</h3>
+<p>输入 4 个样本、3 维；隐藏层 5 维；输出 1 维：$W_1$ 是 $3\times5$，$W_2$ 是 $5\times1$。</p>
+<pre><code>X = np.random.randn(4, 3)
+W1 = np.random.randn(3, 5); b1 = np.zeros(5)
+W2 = np.random.randn(5, 1); b2 = np.zeros(1)
+Y, H, Z1 = net(X, W1, b1, W2, b2)
+print(Y.shape, H.shape)   # (4, 1) (4, 5)</code></pre>
+<div class="good">写网络先写形状注释，再写代码。形状对了，公式通常不会错太远。</div>
+</section>
+
+<section id="train" data-title="8. 手写一次梯度下降">
+<h2><span class="num">08</span>手写一次梯度下降</h2>
+<p>目标：用一条直线拟合 $y=2x+1$。模型 $\hat y=wx+b$，损失用均方误差。</p>
+<pre><code>import numpy as np
+
+x = np.array([1.0, 2.0, 3.0, 4.0])
+y = 2.0 * x + 1.0
+
+w, b = 0.0, 0.0
+lr = 0.05
+
+for step in range(100):
+    pred = w * x + b
+    loss = np.mean((pred - y) ** 2)
+    dw = np.mean(2 * (pred - y) * x)
+    db = np.mean(2 * (pred - y))
+    w = w - lr * dw
+    b = b - lr * db
+    if step % 20 == 0:
+        print(step, loss, w, b)</code></pre>
+<p>跑完 $w$ 接近 2，$b$ 接近 1，loss 接近 0。</p>
+<h3>为什么要 mean</h3>
+<p>用均值让梯度大小和 batch 大小无关。否则 batch 从 4 加到 400，梯度会放大 100 倍，学习率得跟着改。</p>
+<div class="warn">不要写成 `w -= lr * dw` 之后又用旧 `pred` 算 `db`。先算完所有梯度，再统一更新参数。</div>
+</section>
+
+<section id="mistakes" data-title="9. 常见错误与自测">
+<h2><span class="num">09</span>常见错误与自测</h2>
+<h3>四类高频错误</h3>
+<ul>
+<li><strong>shape 对不上</strong>：先打印 `.shape`，从右往左核对矩阵乘法。</li>
+<li><strong>广播方向错</strong>：`(3,)` 加到 `(3,4)` 是加到每一行；要加到每一列得用 `(3,1)`。</li>
+<li><strong>原地修改</strong>：`a += b` 可能改掉共享数组；需要新数组时写 `a = a + b`。</li>
+<li><strong>整数除法</strong>：Python 3 的 `/` 返回浮点，`//` 才是整除。旧教程里的坑。</li>
+</ul>
+<h3>自测</h3>
+<div class="quiz" data-answer="2" data-explain="`7 / 2` 是普通除法，返回 3.5；`7 // 2` 才是 3。">
+<p class="q">1. `print(7 / 2)` 输出什么？</p>
+<button class="opt">A. 3</button>
+<button class="opt">B. 3.0</button>
+<button class="opt">C. 3.5</button>
+<button class="opt">D. 报错</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="1" data-explain="`X` 是 (3,4)，`X[:,1]` 取所有行第 1 列，形状 (3,)。">
+<p class="q">2. `X = np.arange(12).reshape(3,4)`，`X[:,1].shape` 是？</p>
+<button class="opt">A. (4,)</button>
+<button class="opt">B. (3,)</button>
+<button class="opt">C. (3,1)</button>
+<button class="opt">D. (1,3)</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="0" data-explain="$(B\times d)(d\times h)$ 得到 $(B\times h)$；`W @ X` 的内部维度是 $h$ 和 $B$，对不上。">
+<p class="q">3. $X$ 形状 (4,3)，$W$ 形状 (3,5)，哪个乘法合法？</p>
+<button class="opt">A. `X @ W`</button>
+<button class="opt">B. `W @ X`</button>
+<button class="opt">C. `X * W`</button>
+<button class="opt">D. 都不合法</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="3" data-explain="`(3,)` 与 `(3,4)` 从右对齐，最后一维 3 和 4 不相等，不能广播。">
+<p class="q">4. `X` 形状 (3,4)，`b` 形状 (3,)，`X + b` 会怎样？</p>
+<button class="opt">A. 得到 (3,4)</button>
+<button class="opt">B. 得到 (3,3)</button>
+<button class="opt">C. 自动转置</button>
+<button class="opt">D. 广播失败，报错</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="1" data-explain="先算所有梯度再统一更新；边算边改会让后面的梯度用上新参数，偏离真实梯度。">
+<p class="q">5. 训练循环里，为什么先算 `dw` 和 `db`，最后再更新 `w,b`？</p>
+<button class="opt">A. 为了代码好看</button>
+<button class="opt">B. 避免后面的梯度用到已更新的参数</button>
+<button class="opt">C. 因为 NumPy 不允许分开写</button>
+<button class="opt">D. 没有区别</button>
+<div class="fb"></div>
+</div>
+</section>
+
+<div class="pager"><button id="prev">← 上一节</button><button id="next">下一节 →</button></div>
+<div class="foot">这套深潜课是独立单文件页，进度存在本机浏览器。公式用 KaTeX 渲染；离线时显示源码，不影响阅读正文。<br>
+相关分册：<a href="../index.html">主学习手册</a> · <a href="../00-跨书总览/深潜专题.md">深潜专题</a></div>
+</div></main>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+const sections=[...document.querySelectorAll('section')];
+const nav=[...document.querySelectorAll('.nav-item')];
+const bar=document.querySelector('.progress');
+const key='deep:'+location.pathname.split('/').filter(Boolean).slice(-2,-1)[0];
+let cur=0;
+function show(i,push){
+  i=Math.max(0,Math.min(sections.length-1,i));
+  sections.forEach((s,k)=>s.style.display=(k===i?'block':'none'));
+  nav.forEach((n,k)=>n.classList.toggle('active',k===i));
+  cur=i;
+  bar.style.width=((i+1)/sections.length*100)+'%';
+  try{localStorage.setItem(key,String(i))}catch(e){}
+  if(push) history.replaceState(null,'','#'+sections[i].id);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+nav.forEach((n,i)=>n.addEventListener('click',()=>{show(i,true);document.querySelector('.sidebar').classList.remove('open')}));
+document.querySelector('#menu').addEventListener('click',()=>document.querySelector('.sidebar').classList.toggle('open'));
+document.addEventListener('click',e=>{if(e.target.closest('.sidebar')||e.target.closest('#menu'))return;document.querySelector('.sidebar').classList.remove('open')});
+document.querySelector('#prev').addEventListener('click',()=>show(cur-1,true));
+document.querySelector('#next').addEventListener('click',()=>show(cur+1,true));
+try{const saved=localStorage.getItem(key);if(saved!==null)cur=+saved||0}catch(e){}
+const hash=location.hash.slice(1);const hi=sections.findIndex(s=>s.id===hash);if(hi>=0)cur=hi;
+show(cur,false);
+setTimeout(()=>window.scrollTo({top:0,behavior:"auto"}),0);
+
+document.querySelectorAll('.quiz').forEach(q=>{
+  const opts=[...q.querySelectorAll('.opt')], ans=+q.dataset.answer, fb=q.querySelector('.fb');
+  opts.forEach((o,i)=>o.addEventListener('click',()=>{
+    opts.forEach(x=>x.classList.remove('ok','bad'));
+    if(i===ans){o.classList.add('ok')}else{o.classList.add('bad');opts[ans].classList.add('ok')}
+    fb.innerHTML=(i===ans?'<b>正确。</b> ':'<b>不对。</b> ')+(q.dataset.explain||'');
+    fb.classList.add('show');
+    if(window.renderMathInElement){
+      try{renderMathInElement(fb,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});}catch(e){}
+    }
+  }));
+});
+
+function render(){
+  if(!window.renderMathInElement){
+    const el=document.querySelector('.katex-fallback'); if(el) el.style.display='block'; return;
+  }
+  try{
+    renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});
+  }catch(e){const el=document.querySelector('.katex-fallback'); if(el) el.style.display='block';}
+}
+window.addEventListener('load',render);
+</script>
+</body>
+</html>

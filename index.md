@@ -1,6 +1,6 @@
-# AI 架构学习系统：从机器学习到 DeepSeek
+# 学习总手册
 
-**[打开总学习手册（index.html）](index.html)** —— 统一入口，单文件可离线；首页是 7 步主线，左侧按学习路径/章节/概念/测验/抽认卡/术语/模式/速查浏览，进度自动保存。
+**[打开总学习手册（index.html）](index.html)** —— 统一入口，单文件可离线；顶部切换书籍，左侧按学习路径/章节/概念/测验/抽认卡/术语/模式/速查浏览，进度自动保存。
 
 ## 书籍
 
@@ -14,17 +14,6 @@
 | 深度学习入门：从零手写神经网络 | 8 | 2 | 21 | 38 | [deep-learning学习伴侣.html](06-deep-learning/deep-learning学习伴侣.html) |
 | DeepSeek 模型全谱 | 14 | 13 | 42 | 44 | [deepseek-family学习伴侣.html](09-deepseek-family/deepseek-family学习伴侣.html) |
 
-## 深潜课
-
-| 课 | 节 | 入口 |
-|---|---|---|
-| Transformer 从零推导 | 15 | [07-transformer-deep/index.html](07-transformer-deep/index.html) |
-| SVM 从零推导 | 16 | [08-svm-deep/index.html](08-svm-deep/index.html) |
-| 反向传播与优化器 | 10 | [10-backprop-deep/index.html](10-backprop-deep/index.html) |
-| MoE 与 MLA | 10 | [11-moe-mla-deep/index.html](11-moe-mla-deep/index.html) |
-| 概率、损失与评估 | 10 | [12-probability-eval-deep/index.html](12-probability-eval-deep/index.html) |
-| 训练与推理账本 | 9 | [13-train-infer-deep/index.html](13-train-infer-deep/index.html) |
-
 ## 跨书总览
 
 - [跨书总览：一条主线](00-跨书总览/README.md)
@@ -32,7 +21,8 @@
 - [综合检验建议](00-跨书总览/综合检验建议.md)
 - [学习节点地图](00-跨书总览/学习节点地图.md)
 - [跨书术语总表](00-跨书总览/术语总表.md)
-- [深潜专题：六套单文件课](00-跨书总览/深潜专题.md)
+- [深潜专题：15 套单文件课](00-跨书总览/深潜专题.md)
+- [知识覆盖地图](00-跨书总览/知识覆盖地图.md)
 
 ## 使用方法
 

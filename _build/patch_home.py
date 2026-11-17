@@ -1,85 +1,117 @@
 #!/usr/bin/env python3
-"""把总入口首页换成一条 7 步主线，资料库降级为折叠区。"""
+"""把总入口首页换成一条 7 步主线，资料库按需展开。"""
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parent.parent
 INDEX = ROOT / "index.html"
 
-OLD = """  let pre='';
+NEW_BLOCK = r"""  let pre='';
   if(docId===FIRST_DOC){
-    pre = '<h1>学习总手册</h1>'
-      + '<p>本学习系统把书点化为一套可跟着走的学习内容。顶部切换书籍，或用下方卡片进入；'
-      + '每本书含学习路径、章节精讲、概念页、测验、抽认卡、术语表、模式库与速查表，进度自动保存在本机浏览器。</p>'
-      + '<div class="book-cards">'
-      + META.map(m=>`<div class="book-card"><h3>${esc(m.title)}</h3>
-          <div class="meta">${m.chapters} 章 · ${m.concepts} 概念 · ${m.quizzes} 测验 · ${m.cards} 抽认卡</div>
-          <div class="enter"><a href="#/book/${m.key}/path">进入学习 →</a> &nbsp;|&nbsp;
-          <a href="${encodeURI(m.companion)}" target="_blank">单独伴侣 ↗</a></div></div>`).join('')
-      + '</div>';
-  }"""
-
-NEW = """  let pre='';
-  if(docId===FIRST_DOC){
-    const steps=[
-      {n:'01',t:'先把地基补到够用',d:'矩阵乘法、softmax、注意力、FFN。只看这四件事，不从头学完整本数学。',b:'deepseek-foundations',x:'基础篇 6 章 · 约 6 小时'},
-      {n:'02',t:'看懂 Transformer 一层',d:'Q/K/V、多头、残差、LayerNorm。先能手画一层，再读论文。',b:'deepseek-foundations',x:'基础篇第 4–5 章 + Transformer 深潜'},
-      {n:'03',t:'读三篇论文',d:'R1、V4、V4.1 按“问题—方法—数据—实验—局限”拆，不背结论。',b:'deepseek-papers',x:'论文拆解 5 章 · 约 5 小时'},
-      {n:'04',t:'拆三代架构',d:'V3/R1、V4、V4.1 的瓶颈、机制、代价。每章先问“不改会怎样”。',b:'deepseek-architecture',x:'架构阐释 5 章 · 约 4 小时'},
-      {n:'05',t:'走一遍全家族',d:'从 dense 到 V4.1，12 章。每代只记一个结构件，不背模型名。',b:'deepseek-family',x:'模型全谱 12 章 · 约 12 小时'},
-      {n:'06',t:'选型与成本',d:'按任务、显存、延迟、上下文、许可证做决策；手算 KV 账。',b:'deepseek-family',x:'第 11 章 + 架构篇第 14 章'},
-      {n:'07',t:'按需补课',d:'机器学习、神经网络、深度学习、SVM 是资料库，遇到缺口再查，不按顺序读。',b:'machine-learning',x:'04 / 05 / 06 / 08 资料库'},
+    const deep=[
+      ['14-math-deep','数学基础','12 节','函数 / 向量 / 矩阵 / 导数 / 概率'],
+      ['15-python-deep','Python 与 NumPy','10 节','变量 / 函数 / 形状 / 广播 / 手写梯度'],
+      ['16-classical-ml-deep','经典机器学习','12 节','回归 / 树 / 聚类 / PCA / 评估'],
+      ['17-cnn-rnn-deep','CNN 与 RNN','10 节','卷积 / 池化 / 残差 / LSTM / 注意力'],
+      ['18-rl-grpo-deep','强化学习与 GRPO','10 节','MDP / 策略梯度 / PPO / 组内优势'],
+      ['19-deepseek-arch-deep','DeepSeek 架构深潜','13 节','MoE / MLA / DSA / CSA / V4.1'],
+      ['20-multimodal-deep','多模态模型','9 节','ViT / CLIP / VL / Janus / OCR'],
+      ['21-eval-safety-deep','评测与安全','9 节','pass@k / 裁判偏差 / 幻觉 / 红队'],
+      ['22-serving-deep','推理部署','9 节','KV / PagedAttention / 批处理 / 并行'],
+      ['07-transformer-deep','Transformer 深潜','15 节','从初中数学推到一层 Transformer'],
+      ['08-svm-deep','SVM 深潜','16 节','最大间隔 / 对偶 / KKT / 核技巧'],
+      ['10-backprop-deep','反向传播与优化器','10 节','计算图 / 链式法则 / Adam'],
+      ['11-moe-mla-deep','MoE 与 MLA','10 节','路由 / 共享专家 / KV 账 / DSA'],
+      ['12-probability-eval-deep','概率、损失与评估','10 节','交叉熵 / P-R-F1 / AUC / 泄漏'],
+      ['13-train-infer-deep','训练与推理账本','9 节','6ND / KV / prefill-decode / 量化'],
     ];
-    pre='<div class="hero"><h1>AI 架构学习：一条主线走完</h1>'
-      +'<p>如果你只想按顺序学，按下面 7 步走。每一步只读一章或一小节，先拿结论，再进书里看推导。数学和代码接近零基础也能走，但第 4、5、8、9 章的数字要动手算一遍。</p></div>'
+    const steps=[
+      {n:'01',t:'数学与 Python 工具',d:'先补到能算：向量、矩阵、导数与链式法则、概率、NumPy 的形状和广播。每节都有可手算的例子，不要求先学完整本数学。',p:'14-math-deep/index.html',pl:'数学基础 12 节',x:[['15-python-deep/index.html','Python 10 节'],['#/book/machine-learning/chapter/ch01','机器学习第 1 章']]},
+      {n:'02',t:'机器学习与神经网络',d:'线性回归、逻辑回归、树、聚类、偏差方差；再从一条直线推到神经元、损失、反向传播。学完能解释“模型到底在优化什么”。',p:'16-classical-ml-deep/index.html',pl:'经典机器学习 12 节',x:[['#/book/machine-learning/path','机器学习 16 章'],['#/book/neural-networks/path','神经网络 13 章']]},
+      {n:'03',t:'Transformer 与序列模型',d:'Q/K/V、多头、残差、LayerNorm、FFN；用 CNN/RNN 对照，理解为什么注意力替代了循环。目标：能手画一层 Transformer 的 shape 变化。',p:'#/book/deepseek-foundations/path',pl:'基础篇 6 章',x:[['17-cnn-rnn-deep/index.html','CNN/RNN 10 节'],['07-transformer-deep/index.html','Transformer 深潜 15 节']]},
+      {n:'04',t:'读三篇论文',d:'R1、V4、V4.1 按“问题—方法—数据—实验—局限”拆。不背结论，先能说出每篇在解决哪个瓶颈、代价是什么。',p:'#/book/deepseek-papers/path',pl:'论文拆解 5 章',x:[['#/book/deepseek-papers/chapter/ch06','先读 GRPO'],['#/book/deepseek-papers/chapter/ch08','再读 V4']]},
+      {n:'05',t:'三代架构与全家族',d:'MoE、MLA、MTP、DSA、CSA/HCA、mHC/Muon、Engram/DSpark；从 dense 走到 V4.1，再看 VL/Janus/OCR 这些多模态分支。每代只记一个结构件。',p:'19-deepseek-arch-deep/index.html',pl:'架构深潜 13 节',x:[['#/book/deepseek-architecture/path','架构阐释 5 章'],['#/book/deepseek-family/path','模型全谱 14 章'],['20-multimodal-deep/index.html','多模态 9 节']]},
+      {n:'06',t:'训练、强化学习与账本',d:'MDP、策略梯度、PPO、奖励模型、GRPO 的组内优势；再算 FLOPs、KV cache、并行和量化。这一步行完，你能判断一个训练/推理方案大概要多少卡。',p:'18-rl-grpo-deep/index.html',pl:'强化学习 10 节',x:[['13-train-infer-deep/index.html','训练推理账本 9 节'],['12-probability-eval-deep/index.html','概率与评估 10 节']]},
+      {n:'07',t:'评测、安全与上线',d:'pass@k、LLM 裁判偏差、幻觉、拒答、红队、数据污染；再到 PagedAttention、continuous batching、TP/PP/EP、FP8 和容量规划。最后做一次选型。',p:'22-serving-deep/index.html',pl:'推理部署 9 节',x:[['21-eval-safety-deep/index.html','评测与安全 9 节'],['#/book/deepseek-family/chapter/ch11','选型表'],['#/cross/doc7','知识覆盖地图']]},
+    ];
+    pre='<div class="hero"><div class="hero-kicker">AI 架构学习系统 · 学习总手册 · 7 本分册 + 15 套深潜课</div>'
+      +'<h1>一条主线，按依赖走完</h1>'
+      +'<p>数学和代码接近零基础也能走。主线只有 7 步，每步给一个主入口；卡住再从下面资料库补，不必一次开很多。</p>'
+      +'<div class="hero-stats"><span><b>7</b> 本分册</span><span><b>15</b> 套深潜课</span><span><b>164</b> 节单点推导</span><span><b>67</b> 章系统课</span></div></div>'
+      +'<div class="path-head"><h2>学习路径</h2><p>按顺序点。每步先读主入口，再用右侧小标签补缺口。</p></div>'
       +'<div class="simple-path">'
-      + steps.map(s=>`<div class="step-card"><div class="step-num">${s.n}</div><div><h3>${esc(s.t)}</h3><p>${esc(s.d)}</p><div class="step-links"><a href="#/book/${s.b}/path">进入：${esc(s.x)}</a>${s.n==='05'?'<a href="#/book/deepseek-family/chapter/ch01">先读家族地图</a>':''}${s.n==='06'?'<a href="#/book/deepseek-family/chapter/ch11">先读选型表</a>':''}</div></div></div>`).join('')
+      + steps.map(s=>`<div class="step-card"><div class="step-num">${s.n}</div><div><h3>${esc(s.t)}</h3><p>${esc(s.d)}</p><div class="step-links"><a class="primary" href="${encodeURI(s.p)}">${esc(s.pl)} →</a>${s.x.map(x=>`<a href="${encodeURI(x[0])}">${esc(x[1])}</a>`).join('')}</div></div></div>`).join('')
       +'</div>'
-      +'<div class="library"><h2>资料库</h2><p>下面这些书不用从头读到尾。主线卡住时，按关键词回来查。</p><div class="lib-grid">'
-      + META.map(m=>`<a class="lib-item" href="#/book/${m.key}/path"><b>${esc(m.title)}</b><span>${m.chapters} 章 · ${m.quizzes} 测验</span></a>`).join('')
-      + `<a class="lib-item" href="${encodeURI('07-transformer-deep/index.html')}" target="_blank"><b>Transformer 深潜</b><span>15 节 · 179 个推导步骤</span></a>`
-      + `<a class="lib-item" href="${encodeURI('08-svm-deep/index.html')}" target="_blank"><b>SVM 深潜</b><span>16 节 · 1355 个公式</span></a>`
-      + `<a class="lib-item" href="${encodeURI('10-backprop-deep/index.html')}" target="_blank"><b>反向传播与优化器</b><span>10 节 · 手算梯度到 Adam</span></a>`
-      + `<a class="lib-item" href="${encodeURI('11-moe-mla-deep/index.html')}" target="_blank"><b>MoE 与 MLA</b><span>10 节 · 路由与 KV 账</span></a>`
-      + `<a class="lib-item" href="${encodeURI('12-probability-eval-deep/index.html')}" target="_blank"><b>概率、损失与评估</b><span>10 节 · 交叉熵 / PR / AUC</span></a>`
-      + `<a class="lib-item" href="${encodeURI('13-train-infer-deep/index.html')}" target="_blank"><b>训练与推理账本</b><span>9 节 · FLOPs / KV / 并行</span></a>`
-      +'</div></div>';
-  }"""
+      +'<details class="library"><summary><span>资料库</span><em>7 本分册 · 15 套深潜课 · 专题页</em></summary>'
+      +'<p class="lib-note">主线卡住时按关键词回来查。分册负责广度、依赖顺序和诊断；深潜课负责单点推到底。</p>'
+      +'<h3>分册</h3><div class="lib-grid">'
+      + META.map(m=>`<a class="lib-item book-card" href="#/book/${m.key}/path"><b>${esc(m.title)}</b><span>${m.chapters} 章 · ${m.quizzes} 测验</span></a>`).join('')
+      +'</div><h3>深潜课</h3><div class="lib-grid deep">'
+      + deep.map(d=>`<a class="lib-item" href="${encodeURI(d[0]+'/index.html')}" target="_blank"><b>${esc(d[1])}</b><span>${esc(d[2])} · ${esc(d[3])}</span></a>`).join('')
+      +'</div><h3>专题</h3><div class="lib-grid topics">'
+      + `<a class="lib-item" href="#/cross/doc7"><b>知识覆盖地图</b><span>哪些节点覆盖了、哪些还是缺口</span></a>`
+      + `<a class="lib-item" href="#/cross/doc4"><b>学习节点地图</b><span>依赖主线与 12 周推进表</span></a>`
+      + `<a class="lib-item" href="#/cross/doc6"><b>深潜专题</b><span>15 套课怎么选、怎么配主线</span></a>`
+      + `<a class="lib-item" href="#/cross/doc2"><b>跨书概念映射</b><span>同一概念在不同分册的讲法</span></a>`
+      + `<a class="lib-item" href="#/cross/doc3"><b>综合检验</b><span>跨书任务与进阶路线</span></a>`
+      +'</div></details>';
+  }
+"""
 
-CSS = """
-.hero{padding:6px 0 2px}
-.hero h1{font-size:clamp(1.65rem,4vw,2.45rem);line-height:1.18;margin:0 0 10px}
-.hero p{max-width:780px;color:var(--muted);font-size:1.02rem;margin:0}
-.simple-path{display:grid;gap:12px;margin:22px 0 28px}
+CSS = r"""
+.hero{padding:8px 0 4px}
+.hero-kicker{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:8px}
+.hero h1{font-size:clamp(1.7rem,4vw,2.5rem);line-height:1.16;margin:0 0 10px}
+.hero p{max-width:820px;color:var(--muted);font-size:1.02rem;margin:0 0 14px;line-height:1.7}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px 18px;font-size:.88rem;color:var(--muted)}
+.hero-stats b{color:var(--text);font-size:1.08rem;margin-right:3px}
+.path-head{margin:24px 0 12px}
+.path-head h2{font-size:1.18rem;margin:0 0 4px}
+.path-head p{color:var(--muted);font-size:.92rem;margin:0}
+.simple-path{display:grid;gap:12px;margin:0 0 26px}
 .step-card{display:grid;grid-template-columns:52px 1fr;gap:14px;border:1px solid var(--border);border-radius:14px;padding:16px;background:var(--panel)}
 .step-num{font-weight:800;font-size:1.35rem;color:var(--accent);line-height:1.2;letter-spacing:-.02em}
-.step-card h3{margin:0 0 5px;font-size:1.02rem}
-.step-card p{margin:0 0 10px;color:var(--muted);line-height:1.65;font-size:.96rem}
+.step-card h3{margin:0 0 5px;font-size:1.04rem}
+.step-card p{margin:0 0 10px;color:var(--muted);line-height:1.68;font-size:.95rem}
 .step-links{display:flex;flex-wrap:wrap;gap:8px}
-.step-links a{font-size:.9rem;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--accent-soft);color:var(--text);text-decoration:none}
+.step-links a{font-size:.88rem;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--accent-soft);color:var(--text);text-decoration:none}
+.step-links a.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
 .step-links a:hover{border-color:var(--accent);text-decoration:none}
-.library{margin-top:8px;border-top:1px solid var(--border);padding-top:18px}
-.library h2{font-size:1.12rem;margin:0 0 4px}
-.library p{color:var(--muted);font-size:.94rem;margin:0 0 12px}
-.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
-.lib-item{display:flex;flex-direction:column;gap:2px;border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--bg);text-decoration:none;color:var(--text)}
-.lib-item b{font-size:.94rem;line-height:1.4}
-.lib-item span{font-size:.8rem;color:var(--muted)}
+.library{margin-top:6px;border-top:1px solid var(--border);padding-top:16px}
+.library summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px}
+.library summary::-webkit-details-marker{display:none}
+.library summary span{font-size:1.12rem;font-weight:700}
+.library summary em{font-style:normal;font-size:.82rem;color:var(--muted)}
+.library[open] summary{margin-bottom:8px}
+.lib-note{color:var(--muted);font-size:.92rem;margin:0 0 14px;line-height:1.65}
+.library h3{font-size:.98rem;margin:16px 0 8px;color:var(--muted)}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.lib-item{display:flex;flex-direction:column;gap:3px;border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--bg);text-decoration:none;color:var(--text)}
+.lib-item b{font-size:.93rem;line-height:1.4}
+.lib-item span{font-size:.78rem;color:var(--muted);line-height:1.5}
 .lib-item:hover{border-color:var(--accent);text-decoration:none}
 @media(max-width:820px){
   .step-card{grid-template-columns:42px 1fr;gap:10px;padding:13px}
   .step-num{font-size:1.1rem}
   .lib-grid{grid-template-columns:1fr 1fr}
+  .hero-stats{gap:8px 14px}
 }
 @media(max-width:420px){.lib-grid{grid-template-columns:1fr}}
 """
 
 def main():
     text = INDEX.read_text(encoding="utf-8")
-    if OLD not in text:
-        print("未找到旧首页块；可能已改过。")
+    pat = re.compile(r"  let pre='';\n  if\(docId===FIRST_DOC\)\{.*?\n  \}\n  v\.innerHTML", re.S)
+    if not pat.search(text):
+        print("未找到首页块；可能已改过。")
         return 1
-    text = text.replace(OLD, NEW, 1)
+    text = pat.sub(NEW_BLOCK + "  v.innerHTML", text, count=1)
+    text = text.replace(
+        'const html=CROSS[docId]||\'<div class="empty">页面不存在</div>\';',
+        'const html=docId===FIRST_DOC?\'\':(CROSS[docId]||\'<div class="empty">页面不存在</div>\');',
+        1,
+    )
     marker = "@media print{"
     if CSS.strip() not in text:
         if marker not in text:
@@ -87,7 +119,7 @@ def main():
             return 1
         text = text.replace(marker, CSS + "\n" + marker, 1)
     INDEX.write_text(text, encoding="utf-8")
-    print("✓ 首页改为 7 步主线")
+    print("✓ 首页改为 7 步主线 + 可展开资料库")
     return 0
 
 if __name__ == "__main__":

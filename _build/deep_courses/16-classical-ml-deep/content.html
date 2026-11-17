@@ -1,0 +1,223 @@
+<section id="intro" data-title="课程概览">
+<h2><span class="num">00</span>课程概览：先把经典算法走一遍</h2>
+<p>这门课把机器学习最常用的几类算法连成一条线：线性回归、逻辑回归、决策树、随机森林/GBDT、KMeans、PCA。每个算法只回答三个问题：解决什么问题、目标函数是什么、怎么训练。</p>
+<h3>学完你能做到</h3>
+<ul>
+<li>拿到一个表格数据集，判断该用回归、分类还是聚类。</li>
+<li>手算一次线性回归的梯度，解释正则化在干什么。</li>
+<li>说清决策树怎么分裂、随机森林和 GBDT 的区别。</li>
+<li>用偏差—方差解释过拟合，知道什么时候加数据、什么时候加正则。</li>
+</ul>
+<div class="note">前置：会看 $y=kx+b$，知道均值、方差、概率的基本含义。矩阵和导数的细节在 `14-math-deep`，这里直接用结论。</div>
+<h3>路线</h3>
+<div class="flow">
+<div class="box">任务</div><div class="arrow">→</div><div class="box">线性回归</div><div class="arrow">→</div><div class="box">逻辑回归</div><div class="arrow">→</div><div class="box">树</div><div class="arrow">→</div><div class="box">集成</div><div class="arrow">→</div><div class="box">聚类</div><div class="arrow">→</div><div class="box">PCA</div>
+</div>
+</section>
+
+<section id="task" data-title="1. 任务、特征、标签与泛化">
+<h2><span class="num">01</span>任务、特征、标签与泛化</h2>
+<p>机器学习不是“让机器自己发现真理”，而是从数据里拟合一个函数，让它对没见过的样本也能给出靠谱输出。</p>
+<table>
+<tr><th>概念</th><th>白话</th><th>例子</th></tr>
+<tr><td>样本</td><td>一行数据</td><td>一个用户、一张图片</td></tr>
+<tr><td>特征</td><td>用来判断的输入列</td><td>年龄、收入、像素</td></tr>
+<tr><td>标签</td><td>想要的答案</td><td>是否流失、房价、类别</td></tr>
+<tr><td>训练集</td><td>用来调参数的数据</td><td>70% 样本</td></tr>
+<tr><td>验证集</td><td>用来选模型的数据</td><td>15% 样本</td></tr>
+<tr><td>测试集</td><td>最后只测一次的数据</td><td>15% 样本</td></tr>
+</table>
+<h3>三类任务</h3>
+<ul>
+<li><strong>回归</strong>：输出连续值，比如房价、温度。</li>
+<li><strong>分类</strong>：输出类别，比如垃圾邮件/正常邮件。</li>
+<li><strong>聚类</strong>：没有标签，把相似的样本分到一起。</li>
+</ul>
+<div class="warn">训练集准确率 99% 不代表模型好。模型可能只是把训练样本背下来了，换一批数据就崩。这叫过拟合。</div>
+</section>
+
+<section id="linear" data-title="2. 线性回归">
+<h2><span class="num">02</span>线性回归</h2>
+<p>模型：$\hat y=wx+b$。目标：让预测和真实值的平方误差尽量小。</p>
+<div class="formula">$$L(w,b)=\frac{1}{n}\sum_{i=1}^n(\hat y_i-y_i)^2$$</div>
+<h3>梯度</h3>
+<div class="formula">$$\frac{\partial L}{\partial w}=\frac{2}{n}\sum_i(\hat y_i-y_i)x_i,\qquad \frac{\partial L}{\partial b}=\frac{2}{n}\sum_i(\hat y_i-y_i)$$</div>
+<p>更新：$w\leftarrow w-\eta\frac{\partial L}{\partial w}$，$b$ 同理。</p>
+<h3>正规方程</h3>
+<p>线性回归有闭式解：$\mathbf w=(X^TX)^{-1}X^T\mathbf y$。特征很多时矩阵求逆太贵，实际多用梯度下降。</p>
+<div class="note">线性回归不只是“画一条直线”。特征可以先做平方、交叉，模型仍是线性的，但能拟合曲线。</div>
+</section>
+
+<section id="logistic" data-title="3. 逻辑回归">
+<h2><span class="num">03</span>逻辑回归</h2>
+<p>逻辑回归做二分类。先算线性分数 $z=wx+b$，再用 sigmoid 压到 0–1：</p>
+<div class="formula">$$\sigma(z)=\frac{1}{1+e^{-z}},\qquad P(y=1\mid x)=\sigma(wx+b)$$</div>
+<p>损失用交叉熵：</p>
+<div class="formula">$$L=-[y\log p+(1-y)\log(1-p)]$$</div>
+<p>梯度形式很干净：$\frac{\partial L}{\partial w}=(p-y)x$。预测概率 p 比真实 y 大，梯度为正，更新把 w 往回压。</p>
+<h3>决策边界</h3>
+<p>阈值取 0.5 时，$wx+b=0$ 就是分界线。二维里是一条直线，多维里是一个超平面。</p>
+<div class="warn">逻辑回归输出的是概率，不是硬类别。阈值 0.5 是人为选的，业务上可以调到 0.8 来减少误报。</div>
+</section>
+
+<section id="tree" data-title="4. 决策树">
+<h2><span class="num">04</span>决策树</h2>
+<p>决策树不断选一个特征、选一个阈值，把数据切成两半，直到叶子节点足够纯。</p>
+<h3>怎么选分裂点</h3>
+<p>分类树常用基尼不纯度：</p>
+<div class="formula">$$\mathrm{Gini}=1-\sum_k p_k^2$$</div>
+<p>二分类里，一半一半时 Gini=0.5，全是一类时 Gini=0。每次分裂挑“切完加权 Gini 最小”的方案。</p>
+<p>回归树常用平方误差，分裂后两组方差越小越好。</p>
+<h3>优点和缺点</h3>
+<table>
+<tr><th>优点</th><th>缺点</th></tr>
+<tr><td>可解释，能画出来</td><td>容易过拟合，深一点就把训练集背下来</td></tr>
+<tr><td>不需要归一化</td><td>对数据扰动敏感，换一批样本树结构会变</td></tr>
+<tr><td>能处理非线性</td><td>单棵树表达能力有限</td></tr>
+</table>
+<div class="note">剪枝、限制最大深度、限制叶子最少样本，都是防过拟合。树不是越深越好。</div>
+</section>
+
+<section id="ensemble" data-title="5. 随机森林与 GBDT">
+<h2><span class="num">05</span>随机森林与 GBDT</h2>
+<p>单棵树不稳，集成多棵。两种主流思路：</p>
+<h3>Bagging / 随机森林</h3>
+<p>有放回地抽样，训练多棵树，每棵树只看部分特征，最后投票或取平均。目的是降低方差。</p>
+<p>随机森林的两个随机：样本随机、特征随机。树之间越不相关，平均后越稳。</p>
+<h3>Boosting / GBDT</h3>
+<p>一棵一棵串行训练，每棵新树拟合前面模型的残差。目的是降低偏差。</p>
+<div class="formula">$$F_m(x)=F_{m-1}(x)+\eta h_m(x)$$</div>
+<p>$h_m$ 是第 m 棵小树，$\eta$ 是学习率。学习率小，需要更多树，但泛化通常更好。</p>
+<table>
+<tr><th>方法</th><th>训练方式</th><th>主要降什么</th></tr>
+<tr><td>随机森林</td><td>并行，独立树</td><td>方差</td></tr>
+<tr><td>GBDT</td><td>串行，拟合残差</td><td>偏差</td></tr>
+</table>
+</section>
+
+<section id="kmeans" data-title="6. KMeans 聚类">
+<h2><span class="num">06</span>KMeans 聚类</h2>
+<p>没有标签，只有一堆点。KMeans 想把它们分成 K 簇，让每个点到所属簇中心的距离平方和最小。</p>
+<div class="formula">$$J=\sum_{i=1}^n\|\mathbf x_i-\boldsymbol\mu_{c_i}\|^2$$</div>
+<h3>算法两步循环</h3>
+<ol>
+<li>分配：每个点归到最近的中心。</li>
+<li>更新：每个簇的中心改成簇内点的均值。</li>
+</ol>
+<p>重复到中心不再明显移动。</p>
+<h3>手算例子</h3>
+<p>一维点 1、2、3、10、11、12，K=2。初始中心取 1 和 10。分配后第一簇 1,2,3，第二簇 10,11,12。新中心 2 和 11。再分配不变，结束。</p>
+<div class="warn">KMeans 对初始中心敏感，结果可能是局部最优。实际会跑多次取最好的。它假设簇是球形、大小相近，长条形簇不适合。</div>
+</section>
+
+<section id="pca" data-title="7. PCA 降维">
+<h2><span class="num">07</span>PCA 降维</h2>
+<p>PCA 找方差最大的方向，把数据投影过去，用更少的维度保留尽量多的信息。</p>
+<h3>步骤</h3>
+<ol>
+<li>中心化：每个特征减去均值。</li>
+<li>算协方差矩阵。</li>
+<li>求特征值和特征向量。</li>
+<li>取最大的 k 个特征向量，投影。</li>
+</ol>
+<p>保留方差比例 = 前 k 个特征值之和 / 所有特征值之和。</p>
+<h3>例子</h3>
+<p>二维数据沿 $y=x$ 方向拉得很长，垂直方向很窄。PCA 第一主成分接近 $[1,1]/\sqrt2$，第二主成分接近 $[1,-1]/\sqrt2$。只保留第一维，就把二维压成一维，信息损失很小。</p>
+<div class="note">PCA 是无监督的，不看标签。它可能把“对分类最有用的方向”丢掉，因为那个方向方差不一定大。</div>
+</section>
+
+<section id="bias" data-title="8. 偏差、方差与正则化">
+<h2><span class="num">08</span>偏差、方差与正则化</h2>
+<p>模型误差可以拆成三块：偏差、方差、噪声。</p>
+<table>
+<tr><th>来源</th><th>表现</th><th>处理</th></tr>
+<tr><td>偏差高</td><td>训练集和测试集都差</td><td>换更复杂的模型、加特征</td></tr>
+<tr><td>方差高</td><td>训练集很好，测试集差</td><td>加数据、正则化、简化模型、集成</td></tr>
+<tr><td>噪声</td><td>数据本身有随机性</td><td>无法消除，只能估计</td></tr>
+</table>
+<h3>正则化</h3>
+<div class="formula">$$L_{\text{total}}=L_{\text{data}}+\lambda\|\mathbf w\|_2^2$$</div>
+<p>$\lambda$ 越大，权重被压得越小，模型越简单，方差降低，偏差可能升高。</p>
+<div class="warn">“训练集 loss 还在降”不等于还能继续训练。要看验证集 loss 是否开始上升。</div>
+</section>
+
+<section id="validation" data-title="9. 交叉验证与数据泄漏">
+<h2><span class="num">09</span>交叉验证与数据泄漏</h2>
+<p>数据少时，留出法波动大。K 折交叉验证把数据分成 K 份，轮流拿一份做验证，其余训练，最后平均。</p>
+<h3>数据泄漏的几种常见形态</h3>
+<ul>
+<li>先对全量数据做标准化，再切训练/测试。测试集的均值方差泄漏进了训练。</li>
+<li>用未来数据预测过去。时间序列必须按时间切。</li>
+<li>同一用户/同一患者的样本同时出现在训练和测试。</li>
+<li>用测试集反复调参，测试集就不再“没见过的数据”。</li>
+</ul>
+<div class="good">正确顺序：先切分，再在训练集上拟合预处理器，最后把同样的变换应用到验证/测试集。</div>
+</section>
+
+<section id="metrics" data-title="10. 评估与选型">
+<h2><span class="num">10</span>评估与选型</h2>
+<p>不同任务用不同指标。分类别只看准确率，尤其类别不平衡时。</p>
+<table>
+<tr><th>指标</th><th>问的问题</th></tr>
+<tr><td>准确率</td><td>一共判对多少</td></tr>
+<tr><td>精确率 P</td><td>判为正的里面，有多少真的是正</td></tr>
+<tr><td>召回率 R</td><td>真正的正例里，有多少被找出来</td></tr>
+<tr><td>F1</td><td>P 和 R 的调和平均</td></tr>
+<tr><td>AUC</td><td>随机取一正一负，正例排在负例前面的概率</td></tr>
+<tr><td>RMSE</td><td>回归预测误差的平方根</td></tr>
+</table>
+<p>垃圾邮件过滤更怕误报，精确率优先；疾病筛查更怕漏诊，召回率优先。</p>
+<div class="note">选型不只看指标，还要看推理成本、可解释性、数据需求、上线环境。一个小而稳的模型常比大模型更合适。</div>
+</section>
+
+<section id="mistakes" data-title="11. 常见误解与自测">
+<h2><span class="num">11</span>常见误解与自测</h2>
+<h3>四个误解</h3>
+<ul>
+<li><strong>“模型越复杂越好”</strong>：复杂度上去，方差也上去；数据不够时简单模型反而赢。</li>
+<li><strong>“准确率 95% 就很强”</strong>：如果 95% 样本都是负类，全判负也有 95%。</li>
+<li><strong>“随机森林不会过拟合”</strong>：树太多、太深仍会过拟合，只是比单树稳。</li>
+<li><strong>“PCA 一定保留分类信息”</strong>：PCA 只看方差，不看标签。</li>
+</ul>
+<h3>自测</h3>
+<div class="quiz" data-answer="1" data-explain="逻辑回归先算线性分数，再经 sigmoid 输出 0–1 的概率。">
+<p class="q">1. 逻辑回归的输出是什么？</p>
+<button class="opt">A. 连续实数，没有范围</button>
+<button class="opt">B. 0 到 1 之间的概率</button>
+<button class="opt">C. 只能是 0 或 1</button>
+<button class="opt">D. 多维向量</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="2" data-explain="随机森林用样本随机和特征随机训练多棵独立树，再投票/平均，主要降方差。">
+<p class="q">2. 随机森林主要通过什么降低误差？</p>
+<button class="opt">A. 降低偏差</button>
+<button class="opt">B. 降低噪声</button>
+<button class="opt">C. 降低方差</button>
+<button class="opt">D. 提高学习率</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="0" data-explain="GBDT 串行训练，每棵新树拟合前面模型的残差，主要降偏差。">
+<p class="q">3. GBDT 的训练方式是哪一种？</p>
+<button class="opt">A. 串行拟合残差</button>
+<button class="opt">B. 并行独立树</button>
+<button class="opt">C. 只用一棵树</button>
+<button class="opt">D. 随机投影</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="3" data-explain="先全量标准化再切分，测试集信息进入训练，属于数据泄漏。">
+<p class="q">4. 下面哪种做法会造成数据泄漏？</p>
+<button class="opt">A. 先切分，再在训练集上拟合标准化</button>
+<button class="opt">B. 用验证集选超参数</button>
+<button class="opt">C. 用测试集评估一次</button>
+<button class="opt">D. 先对全量数据标准化，再切分</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="1" data-explain="类别不平衡时全判负也可能有高准确率，要看 P/R/F1 和混淆矩阵。">
+<p class="q">5. 95% 样本是负类，模型全判负，准确率 95%。这说明？</p>
+<button class="opt">A. 模型很好</button>
+<button class="opt">B. 准确率失真，要看 P/R/F1</button>
+<button class="opt">C. 数据没有标签</button>
+<button class="opt">D. 应该直接用 AUC</button>
+<div class="fb"></div>
+</div>
+</section>

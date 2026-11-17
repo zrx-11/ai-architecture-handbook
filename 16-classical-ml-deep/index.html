@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>经典机器学习 · 深潜课</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%237c5bff'/><text x='50' y='68' font-size='44' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>DS</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161922;--bg3:#1e2230;--panel:#1a1e2a;
+  --text:#e4e6ed;--muted:#9ba1b3;--dim:#6b7184;
+  --accent:#7c5bff;--accent2:#5b9dff;--green:#38d39f;--warn:#f5a623;
+  --border:#2a3040;--soft:rgba(124,91,255,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden;max-width:100vw}
+body{font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.78;font-size:15.5px;overflow-x:hidden;
+  overflow-wrap:break-word;word-break:break-word}
+a{color:var(--accent2);text-decoration:none}
+a:hover{text-decoration:underline}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:999;width:0}
+.topbar{position:fixed;top:3px;left:0;right:0;height:54px;background:rgba(15,17,23,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:900;
+  display:flex;align-items:center;gap:12px;padding:0 18px}
+.topbar button{display:none;background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:7px 10px;font-size:17px;cursor:pointer}
+.brand{font-weight:700;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand span{color:var(--muted);font-weight:400;margin-left:8px}
+.topbar .back{margin-left:auto;font-size:12.5px;color:var(--muted);border:1px solid var(--border);
+  padding:5px 9px;border-radius:999px;white-space:nowrap}
+.sidebar{position:fixed;top:57px;left:0;bottom:0;width:250px;background:var(--bg2);
+  border-right:1px solid var(--border);overflow-y:auto;padding:18px 0;z-index:800;
+  transition:transform .25s}
+.sidebar h2{font-size:12px;color:var(--dim);font-weight:600;letter-spacing:.08em;
+  padding:0 20px 10px;text-transform:uppercase}
+.nav-item{display:block;padding:9px 20px;font-size:13px;color:var(--muted);
+  border-left:3px solid transparent;cursor:pointer;line-height:1.45}
+.nav-item:hover{background:var(--bg3);color:var(--text);text-decoration:none}
+.nav-item.active{border-left-color:var(--accent);color:var(--text);background:var(--bg3)}
+.nav-item small{display:block;color:var(--dim);font-size:11px;margin-top:1px}
+.main{margin-left:250px;padding:80px 28px 60px;max-width:1180px}
+.wrap{max-width:860px;margin:0 auto}
+section{padding:4px 0 30px;border-bottom:1px solid rgba(42,48,64,.55);margin-bottom:26px;scroll-margin-top:70px}
+section:last-of-type{border-bottom:0}
+h2{font-size:clamp(1.35rem,3vw,1.85rem);line-height:1.28;margin:8px 0 14px;letter-spacing:-.01em}
+h2 .num{color:var(--accent);font-size:.78em;margin-right:9px;font-variant-numeric:tabular-nums}
+h3{font-size:1.05rem;margin:18px 0 7px;color:var(--text)}
+h4{font-size:.96rem;margin:14px 0 5px;color:var(--muted)}
+p{margin:9px 0}
+ul,ol{margin:8px 0 10px 1.35em}
+li{margin:4px 0}
+strong{color:#fff;font-weight:650}
+code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--bg3);
+  padding:1px 5px;border-radius:4px;font-size:.9em;color:#c9d5ff}
+pre{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;
+  overflow-x:auto;font-size:13px;line-height:1.55;margin:12px 0}
+pre code{background:none;padding:0;color:#d8def0}
+.formula{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);
+  border-radius:8px;padding:10px 14px;margin:12px 0;overflow-x:auto;font-size:1.02em}
+.formula .katex-display{margin:0}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg3);color:#fff;font-weight:600;white-space:nowrap}
+td{color:var(--text)}
+table th:first-child,table td:first-child{white-space:nowrap}
+.note{background:rgba(91,157,255,.07);border:1px solid rgba(91,157,255,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#c9d8f5}
+.warn{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#f3d19a}
+.good{background:rgba(56,211,159,.07);border:1px solid rgba(56,211,159,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#b5f0d9}
+details{border:1px solid var(--border);border-radius:9px;margin:12px 0;background:var(--bg2)}
+details summary{cursor:pointer;padding:10px 13px;font-size:13.5px;color:var(--accent2);font-weight:600}
+details .inner{padding:2px 14px 14px;border-top:1px solid var(--border)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0}
+.flow .box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 11px;
+  font-size:13px;text-align:center;min-width:74px}
+.flow .arrow{color:var(--dim);font-size:18px}
+.quiz{border:1px solid var(--border);border-radius:11px;padding:14px;margin:14px 0;background:var(--bg2)}
+.quiz .q{font-weight:600;color:#fff;margin:0 0 9px;font-size:14.5px}
+.quiz .opt{display:block;width:100%;text-align:left;background:var(--bg);color:var(--text);
+  border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin:6px 0;font:inherit;
+  font-size:13.5px;cursor:pointer;line-height:1.5}
+.quiz .opt:hover{border-color:var(--accent)}
+.quiz .opt.ok{border-color:var(--green);background:rgba(56,211,159,.1)}
+.quiz .opt.bad{border-color:#ff6b6b;background:rgba(255,107,107,.1)}
+.quiz .fb{display:none;margin-top:9px;font-size:13.5px;line-height:1.65;color:var(--muted);border-top:1px dashed var(--border);padding-top:9px}
+.quiz .fb.show{display:block}
+.quiz .fb b{color:var(--text)}
+.pager{display:flex;justify-content:space-between;gap:10px;margin:18px 0 8px}
+.pager button{background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:9px 14px;font:inherit;font-size:13px;cursor:pointer}
+.pager button:hover{border-color:var(--accent)}
+.foot{color:var(--dim);font-size:12.5px;margin-top:24px;line-height:1.7}
+.katex-fallback{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.35);
+  border-radius:8px;padding:9px 12px;margin:10px 0;color:#f3d19a;font-size:13px;display:none}
+@media(max-width:900px){
+  .topbar button{display:block}
+  .brand span{display:none}
+  .sidebar{transform:translateX(-100%);top:57px;width:82vw;max-width:310px;box-shadow:20px 0 40px rgba(0,0,0,.35)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:76px 16px 48px}
+  h2{font-size:1.3rem}
+  .formula{padding:8px 10px}
+  .formula .katex{font-size:.86em}
+  table{font-size:12px}
+  .flow{gap:5px}.flow .box{font-size:12px;padding:6px 8px;min-width:60px}.flow .arrow{font-size:14px}
+}
+@media(max-width:420px){
+  body{font-size:15px}
+  .main{padding-left:13px;padding-right:13px}
+  .quiz .opt{font-size:13px}
+}
+</style>
+</head>
+<body>
+<div class="progress"></div>
+<header class="topbar">
+  <button id="menu" aria-label="目录">☰</button>
+  <div class="brand">经典机器学习<span>线性模型、树、集成、聚类与 PCA</span></div>
+  <a class="back" href="../index.html">返回主手册</a>
+</header>
+<aside class="sidebar">
+  <h2>课程目录</h2>
+  <a class="nav-item" data-target="intro">课程概览<small>00</small></a>
+<a class="nav-item" data-target="task">1. 任务、特征、标签与泛化<small>01</small></a>
+<a class="nav-item" data-target="linear">2. 线性回归<small>02</small></a>
+<a class="nav-item" data-target="logistic">3. 逻辑回归<small>03</small></a>
+<a class="nav-item" data-target="tree">4. 决策树<small>04</small></a>
+<a class="nav-item" data-target="ensemble">5. 随机森林与 GBDT<small>05</small></a>
+<a class="nav-item" data-target="kmeans">6. KMeans 聚类<small>06</small></a>
+<a class="nav-item" data-target="pca">7. PCA 降维<small>07</small></a>
+<a class="nav-item" data-target="bias">8. 偏差、方差与正则化<small>08</small></a>
+<a class="nav-item" data-target="validation">9. 交叉验证与数据泄漏<small>09</small></a>
+<a class="nav-item" data-target="metrics">10. 评估与选型<small>10</small></a>
+<a class="nav-item" data-target="mistakes">11. 常见误解与自测<small>11</small></a>
+</aside>
+<main class="main"><div class="wrap">
+<div class="katex-fallback">公式需要联网加载 KaTeX。当前显示的是 LaTeX 源码，文字、表格、测验仍可用。</div>
+<section id="intro" data-title="课程概览">
+<h2><span class="num">00</span>课程概览：先把经典算法走一遍</h2>
+<p>这门课把机器学习最常用的几类算法连成一条线：线性回归、逻辑回归、决策树、随机森林/GBDT、KMeans、PCA。每个算法只回答三个问题：解决什么问题、目标函数是什么、怎么训练。</p>
+<h3>学完你能做到</h3>
+<ul>
+<li>拿到一个表格数据集，判断该用回归、分类还是聚类。</li>
+<li>手算一次线性回归的梯度，解释正则化在干什么。</li>
+<li>说清决策树怎么分裂、随机森林和 GBDT 的区别。</li>
+<li>用偏差—方差解释过拟合，知道什么时候加数据、什么时候加正则。</li>
+</ul>
+<div class="note">前置：会看 $y=kx+b$，知道均值、方差、概率的基本含义。矩阵和导数的细节在 `14-math-deep`，这里直接用结论。</div>
+<h3>路线</h3>
+<div class="flow">
+<div class="box">任务</div><div class="arrow">→</div><div class="box">线性回归</div><div class="arrow">→</div><div class="box">逻辑回归</div><div class="arrow">→</div><div class="box">树</div><div class="arrow">→</div><div class="box">集成</div><div class="arrow">→</div><div class="box">聚类</div><div class="arrow">→</div><div class="box">PCA</div>
+</div>
+</section>
+
+<section id="task" data-title="1. 任务、特征、标签与泛化">
+<h2><span class="num">01</span>任务、特征、标签与泛化</h2>
+<p>机器学习不是“让机器自己发现真理”，而是从数据里拟合一个函数，让它对没见过的样本也能给出靠谱输出。</p>
+<table>
+<tr><th>概念</th><th>白话</th><th>例子</th></tr>
+<tr><td>样本</td><td>一行数据</td><td>一个用户、一张图片</td></tr>
+<tr><td>特征</td><td>用来判断的输入列</td><td>年龄、收入、像素</td></tr>
+<tr><td>标签</td><td>想要的答案</td><td>是否流失、房价、类别</td></tr>
+<tr><td>训练集</td><td>用来调参数的数据</td><td>70% 样本</td></tr>
+<tr><td>验证集</td><td>用来选模型的数据</td><td>15% 样本</td></tr>
+<tr><td>测试集</td><td>最后只测一次的数据</td><td>15% 样本</td></tr>
+</table>
+<h3>三类任务</h3>
+<ul>
+<li><strong>回归</strong>：输出连续值，比如房价、温度。</li>
+<li><strong>分类</strong>：输出类别，比如垃圾邮件/正常邮件。</li>
+<li><strong>聚类</strong>：没有标签，把相似的样本分到一起。</li>
+</ul>
+<div class="warn">训练集准确率 99% 不代表模型好。模型可能只是把训练样本背下来了，换一批数据就崩。这叫过拟合。</div>
+</section>
+
+<section id="linear" data-title="2. 线性回归">
+<h2><span class="num">02</span>线性回归</h2>
+<p>模型：$\hat y=wx+b$。目标：让预测和真实值的平方误差尽量小。</p>
+<div class="formula">$$L(w,b)=\frac{1}{n}\sum_{i=1}^n(\hat y_i-y_i)^2$$</div>
+<h3>梯度</h3>
+<div class="formula">$$\frac{\partial L}{\partial w}=\frac{2}{n}\sum_i(\hat y_i-y_i)x_i,\qquad \frac{\partial L}{\partial b}=\frac{2}{n}\sum_i(\hat y_i-y_i)$$</div>
+<p>更新：$w\leftarrow w-\eta\frac{\partial L}{\partial w}$，$b$ 同理。</p>
+<h3>正规方程</h3>
+<p>线性回归有闭式解：$\mathbf w=(X^TX)^{-1}X^T\mathbf y$。特征很多时矩阵求逆太贵，实际多用梯度下降。</p>
+<div class="note">线性回归不只是“画一条直线”。特征可以先做平方、交叉，模型仍是线性的，但能拟合曲线。</div>
+</section>
+
+<section id="logistic" data-title="3. 逻辑回归">
+<h2><span class="num">03</span>逻辑回归</h2>
+<p>逻辑回归做二分类。先算线性分数 $z=wx+b$，再用 sigmoid 压到 0–1：</p>
+<div class="formula">$$\sigma(z)=\frac{1}{1+e^{-z}},\qquad P(y=1\mid x)=\sigma(wx+b)$$</div>
+<p>损失用交叉熵：</p>
+<div class="formula">$$L=-[y\log p+(1-y)\log(1-p)]$$</div>
+<p>梯度形式很干净：$\frac{\partial L}{\partial w}=(p-y)x$。预测概率 p 比真实 y 大，梯度为正，更新把 w 往回压。</p>
+<h3>决策边界</h3>
+<p>阈值取 0.5 时，$wx+b=0$ 就是分界线。二维里是一条直线，多维里是一个超平面。</p>
+<div class="warn">逻辑回归输出的是概率，不是硬类别。阈值 0.5 是人为选的，业务上可以调到 0.8 来减少误报。</div>
+</section>
+
+<section id="tree" data-title="4. 决策树">
+<h2><span class="num">04</span>决策树</h2>
+<p>决策树不断选一个特征、选一个阈值，把数据切成两半，直到叶子节点足够纯。</p>
+<h3>怎么选分裂点</h3>
+<p>分类树常用基尼不纯度：</p>
+<div class="formula">$$\mathrm{Gini}=1-\sum_k p_k^2$$</div>
+<p>二分类里，一半一半时 Gini=0.5，全是一类时 Gini=0。每次分裂挑“切完加权 Gini 最小”的方案。</p>
+<p>回归树常用平方误差，分裂后两组方差越小越好。</p>
+<h3>优点和缺点</h3>
+<table>
+<tr><th>优点</th><th>缺点</th></tr>
+<tr><td>可解释，能画出来</td><td>容易过拟合，深一点就把训练集背下来</td></tr>
+<tr><td>不需要归一化</td><td>对数据扰动敏感，换一批样本树结构会变</td></tr>
+<tr><td>能处理非线性</td><td>单棵树表达能力有限</td></tr>
+</table>
+<div class="note">剪枝、限制最大深度、限制叶子最少样本，都是防过拟合。树不是越深越好。</div>
+</section>
+
+<section id="ensemble" data-title="5. 随机森林与 GBDT">
+<h2><span class="num">05</span>随机森林与 GBDT</h2>
+<p>单棵树不稳，集成多棵。两种主流思路：</p>
+<h3>Bagging / 随机森林</h3>
+<p>有放回地抽样，训练多棵树，每棵树只看部分特征，最后投票或取平均。目的是降低方差。</p>
+<p>随机森林的两个随机：样本随机、特征随机。树之间越不相关，平均后越稳。</p>
+<h3>Boosting / GBDT</h3>
+<p>一棵一棵串行训练，每棵新树拟合前面模型的残差。目的是降低偏差。</p>
+<div class="formula">$$F_m(x)=F_{m-1}(x)+\eta h_m(x)$$</div>
+<p>$h_m$ 是第 m 棵小树，$\eta$ 是学习率。学习率小，需要更多树，但泛化通常更好。</p>
+<table>
+<tr><th>方法</th><th>训练方式</th><th>主要降什么</th></tr>
+<tr><td>随机森林</td><td>并行，独立树</td><td>方差</td></tr>
+<tr><td>GBDT</td><td>串行，拟合残差</td><td>偏差</td></tr>
+</table>
+</section>
+
+<section id="kmeans" data-title="6. KMeans 聚类">
+<h2><span class="num">06</span>KMeans 聚类</h2>
+<p>没有标签，只有一堆点。KMeans 想把它们分成 K 簇，让每个点到所属簇中心的距离平方和最小。</p>
+<div class="formula">$$J=\sum_{i=1}^n\|\mathbf x_i-\boldsymbol\mu_{c_i}\|^2$$</div>
+<h3>算法两步循环</h3>
+<ol>
+<li>分配：每个点归到最近的中心。</li>
+<li>更新：每个簇的中心改成簇内点的均值。</li>
+</ol>
+<p>重复到中心不再明显移动。</p>
+<h3>手算例子</h3>
+<p>一维点 1、2、3、10、11、12，K=2。初始中心取 1 和 10。分配后第一簇 1,2,3，第二簇 10,11,12。新中心 2 和 11。再分配不变，结束。</p>
+<div class="warn">KMeans 对初始中心敏感，结果可能是局部最优。实际会跑多次取最好的。它假设簇是球形、大小相近，长条形簇不适合。</div>
+</section>
+
+<section id="pca" data-title="7. PCA 降维">
+<h2><span class="num">07</span>PCA 降维</h2>
+<p>PCA 找方差最大的方向，把数据投影过去，用更少的维度保留尽量多的信息。</p>
+<h3>步骤</h3>
+<ol>
+<li>中心化：每个特征减去均值。</li>
+<li>算协方差矩阵。</li>
+<li>求特征值和特征向量。</li>
+<li>取最大的 k 个特征向量，投影。</li>
+</ol>
+<p>保留方差比例 = 前 k 个特征值之和 / 所有特征值之和。</p>
+<h3>例子</h3>
+<p>二维数据沿 $y=x$ 方向拉得很长，垂直方向很窄。PCA 第一主成分接近 $[1,1]/\sqrt2$，第二主成分接近 $[1,-1]/\sqrt2$。只保留第一维，就把二维压成一维，信息损失很小。</p>
+<div class="note">PCA 是无监督的，不看标签。它可能把“对分类最有用的方向”丢掉，因为那个方向方差不一定大。</div>
+</section>
+
+<section id="bias" data-title="8. 偏差、方差与正则化">
+<h2><span class="num">08</span>偏差、方差与正则化</h2>
+<p>模型误差可以拆成三块：偏差、方差、噪声。</p>
+<table>
+<tr><th>来源</th><th>表现</th><th>处理</th></tr>
+<tr><td>偏差高</td><td>训练集和测试集都差</td><td>换更复杂的模型、加特征</td></tr>
+<tr><td>方差高</td><td>训练集很好，测试集差</td><td>加数据、正则化、简化模型、集成</td></tr>
+<tr><td>噪声</td><td>数据本身有随机性</td><td>无法消除，只能估计</td></tr>
+</table>
+<h3>正则化</h3>
+<div class="formula">$$L_{\text{total}}=L_{\text{data}}+\lambda\|\mathbf w\|_2^2$$</div>
+<p>$\lambda$ 越大，权重被压得越小，模型越简单，方差降低，偏差可能升高。</p>
+<div class="warn">“训练集 loss 还在降”不等于还能继续训练。要看验证集 loss 是否开始上升。</div>
+</section>
+
+<section id="validation" data-title="9. 交叉验证与数据泄漏">
+<h2><span class="num">09</span>交叉验证与数据泄漏</h2>
+<p>数据少时，留出法波动大。K 折交叉验证把数据分成 K 份，轮流拿一份做验证，其余训练，最后平均。</p>
+<h3>数据泄漏的几种常见形态</h3>
+<ul>
+<li>先对全量数据做标准化，再切训练/测试。测试集的均值方差泄漏进了训练。</li>
+<li>用未来数据预测过去。时间序列必须按时间切。</li>
+<li>同一用户/同一患者的样本同时出现在训练和测试。</li>
+<li>用测试集反复调参，测试集就不再“没见过的数据”。</li>
+</ul>
+<div class="good">正确顺序：先切分，再在训练集上拟合预处理器，最后把同样的变换应用到验证/测试集。</div>
+</section>
+
+<section id="metrics" data-title="10. 评估与选型">
+<h2><span class="num">10</span>评估与选型</h2>
+<p>不同任务用不同指标。分类别只看准确率，尤其类别不平衡时。</p>
+<table>
+<tr><th>指标</th><th>问的问题</th></tr>
+<tr><td>准确率</td><td>一共判对多少</td></tr>
+<tr><td>精确率 P</td><td>判为正的里面，有多少真的是正</td></tr>
+<tr><td>召回率 R</td><td>真正的正例里，有多少被找出来</td></tr>
+<tr><td>F1</td><td>P 和 R 的调和平均</td></tr>
+<tr><td>AUC</td><td>随机取一正一负，正例排在负例前面的概率</td></tr>
+<tr><td>RMSE</td><td>回归预测误差的平方根</td></tr>
+</table>
+<p>垃圾邮件过滤更怕误报，精确率优先；疾病筛查更怕漏诊，召回率优先。</p>
+<div class="note">选型不只看指标，还要看推理成本、可解释性、数据需求、上线环境。一个小而稳的模型常比大模型更合适。</div>
+</section>
+
+<section id="mistakes" data-title="11. 常见误解与自测">
+<h2><span class="num">11</span>常见误解与自测</h2>
+<h3>四个误解</h3>
+<ul>
+<li><strong>“模型越复杂越好”</strong>：复杂度上去，方差也上去；数据不够时简单模型反而赢。</li>
+<li><strong>“准确率 95% 就很强”</strong>：如果 95% 样本都是负类，全判负也有 95%。</li>
+<li><strong>“随机森林不会过拟合”</strong>：树太多、太深仍会过拟合，只是比单树稳。</li>
+<li><strong>“PCA 一定保留分类信息”</strong>：PCA 只看方差，不看标签。</li>
+</ul>
+<h3>自测</h3>
+<div class="quiz" data-answer="1" data-explain="逻辑回归先算线性分数，再经 sigmoid 输出 0–1 的概率。">
+<p class="q">1. 逻辑回归的输出是什么？</p>
+<button class="opt">A. 连续实数，没有范围</button>
+<button class="opt">B. 0 到 1 之间的概率</button>
+<button class="opt">C. 只能是 0 或 1</button>
+<button class="opt">D. 多维向量</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="2" data-explain="随机森林用样本随机和特征随机训练多棵独立树，再投票/平均，主要降方差。">
+<p class="q">2. 随机森林主要通过什么降低误差？</p>
+<button class="opt">A. 降低偏差</button>
+<button class="opt">B. 降低噪声</button>
+<button class="opt">C. 降低方差</button>
+<button class="opt">D. 提高学习率</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="0" data-explain="GBDT 串行训练，每棵新树拟合前面模型的残差，主要降偏差。">
+<p class="q">3. GBDT 的训练方式是哪一种？</p>
+<button class="opt">A. 串行拟合残差</button>
+<button class="opt">B. 并行独立树</button>
+<button class="opt">C. 只用一棵树</button>
+<button class="opt">D. 随机投影</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="3" data-explain="先全量标准化再切分，测试集信息进入训练，属于数据泄漏。">
+<p class="q">4. 下面哪种做法会造成数据泄漏？</p>
+<button class="opt">A. 先切分，再在训练集上拟合标准化</button>
+<button class="opt">B. 用验证集选超参数</button>
+<button class="opt">C. 用测试集评估一次</button>
+<button class="opt">D. 先对全量数据标准化，再切分</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="1" data-explain="类别不平衡时全判负也可能有高准确率，要看 P/R/F1 和混淆矩阵。">
+<p class="q">5. 95% 样本是负类，模型全判负，准确率 95%。这说明？</p>
+<button class="opt">A. 模型很好</button>
+<button class="opt">B. 准确率失真，要看 P/R/F1</button>
+<button class="opt">C. 数据没有标签</button>
+<button class="opt">D. 应该直接用 AUC</button>
+<div class="fb"></div>
+</div>
+</section>
+
+<div class="pager"><button id="prev">← 上一节</button><button id="next">下一节 →</button></div>
+<div class="foot">这套深潜课是独立单文件页，进度存在本机浏览器。公式用 KaTeX 渲染；离线时显示源码，不影响阅读正文。<br>
+相关分册：<a href="../index.html">主学习手册</a> · <a href="../00-跨书总览/深潜专题.md">深潜专题</a></div>
+</div></main>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+const sections=[...document.querySelectorAll('section')];
+const nav=[...document.querySelectorAll('.nav-item')];
+const bar=document.querySelector('.progress');
+const key='deep:'+location.pathname.split('/').filter(Boolean).slice(-2,-1)[0];
+let cur=0;
+function show(i,push){
+  i=Math.max(0,Math.min(sections.length-1,i));
+  sections.forEach((s,k)=>s.style.display=(k===i?'block':'none'));
+  nav.forEach((n,k)=>n.classList.toggle('active',k===i));
+  cur=i;
+  bar.style.width=((i+1)/sections.length*100)+'%';
+  try{localStorage.setItem(key,String(i))}catch(e){}
+  if(push) history.replaceState(null,'','#'+sections[i].id);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+nav.forEach((n,i)=>n.addEventListener('click',()=>{show(i,true);document.querySelector('.sidebar').classList.remove('open')}));
+document.querySelector('#menu').addEventListener('click',()=>document.querySelector('.sidebar').classList.toggle('open'));
+document.addEventListener('click',e=>{if(e.target.closest('.sidebar')||e.target.closest('#menu'))return;document.querySelector('.sidebar').classList.remove('open')});
+document.querySelector('#prev').addEventListener('click',()=>show(cur-1,true));
+document.querySelector('#next').addEventListener('click',()=>show(cur+1,true));
+try{const saved=localStorage.getItem(key);if(saved!==null)cur=+saved||0}catch(e){}
+const hash=location.hash.slice(1);const hi=sections.findIndex(s=>s.id===hash);if(hi>=0)cur=hi;
+show(cur,false);
+setTimeout(()=>window.scrollTo({top:0,behavior:"auto"}),0);
+
+document.querySelectorAll('.quiz').forEach(q=>{
+  const opts=[...q.querySelectorAll('.opt')], ans=+q.dataset.answer, fb=q.querySelector('.fb');
+  opts.forEach((o,i)=>o.addEventListener('click',()=>{
+    opts.forEach(x=>x.classList.remove('ok','bad'));
+    if(i===ans){o.classList.add('ok')}else{o.classList.add('bad');opts[ans].classList.add('ok')}
+    fb.innerHTML=(i===ans?'<b>正确。</b> ':'<b>不对。</b> ')+(q.dataset.explain||'');
+    fb.classList.add('show');
+    if(window.renderMathInElement){
+      try{renderMathInElement(fb,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});}catch(e){}
+    }
+  }));
+});
+
+function render(){
+  if(!window.renderMathInElement){
+    const el=document.querySelector('.katex-fallback'); if(el) el.style.display='block'; return;
+  }
+  try{
+    renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});
+  }catch(e){const el=document.querySelector('.katex-fallback'); if(el) el.style.display='block';}
+}
+window.addEventListener('load',render);
+</script>
+</body>
+</html>

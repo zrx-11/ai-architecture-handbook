@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DeepSeek 架构深潜 · 深潜课</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%237c5bff'/><text x='50' y='68' font-size='44' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>DS</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161922;--bg3:#1e2230;--panel:#1a1e2a;
+  --text:#e4e6ed;--muted:#9ba1b3;--dim:#6b7184;
+  --accent:#7c5bff;--accent2:#5b9dff;--green:#38d39f;--warn:#f5a623;
+  --border:#2a3040;--soft:rgba(124,91,255,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden;max-width:100vw}
+body{font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.78;font-size:15.5px;overflow-x:hidden;
+  overflow-wrap:break-word;word-break:break-word}
+a{color:var(--accent2);text-decoration:none}
+a:hover{text-decoration:underline}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:999;width:0}
+.topbar{position:fixed;top:3px;left:0;right:0;height:54px;background:rgba(15,17,23,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:900;
+  display:flex;align-items:center;gap:12px;padding:0 18px}
+.topbar button{display:none;background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:7px 10px;font-size:17px;cursor:pointer}
+.brand{font-weight:700;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand span{color:var(--muted);font-weight:400;margin-left:8px}
+.topbar .back{margin-left:auto;font-size:12.5px;color:var(--muted);border:1px solid var(--border);
+  padding:5px 9px;border-radius:999px;white-space:nowrap}
+.sidebar{position:fixed;top:57px;left:0;bottom:0;width:250px;background:var(--bg2);
+  border-right:1px solid var(--border);overflow-y:auto;padding:18px 0;z-index:800;
+  transition:transform .25s}
+.sidebar h2{font-size:12px;color:var(--dim);font-weight:600;letter-spacing:.08em;
+  padding:0 20px 10px;text-transform:uppercase}
+.nav-item{display:block;padding:9px 20px;font-size:13px;color:var(--muted);
+  border-left:3px solid transparent;cursor:pointer;line-height:1.45}
+.nav-item:hover{background:var(--bg3);color:var(--text);text-decoration:none}
+.nav-item.active{border-left-color:var(--accent);color:var(--text);background:var(--bg3)}
+.nav-item small{display:block;color:var(--dim);font-size:11px;margin-top:1px}
+.main{margin-left:250px;padding:80px 28px 60px;max-width:1180px}
+.wrap{max-width:860px;margin:0 auto}
+section{padding:4px 0 30px;border-bottom:1px solid rgba(42,48,64,.55);margin-bottom:26px;scroll-margin-top:70px}
+section:last-of-type{border-bottom:0}
+h2{font-size:clamp(1.35rem,3vw,1.85rem);line-height:1.28;margin:8px 0 14px;letter-spacing:-.01em}
+h2 .num{color:var(--accent);font-size:.78em;margin-right:9px;font-variant-numeric:tabular-nums}
+h3{font-size:1.05rem;margin:18px 0 7px;color:var(--text)}
+h4{font-size:.96rem;margin:14px 0 5px;color:var(--muted)}
+p{margin:9px 0}
+ul,ol{margin:8px 0 10px 1.35em}
+li{margin:4px 0}
+strong{color:#fff;font-weight:650}
+code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--bg3);
+  padding:1px 5px;border-radius:4px;font-size:.9em;color:#c9d5ff}
+pre{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;
+  overflow-x:auto;font-size:13px;line-height:1.55;margin:12px 0}
+pre code{background:none;padding:0;color:#d8def0}
+.formula{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);
+  border-radius:8px;padding:10px 14px;margin:12px 0;overflow-x:auto;font-size:1.02em}
+.formula .katex-display{margin:0}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg3);color:#fff;font-weight:600;white-space:nowrap}
+td{color:var(--text)}
+table th:first-child,table td:first-child{white-space:nowrap}
+.note{background:rgba(91,157,255,.07);border:1px solid rgba(91,157,255,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#c9d8f5}
+.warn{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#f3d19a}
+.good{background:rgba(56,211,159,.07);border:1px solid rgba(56,211,159,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#b5f0d9}
+details{border:1px solid var(--border);border-radius:9px;margin:12px 0;background:var(--bg2)}
+details summary{cursor:pointer;padding:10px 13px;font-size:13.5px;color:var(--accent2);font-weight:600}
+details .inner{padding:2px 14px 14px;border-top:1px solid var(--border)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0}
+.flow .box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 11px;
+  font-size:13px;text-align:center;min-width:74px}
+.flow .arrow{color:var(--dim);font-size:18px}
+.quiz{border:1px solid var(--border);border-radius:11px;padding:14px;margin:14px 0;background:var(--bg2)}
+.quiz .q{font-weight:600;color:#fff;margin:0 0 9px;font-size:14.5px}
+.quiz .opt{display:block;width:100%;text-align:left;background:var(--bg);color:var(--text);
+  border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin:6px 0;font:inherit;
+  font-size:13.5px;cursor:pointer;line-height:1.5}
+.quiz .opt:hover{border-color:var(--accent)}
+.quiz .opt.ok{border-color:var(--green);background:rgba(56,211,159,.1)}
+.quiz .opt.bad{border-color:#ff6b6b;background:rgba(255,107,107,.1)}
+.quiz .fb{display:none;margin-top:9px;font-size:13.5px;line-height:1.65;color:var(--muted);border-top:1px dashed var(--border);padding-top:9px}
+.quiz .fb.show{display:block}
+.quiz .fb b{color:var(--text)}
+.pager{display:flex;justify-content:space-between;gap:10px;margin:18px 0 8px}
+.pager button{background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:9px 14px;font:inherit;font-size:13px;cursor:pointer}
+.pager button:hover{border-color:var(--accent)}
+.foot{color:var(--dim);font-size:12.5px;margin-top:24px;line-height:1.7}
+.katex-fallback{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.35);
+  border-radius:8px;padding:9px 12px;margin:10px 0;color:#f3d19a;font-size:13px;display:none}
+@media(max-width:900px){
+  .topbar button{display:block}
+  .brand span{display:none}
+  .sidebar{transform:translateX(-100%);top:57px;width:82vw;max-width:310px;box-shadow:20px 0 40px rgba(0,0,0,.35)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:76px 16px 48px}
+  h2{font-size:1.3rem}
+  .formula{padding:8px 10px}
+  .formula .katex{font-size:.86em}
+  table{font-size:12px}
+  .flow{gap:5px}.flow .box{font-size:12px;padding:6px 8px;min-width:60px}.flow .arrow{font-size:14px}
+}
+@media(max-width:420px){
+  body{font-size:15px}
+  .main{padding-left:13px;padding-right:13px}
+  .quiz .opt{font-size:13px}
+}
+</style>
+</head>
+<body>
+<div class="progress"></div>
+<header class="topbar">
+  <button id="menu" aria-label="目录">☰</button>
+  <div class="brand">DeepSeek 架构深潜<span>MoE、MLA、DSA、CSA 与 V4.1</span></div>
+  <a class="back" href="../index.html">返回主手册</a>
+</header>
+<aside class="sidebar">
+  <h2>课程目录</h2>
+  <a class="nav-item" data-target="intro">课程概览<small>00</small></a>
+<a class="nav-item" data-target="family">1. 家族时间线与三代骨架<small>01</small></a>
+<a class="nav-item" data-target="moe">2. MoE：把 FFN 拆成专家<small>02</small></a>
+<a class="nav-item" data-target="mla">3. MLA：把 KV cache 压小<small>03</small></a>
+<a class="nav-item" data-target="mtp">4. MTP：一次预测多个 token<small>04</small></a>
+<a class="nav-item" data-target="dsa">5. DSA：稀疏注意力<small>05</small></a>
+<a class="nav-item" data-target="csa">6. CSA：压缩稀疏注意力<small>06</small></a>
+<a class="nav-item" data-target="hca">7. HCA：混合压缩注意力<small>07</small></a>
+<a class="nav-item" data-target="mhc">8. mHC 与 Muon<small>08</small></a>
+<a class="nav-item" data-target="engram">9. Engram 与 DSpark<small>09</small></a>
+<a class="nav-item" data-target="v41">10. V4.1 的 CED 与 CSA2<small>10</small></a>
+<a class="nav-item" data-target="selection">11. 选型与成本<small>11</small></a>
+<a class="nav-item" data-target="mistakes">12. 常见误解与自测<small>12</small></a>
+</aside>
+<main class="main"><div class="wrap">
+<div class="katex-fallback">公式需要联网加载 KaTeX。当前显示的是 LaTeX 源码，文字、表格、测验仍可用。</div>
+<section id="intro" data-title="课程概览">
+<h2><span class="num">00</span>课程概览：把 DeepSeek 的结构件串成一条线</h2>
+<p>这门课只讲架构，不重复论文里的实验表格。主线是：dense → DeepSeekMoE → MLA → MTP → DSA → V4 的 CSA/HCA → V4.1 的 CED/CSA2/Engram/DSpark。每一节都回答两个问题：解决什么瓶颈，代价是什么。</p>
+<h3>学完你能做到</h3>
+<ul>
+<li>用参数量、激活参数、KV cache 三个数字描述一代模型。</li>
+<li>说清 MoE 的路由、共享专家、负载均衡各自解决什么问题。</li>
+<li>手算 MLA 每 token 每层缓存多少字节，以及 128K 上下文的总账。</li>
+<li>解释 DSA、CSA、HCA、CED 分别在压缩什么。</li>
+</ul>
+<div class="note">前置：知道注意力、FFN、KV cache、softmax。没读过论文也能跟，但建议先看 `02-paper-teardown` 和 `03-architecture` 的对应章节。</div>
+<h3>路线</h3>
+<div class="flow">
+<div class="box">家族</div><div class="arrow">→</div><div class="box">MoE</div><div class="arrow">→</div><div class="box">MLA</div><div class="arrow">→</div><div class="box">MTP</div><div class="arrow">→</div><div class="box">DSA</div><div class="arrow">→</div><div class="box">CSA/HCA</div><div class="arrow">→</div><div class="box">V4.1</div>
+</div>
+</section>
+
+<section id="family" data-title="1. 家族时间线与三代骨架">
+<h2><span class="num">01</span>家族时间线与三代骨架</h2>
+<p>先把代际和结构件对齐。不要背模型名，先记每一代解决了什么瓶颈。</p>
+<table>
+<tr><th>代际</th><th>总参数 / 激活</th><th>层数</th><th>路由专家</th><th>top-k</th><th>上下文</th><th>核心结构件</th></tr>
+<tr><td>V3</td><td>671B / 37B</td><td>61</td><td>256 + 1 共享</td><td>8</td><td>128K</td><td>MLA、DeepSeekMoE、MTP</td></tr>
+<tr><td>V4-Pro</td><td>约 1.6T / 49B</td><td>61</td><td>384 + 1 共享</td><td>6</td><td>1M</td><td>CSA、HCA、mHC、Muon、FP4</td></tr>
+<tr><td>V4-Flash</td><td>284B / 13B</td><td>43</td><td>256 + 1 共享</td><td>6</td><td>1M</td><td>同上，规模缩小</td></tr>
+<tr><td>V4.1-Flash</td><td>552B 主干 + 196B Engram</td><td>40</td><td>384 + 1 共享</td><td>6</td><td>1M</td><td>CED、CSA2、Engram、DSpark</td></tr>
+</table>
+<p>V3 的关键是“用 MoE 把总参数做大，用 MLA 把 KV cache 压小”。V4 的关键是“在 1M 上下文下，把注意力和缓存再压一层”。V4.1 的关键是“非对称压缩 + 外部记忆”。</p>
+<div class="warn">“总参数”不等于“每个 token 都算”。MoE 只激活 top-k 个专家，激活参数远小于总参数。看到 1.6T 先问激活是多少。</div>
+</section>
+
+<section id="moe" data-title="2. MoE：把 FFN 拆成专家">
+<h2><span class="num">02</span>MoE：把 FFN 拆成专家</h2>
+<p>Transformer 每层有两个大块：注意力 + FFN。FFN 通常占参数的大头。MoE 把一个大 FFN 拆成很多小专家，每个 token 只走其中几个。</p>
+<div class="formula">$$y=\sum_{i\in\text{top-}k}g_iE_i(x)$$</div>
+<p>$E_i$ 是第 i 个专家，$g_i$ 是路由权重。V3 有 256 个路由专家 + 1 个共享专家，top-8。</p>
+<h3>三个设计点</h3>
+<ul>
+<li><strong>细粒度专家</strong>：专家多而小，组合更灵活。</li>
+<li><strong>共享专家</strong>：每个 token 都过一个共享专家，兜住通用知识，减少路由专家之间的重复。</li>
+<li><strong>负载均衡</strong>：如果所有 token 都挤向少数专家，其他专家白占显存。训练时加辅助损失，逼路由分散。</li>
+</ul>
+<h3>参数量账</h3>
+<p>假设每个专家参数量 $P_e$，路由专家 $N$ 个，共享专家 1 个：总 FFN 参数约 $(N+1)P_e$，每 token 激活约 $(k+1)P_e$。V3 的 37B 激活里，大部分不是全部专家。</p>
+<div class="good">MoE 省的是“每 token 的计算”，不是“显存”。总参数仍要装进显存/内存，所以 MoE 模型通常需要多卡或大内存。</div>
+</section>
+
+<section id="mla" data-title="3. MLA：把 KV cache 压小">
+<h2><span class="num">03</span>MLA：把 KV cache 压小</h2>
+<p>标准多头注意力要缓存每个 token 的 K 和 V。层数越多、头越多、上下文越长，缓存越爆。</p>
+<p>V3 的 MLA 不直接缓存完整 K/V，而是缓存一个低秩潜向量，再投影出 K/V。论文口径下，每 token 每层缓存 512 + 64 = 576 个数。</p>
+<div class="formula">$$\text{每 token 每层字节}=576\times2=1152\ \text{B（BF16）}$$</div>
+<p>128K 上下文、61 层、单序列：</p>
+<div class="formula">$$128000\times61\times1152\approx9.21\ \text{GB}$$</div>
+<p>如果不压缩，同样配置下缓存会大得多。MLA 的代价是多了投影矩阵和计算，但省下的是显存和带宽。</p>
+<div class="note">576 这个数不是“所有头加起来 576 维”，而是论文里每 token 每层的缓存元素数。不同实现可能有布局差异，算账时以 config 和代码为准。</div>
+</section>
+
+<section id="mtp" data-title="4. MTP：一次预测多个 token">
+<h2><span class="num">04</span>MTP：一次预测多个 token</h2>
+<p>标准语言模型一次只预测下一个 token。MTP（多 token 预测）让模型在一次前向里预测未来多个 token，训练信号更密，也表示规划能力。</p>
+<p>DeepSeek 的 MTP 不是简单加几个独立输出头，而是让第 $k$ 个预测头看前面已经预测出的 token 表示，形成链式依赖。</p>
+<div class="formula">$$p(x_{t+1},x_{t+2}\mid x_{\le t})=p(x_{t+1}\mid x_{\le t})\cdot p(x_{t+2}\mid x_{\le t},x_{t+1})$$</div>
+<h3>推理时怎么用</h3>
+<p>MTP 头可以拿来做投机解码：先草拟多个 token，再用主模型验证。验证通过就一次接受多个，提升吞吐。不是所有部署都会开，取决于实现和负载。</p>
+<div class="warn">MTP 增加训练计算和显存。它的收益主要在训练信号和推理加速，不是“白送”。</div>
+</section>
+
+<section id="dsa" data-title="5. DSA：稀疏注意力">
+<h2><span class="num">05</span>DSA：稀疏注意力</h2>
+<p>全注意力每个 token 要看前面所有 token。1M 上下文、单序列的注意力配对数约：</p>
+<div class="formula">$$10^6\times10^6=10^{12}$$</div>
+<p>DSA 只选 top-k 个最相关的历史 token 参与注意力。论文口径 top-k=2048：</p>
+<div class="formula">$$10^6\times2048\approx2.048\times10^9$$</div>
+<p>两者相差约 488 倍。这就是“百万上下文能不能跑”的关键。</p>
+<h3>怎么选 top-k</h3>
+<p>需要一个轻量的打分器，快速估计每个历史 token 的相关性，再取前 k 个。打分器不能太重，否则省下的注意力又被它吃掉。</p>
+<div class="note">稀疏注意力不是免费的：选错 token 会丢信息；top-k 太小，长文档问答会漏关键段落。k 是精度和成本的旋钮。</div>
+</section>
+
+<section id="csa" data-title="6. CSA：压缩稀疏注意力">
+<h2><span class="num">06</span>CSA：压缩稀疏注意力</h2>
+<p>V4 的 CSA 在 DSA 的基础上再压一层：先把历史 token 的 KV 压成块级表示，再在块上做稀疏选择。这样打分和注意力的对象都变少。</p>
+<p>直观理解：DSA 是“在 token 级别挑 top-k”，CSA 是“先把 token 分块压缩，再在块级别挑 top-k”。块内信息被池化，块间用稀疏注意力。</p>
+<h3>代价</h3>
+<ul>
+<li>压缩会丢细粒度信息，块太小省不了，块太大丢细节。</li>
+<li>块级选择可能漏掉块内的关键 token。</li>
+<li>实现复杂，训练和推理的 kernel 要配套。</li>
+</ul>
+<div class="good">CSA 的收益在长上下文：把“看所有 token”变成“看少量块”，计算和缓存一起降。短上下文时收益不明显。</div>
+</section>
+
+<section id="hca" data-title="7. HCA：混合压缩注意力">
+<h2><span class="num">07</span>HCA：混合压缩注意力</h2>
+<p>HCA 把不同粒度的注意力混在一起：一部分头/层做局部精细注意力，一部分做块级压缩注意力。局部头保住细节，压缩头管长程。</p>
+<p>这解决的是“全压缩丢细节、全精细太贵”的两难。混合的比例是设计参数，按任务和上下文长度调。</p>
+<table>
+<tr><th>结构</th><th>看什么</th><th>适合</th></tr>
+<tr><td>局部注意力</td><td>近处 token</td><td>语法、局部指代</td></tr>
+<tr><td>压缩/稀疏注意力</td><td>远处块</td><td>长文档、全局主题</td></tr>
+<tr><td>HCA</td><td>两者混合</td><td>既要细节又要长程</td></tr>
+</table>
+<div class="note">“混合”不是把所有机制简单相加。头数、层数、路由和缓存布局都要一起设计，否则省下的算力会被额外分支吃回去。</div>
+</section>
+
+<section id="mhc" data-title="8. mHC 与 Muon">
+<h2><span class="num">08</span>mHC 与 Muon</h2>
+<p>mHC 可以理解为“多头超连接”一类的结构件，目标是让信息在层间走多条路径，改善深层训练的信号传播。具体实现论文有定义，课程里不逐行复刻 kernel。</p>
+<p>Muon 是优化器方向的改动，核心是对动量矩阵做正交化/归一化，让更新方向更稳。它不等于“又一个 Adam 变体”，而是改更新矩阵的几何性质。</p>
+<h3>为什么架构课要讲优化器</h3>
+<p>同一副骨架，换优化器和初始化，训练稳定性和最终效果会差很多。DeepSeek 的技术报告把结构件和训练技巧放在一起讲，是有原因的。</p>
+<div class="warn">mHC 和 Muon 的细节在论文里没有全部展开到 kernel 级。看到二手解读里给出“精确公式”时，先回去核对原文，别把推测当事实。</div>
+</section>
+
+<section id="engram" data-title="9. Engram 与 DSpark">
+<h2><span class="num">09</span>Engram 与 DSpark</h2>
+<p>Engram 是 V4.1 引入的外部记忆/查表结构。它把一部分知识从“参数里算出来”变成“按索引查出来”，主干参数不必把所有事实都背进去。</p>
+<p>V4.1-Flash 的口径是 552B 主干 + 196B Engram，总参数约 763B，但 prefill 激活 8B、decode 激活 16B。注意 prefill 和 decode 的激活不一样，因为两者计算模式不同。</p>
+<p>DSpark 是 V4.1 的推理/稀疏化相关结构件，目标是进一步降低长上下文解码的成本。论文里对它的公开细节有限，课程里只讲它解决的问题，不编造实现。</p>
+<div class="note">Engram 的“查表”不是普通 embedding 查找。它和主干的交互、路由、训练目标都需要设计，不能简单理解成“外挂一个知识库”。</div>
+</section>
+
+<section id="v41" data-title="10. V4.1 的 CED 与 CSA2">
+<h2><span class="num">10</span>V4.1 的 CED 与 CSA2</h2>
+<p>V4.1 的核心叙事是“非对称压缩”：prefill 和 decode 的瓶颈不同，不用同一套压缩策略。</p>
+<ul>
+<li><strong>Prefill</strong>：一次处理整段 prompt，计算密集，重点是吞吐。</li>
+<li><strong>Decode</strong>：一次生成一个 token，访存密集，重点是 KV cache 带宽。</li>
+</ul>
+<p>CED 可以理解为面向 decode 的缓存压缩/驱逐策略：把不重要的 KV 压掉或赶出快速缓存，保住关键 token。CSA2 是 CSA 的迭代版，进一步优化块级选择。</p>
+<p>V4.1-Flash 的全局 KV 账约 890 B/token，相比 V3 的 1152 B/token 又降了一截。1M 上下文下单序列缓存仍然是 GB 级，不是“压到零”。</p>
+<div class="formula">$$10^6\times890\approx0.89\ \text{GB（单序列，未计层数细节的口径换算）}$$</div>
+<p>具体总账要乘层数、头数等布局参数，课程里给的是量级，不是部署报价。</p>
+</section>
+
+<section id="selection" data-title="11. 选型与成本">
+<h2><span class="num">11</span>选型与成本</h2>
+<p>选型不要只看参数量。按顺序问五个问题：</p>
+<ol>
+<li>任务需不需要 1M 上下文？不需要就别为长上下文付缓存钱。</li>
+<li>延迟敏感还是吞吐敏感？decode 重访存，prefill 重算力。</li>
+<li>显存能装下总参数吗？MoE 总参数大，激活小，但权重仍要装。</li>
+<li>能不能用量化？FP8/FP4 省显存，但精度和 kernel 支持要验证。</li>
+<li>许可证和数据合规能不能接受？</li>
+</ol>
+<table>
+<tr><th>场景</th><th>倾向</th><th>理由</th></tr>
+<tr><td>长文档问答、代码库级上下文</td><td>V4/V4.1 长上下文档</td><td>DSA/CSA/CED 省 KV</td></tr>
+<tr><td>高并发短对话</td><td>V4-Flash / V3 类小激活</td><td>激活小，decode 便宜</td></tr>
+<tr><td>离线批量生成</td><td>大模型 + 高吞吐并行</td><td>prefill 吞吐优先</td></tr>
+<tr><td>单卡/边缘</td><td>dense 小模型或蒸馏版</td><td>MoE 权重装不下</td></tr>
+</table>
+<div class="good">架构选型的本质是“把瓶颈放在便宜的资源上”。长上下文把瓶颈推给 KV cache，MoE 把瓶颈推给显存和路由，CSA 把瓶颈推给压缩质量。</div>
+</section>
+
+<section id="mistakes" data-title="12. 常见误解与自测">
+<h2><span class="num">12</span>常见误解与自测</h2>
+<h3>五个误解</h3>
+<ul>
+<li><strong>“MoE 总参数大，所以推理一定慢”</strong>：每 token 只激活 top-k，算力不一定大；但权重显存大。</li>
+<li><strong>“MLA 把 KV cache 压没了”</strong>：只是压到 576 个数/ token/层，仍有 GB 级开销。</li>
+<li><strong>“DSA 的 top-k 越大越好”</strong>：越大越准，也越贵；k 是精度—成本旋钮。</li>
+<li><strong>“V4.1 只是 V4 加参数”</strong>：它改的是压缩策略和记忆结构，不是单纯放大。</li>
+<li><strong>“论文没写 = 不存在”</strong>：论文没展开的实现细节，不能靠二手解读补成事实。</li>
+</ul>
+<h3>自测</h3>
+<div class="quiz" data-answer="1" data-explain="V3 是 671B 总参数、37B 激活，61 层，256 路由 + 1 共享，top-8。">
+<p class="q">1. V3 的激活参数是多少？</p>
+<button class="opt">A. 671B</button>
+<button class="opt">B. 37B</button>
+<button class="opt">C. 13B</button>
+<button class="opt">D. 49B</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="2" data-explain="576 个数，BF16 每数 2 字节，得到 1152 B/token/层。">
+<p class="q">2. MLA 每 token 每层缓存 576 个数，BF16 下多少字节？</p>
+<button class="opt">A. 576 B</button>
+<button class="opt">B. 288 B</button>
+<button class="opt">C. 1152 B</button>
+<button class="opt">D. 2304 B</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="3" data-explain="1M 全注意力约 $10^{12}$ 对，DSA top-k=2048 约 $2.048\times10^9$，差约 488 倍。">
+<p class="q">3. 1M 上下文，DSA top-k=2048，配对数约降多少倍？</p>
+<button class="opt">A. 8 倍</button>
+<button class="opt">B. 64 倍</button>
+<button class="opt">C. 2048 倍</button>
+<button class="opt">D. 约 488 倍</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="0" data-explain="CSA 先把 KV 压成块，再在块级做稀疏选择，计算和缓存一起降。">
+<p class="q">4. CSA 相比 DSA 多做了什么？</p>
+<button class="opt">A. 块级压缩后再稀疏选择</button>
+<button class="opt">B. 完全去掉注意力</button>
+<button class="opt">C. 增加全连接层</button>
+<button class="opt">D. 只做局部注意力</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="1" data-explain="MoE 省每 token 计算，不省权重显存；总参数仍要装下。">
+<p class="q">5. MoE 主要省什么？</p>
+<button class="opt">A. 权重显存</button>
+<button class="opt">B. 每 token 激活计算</button>
+<button class="opt">C. 训练数据</button>
+<button class="opt">D. 上下文长度</button>
+<div class="fb"></div>
+</div>
+</section>
+
+<div class="pager"><button id="prev">← 上一节</button><button id="next">下一节 →</button></div>
+<div class="foot">这套深潜课是独立单文件页，进度存在本机浏览器。公式用 KaTeX 渲染；离线时显示源码，不影响阅读正文。<br>
+相关分册：<a href="../index.html">主学习手册</a> · <a href="../00-跨书总览/深潜专题.md">深潜专题</a></div>
+</div></main>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+const sections=[...document.querySelectorAll('section')];
+const nav=[...document.querySelectorAll('.nav-item')];
+const bar=document.querySelector('.progress');
+const key='deep:'+location.pathname.split('/').filter(Boolean).slice(-2,-1)[0];
+let cur=0;
+function show(i,push){
+  i=Math.max(0,Math.min(sections.length-1,i));
+  sections.forEach((s,k)=>s.style.display=(k===i?'block':'none'));
+  nav.forEach((n,k)=>n.classList.toggle('active',k===i));
+  cur=i;
+  bar.style.width=((i+1)/sections.length*100)+'%';
+  try{localStorage.setItem(key,String(i))}catch(e){}
+  if(push) history.replaceState(null,'','#'+sections[i].id);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+nav.forEach((n,i)=>n.addEventListener('click',()=>{show(i,true);document.querySelector('.sidebar').classList.remove('open')}));
+document.querySelector('#menu').addEventListener('click',()=>document.querySelector('.sidebar').classList.toggle('open'));
+document.addEventListener('click',e=>{if(e.target.closest('.sidebar')||e.target.closest('#menu'))return;document.querySelector('.sidebar').classList.remove('open')});
+document.querySelector('#prev').addEventListener('click',()=>show(cur-1,true));
+document.querySelector('#next').addEventListener('click',()=>show(cur+1,true));
+try{const saved=localStorage.getItem(key);if(saved!==null)cur=+saved||0}catch(e){}
+const hash=location.hash.slice(1);const hi=sections.findIndex(s=>s.id===hash);if(hi>=0)cur=hi;
+show(cur,false);
+setTimeout(()=>window.scrollTo({top:0,behavior:"auto"}),0);
+
+document.querySelectorAll('.quiz').forEach(q=>{
+  const opts=[...q.querySelectorAll('.opt')], ans=+q.dataset.answer, fb=q.querySelector('.fb');
+  opts.forEach((o,i)=>o.addEventListener('click',()=>{
+    opts.forEach(x=>x.classList.remove('ok','bad'));
+    if(i===ans){o.classList.add('ok')}else{o.classList.add('bad');opts[ans].classList.add('ok')}
+    fb.innerHTML=(i===ans?'<b>正确。</b> ':'<b>不对。</b> ')+(q.dataset.explain||'');
+    fb.classList.add('show');
+    if(window.renderMathInElement){
+      try{renderMathInElement(fb,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});}catch(e){}
+    }
+  }));
+});
+
+function render(){
+  if(!window.renderMathInElement){
+    const el=document.querySelector('.katex-fallback'); if(el) el.style.display='block'; return;
+  }
+  try{
+    renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});
+  }catch(e){const el=document.querySelector('.katex-fallback'); if(el) el.style.display='block';}
+}
+window.addEventListener('load',render);
+</script>
+</body>
+</html>

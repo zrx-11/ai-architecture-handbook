@@ -8,7 +8,7 @@
 from pathlib import Path
 p = Path('index.html')
 s = p.read_text(encoding='utf-8')
-for slug in ('07-transformer-deep', '08-svm-deep', '10-backprop-deep', '11-moe-mla-deep', '12-probability-eval-deep', '13-train-infer-deep'):
+for slug in ('01-foundations', '02-paper-teardown', '03-architecture', '04-machine-learning', '05-neural-networks', '06-deep-learning', '09-deepseek-family', '07-transformer-deep', '08-svm-deep', '10-backprop-deep', '11-moe-mla-deep', '12-probability-eval-deep', '13-train-infer-deep', '14-math-deep', '15-python-deep', '16-classical-ml-deep', '17-cnn-rnn-deep', '18-rl-grpo-deep', '19-deepseek-arch-deep', '20-multimodal-deep', '21-eval-safety-deep', '22-serving-deep'):
     s = s.replace(f'../{slug}/', f'{slug}/')
     s = s.replace(f'../{slug}', f'{slug}')
 p.write_text(s, encoding='utf-8')

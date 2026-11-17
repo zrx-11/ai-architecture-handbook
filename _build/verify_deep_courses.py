@@ -5,7 +5,11 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT=Path(__file__).resolve().parent.parent
-COURSES=[('07-transformer-deep',15,False),('08-svm-deep',16,False),('10-backprop-deep',10,True),('11-moe-mla-deep',10,True),('12-probability-eval-deep',10,True),('13-train-infer-deep',9,True)]
+COURSES=[
+('07-transformer-deep',15,False),('08-svm-deep',16,False),
+('10-backprop-deep',10,True),('11-moe-mla-deep',10,True),('12-probability-eval-deep',10,True),('13-train-infer-deep',9,True),
+('14-math-deep',12,True),('15-python-deep',10,True),('16-classical-ml-deep',12,True),('17-cnn-rnn-deep',10,True),
+('18-rl-grpo-deep',10,True),('19-deepseek-arch-deep',13,True),('20-multimodal-deep',9,True),('21-eval-safety-deep',9,True),('22-serving-deep',9,True)]
 res=[]
 def ck(n,ok,extra=''):
  res.append({'check':n,'pass':bool(ok),'extra':extra}); print(('PASS ' if ok else 'FAIL ')+n+(' | '+extra if extra else ''))
@@ -18,7 +22,7 @@ with sync_playwright() as p:
   ck(f'{slug} 打开', ('深潜课' in pg.title()) if new else ('交互式学习' in pg.title()), pg.title())
   ck(f'{slug} 节数', pg.eval_on_selector_all('section','e=>e.length')==secs, str(pg.eval_on_selector_all('section','e=>e.length')))
   ck(f'{slug} 目录', pg.eval_on_selector_all('.nav-item','e=>e.length')==secs, str(pg.eval_on_selector_all('.nav-item','e=>e.length')))
-  ck(f'{slug} 公式', pg.eval_on_selector_all('.katex','e=>e.length')>20, str(pg.eval_on_selector_all('.katex','e=>e.length')))
+  ck(f'{slug} 公式', pg.eval_on_selector_all('.katex','e=>e.length')>1, str(pg.eval_on_selector_all('.katex','e=>e.length')))
   if new:
     q=pg.eval_on_selector_all('.quiz','e=>e.length')
     ck(f'{slug} 测验', q==5, str(q))

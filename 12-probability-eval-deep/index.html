@@ -64,6 +64,7 @@ table{width:100%;border-collapse:collapse;margin:13px 0;font-size:13.5px;display
 th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
 th{background:var(--bg3);color:#fff;font-weight:600;white-space:nowrap}
 td{color:var(--text)}
+table th:first-child,table td:first-child{white-space:nowrap}
 .note{background:rgba(91,157,255,.07);border:1px solid rgba(91,157,255,.35);border-radius:8px;
   padding:10px 13px;margin:12px 0;font-size:14px;color:#c9d8f5}
 .warn{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.35);border-radius:8px;

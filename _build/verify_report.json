@@ -1,18 +1,18 @@
 [
  {
   "check": "首页渲染",
-  "pass": true,
+  "pass": false,
   "extra": ""
  },
  {
   "check": "书卡数量",
-  "pass": true,
-  "extra": "6/6"
+  "pass": false,
+  "extra": "0/7"
  },
  {
   "check": "总览页：跨书总览：从机器学习到 DeepSeek 架构",
   "pass": true,
-  "extra": "2199 字符"
+  "extra": "3219 字符"
  },
  {
   "check": "总览页：跨书概念映射表",
@@ -27,17 +27,17 @@
  {
   "check": "总览页：学习节点地图",
   "pass": true,
-  "extra": "2324 字符"
+  "extra": "3044 字符"
  },
  {
   "check": "总览页：跨书术语总表",
   "pass": true,
-  "extra": "11673 字符"
+  "extra": "12649 字符"
  },
  {
-  "check": "总览页：深潜专题：Transformer 与 SVM",
+  "check": "总览页：深潜专题：六套单文件课",
   "pass": true,
-  "extra": "741 字符"
+  "extra": "2058 字符"
  },
  {
   "check": "deepseek-foundations 首章渲染",
@@ -98,6 +98,16 @@
   "check": "deep-learning-scratch 末章渲染",
   "pass": true,
   "extra": "1703 字符"
+ },
+ {
+  "check": "deepseek-family 首章渲染",
+  "pass": true,
+  "extra": "4696 字符"
+ },
+ {
+  "check": "deepseek-family 末章渲染",
+  "pass": true,
+  "extra": "5480 字符"
  },
  {
   "check": "deepseek-foundations 测验题数",
@@ -190,6 +200,21 @@
   "extra": ""
  },
  {
+  "check": "deepseek-family 测验题数",
+  "pass": true,
+  "extra": "42 题"
+ },
+ {
+  "check": "deepseek-family 测验正确反馈",
+  "pass": true,
+  "extra": "✓ 正确"
+ },
+ {
+  "check": "deepseek-family 测验解析",
+  "pass": true,
+  "extra": ""
+ },
+ {
   "check": "抽认卡正面有内容",
   "pass": true,
   "extra": "向量在模型里是什么？"
@@ -227,7 +252,7 @@
  {
   "check": "结果片段高亮",
   "pass": true,
-  "extra": "69 处"
+  "extra": "66 处"
  },
  {
   "check": "点击结果定位高亮",
@@ -237,7 +262,7 @@
  {
   "check": "结果按章节分组",
   "pass": true,
-  "extra": "26 组：神经网络：从一条直线推到反向传播 · 测验2 / 机器学习基础：从任务到评估 · 测验2 / 基础篇：从零到 Transformer · 测验3"
+  "extra": "29 组：神经网络：从一条直线推到反向传播 · 测验1 / 机器学习基础：从任务到评估 · 测验2 / DeepSeek 模型全谱 · 测验1"
  },
  {
   "check": "结果标题可读",

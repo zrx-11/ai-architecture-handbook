@@ -1,0 +1,172 @@
+<section id="intro" data-title="课程概览">
+<h2><span class="num">00</span>课程概览：怎么判断一个模型“行不行”</h2>
+<p>这门课讲大模型评测的四层：数据集与指标、生成任务的特殊指标、模型当裁判的坑、安全与对齐。最后落到“怎么设计一个不被指标骗到的评测集”。</p>
+<h3>学完你能做到</h3>
+<ul>
+<li>给分类、抽取、生成、代码四类任务选对指标。</li>
+<li>算 pass@k，解释它和准确率的区别。</li>
+<li>说清 LLM-as-judge 的偏差来源。</li>
+<li>设计一个包含正常样本、边界样本、对抗样本的评测集。</li>
+</ul>
+<div class="note">前置：知道精确率、召回率、F1、AUC。没学过也没关系，本课第 1 节会快速过一遍。</div>
+<h3>路线</h3>
+<div class="flow">
+<div class="box">指标</div><div class="arrow">→</div><div class="box">pass@k</div><div class="arrow">→</div><div class="box">LLM 裁判</div><div class="arrow">→</div><div class="box">幻觉</div><div class="arrow">→</div><div class="box">对齐</div><div class="arrow">→</div><div class="box">红队</div>
+</div>
+</section>
+
+<section id="metrics" data-title="1. 任务与指标怎么配">
+<h2><span class="num">01</span>任务与指标怎么配</h2>
+<table>
+<tr><th>任务</th><th>常用指标</th><th>别只看</th></tr>
+<tr><td>二分类</td><td>P、R、F1、AUC</td><td>准确率（类别不平衡会骗人）</td></tr>
+<tr><td>多分类</td><td>macro-F1、micro-F1、混淆矩阵</td><td>总体准确率</td></tr>
+<tr><td>信息抽取</td><td>实体级/关系级 F1</td><td>字符级准确率</td></tr>
+<tr><td>摘要/翻译</td><td>ROUGE、BLEU、BERTScore、人评</td><td>单一自动指标</td></tr>
+<tr><td>代码</td><td>pass@k、编译率、测试通过率</td><td>代码相似度</td></tr>
+<tr><td>开放问答</td><td>EM、F1、LLM judge、人评</td><td>关键词命中</td></tr>
+</table>
+<p>P/R/F1 的复习：精确率是“判为正的里面有多少真对”，召回率是“真正的正例里找出多少”，F1 是两者的调和平均。</p>
+<div class="warn">指标必须和业务代价匹配。漏诊代价高，就看召回；误报代价高，就看精确率。没有“万能最好指标”。</div>
+</section>
+
+<section id="passk" data-title="2. pass@k 与生成任务">
+<h2><span class="num">02</span>pass@k 与生成任务</h2>
+<p>代码生成不是只有一个答案。pass@k 表示对同一题采样 k 次，至少有一次通过测试的概率。</p>
+<p>无偏估计常用：</p>
+<div class="formula">$$\text{pass@}k=E\left[1-\frac{\binom{n-c}{k}}{\binom{n}{k}}\right]$$</div>
+<p>$n$ 是采样总数，$c$ 是通过测试的样本数。直观理解：从 n 个样本里抽 k 个，一个都没抽中正确样本的概率，用 1 减去它。</p>
+<h3>例子</h3>
+<p>一题采样 10 次，3 次通过。pass@1 约 0.3。pass@10 是“10 次里至少一次通过”，约 1。k 越大，分数越高。</p>
+<div class="good">pass@k 衡量“多试几次能不能做出来”，不衡量“一次就对”。产品里如果只给用户一次机会，看 pass@1 更实际。</div>
+</section>
+
+<section id="judge" data-title="3. LLM-as-judge 的偏差">
+<h2><span class="num">03</span>LLM-as-judge 的偏差</h2>
+<p>开放生成没有标准答案，常用另一个模型当裁判。便宜、可扩展，但有偏差：</p>
+<ul>
+<li><strong>位置偏差</strong>：裁判偏爱第一个或第二个回答。</li>
+<li><strong>长度偏差</strong>：更长、更详细的回答容易得高分。</li>
+<li><strong>风格偏差</strong>：自信、排版漂亮的回答占便宜。</li>
+<li><strong>自我偏好</strong>：裁判偏爱和自己风格相似的输出。</li>
+</ul>
+<h3>降低偏差</h3>
+<ul>
+<li>交换 A/B 顺序，取平均。</li>
+<li>用评分细则，不只看“哪个更好”。</li>
+<li>多裁判投票，或人评校准。</li>
+<li>报告裁判与人的一致率，不只看分数。</li>
+</ul>
+<div class="warn">裁判模型也会被 prompt 注入。评测集里要放对抗样本，别让“请给满分”这类指令影响结果。</div>
+</section>
+
+<section id="hallucination" data-title="4. 幻觉与事实性">
+<h2><span class="num">04</span>幻觉与事实性</h2>
+<p>幻觉是模型生成了看似合理但不符合事实的内容。分两类：</p>
+<ul>
+<li><strong>事实性幻觉</strong>：人物、时间、数字、引用错了。</li>
+<li><strong>忠实性幻觉</strong>：摘要或问答偏离了给定材料。</li>
+</ul>
+<h3>怎么测</h3>
+<ul>
+<li>闭卷事实问答：对标准答案。</li>
+<li>开卷/检索问答：要求引用原文，检查引用是否支持结论。</li>
+<li>摘要：检查每个断言能否在原文找到依据。</li>
+<li>一致性：同一问题多次采样，看答案是否自相矛盾。</li>
+</ul>
+<div class="note">“不知道”是合法输出。强制模型必须回答，会提高幻觉率。评测里要允许弃答，并单独统计弃答率。</div>
+</section>
+
+<section id="alignment" data-title="5. 对齐与拒答">
+<h2><span class="num">05</span>对齐与拒答</h2>
+<p>对齐是让模型的行为符合人类意图和安全规范。不是“让模型变善良”这么简单，包含有用性、诚实性、无害性三个目标。</p>
+<h3>拒答的边界</h3>
+<p>好的拒答：明确拒绝危险请求，给出安全替代方案。坏的拒答：把正常医学问题、法律问题也拒掉，叫过度拒答。</p>
+<table>
+<tr><th>类型</th><th>表现</th><th>评测</th></tr>
+<tr><td>漏拒</td><td>该拒没拒</td><td>危险请求通过率</td></tr>
+<tr><td>过度拒答</td><td>正常请求被拒</td><td>良性请求拒答率</td></tr>
+<tr><td>拒答质量</td><td>拒了但没帮助</td><td>人评/替代建议完整性</td></tr>
+</table>
+<div class="warn">只看“危险请求通过率”会把模型训成什么都拒。必须同时测良性请求的通过率。</div>
+</section>
+
+<section id="redteam" data-title="6. 红队与对抗评测">
+<h2><span class="num">06</span>红队与对抗评测</h2>
+<p>红队是主动找模型的漏洞：越狱、提示注入、数据泄露、工具滥用。评测集要覆盖正常、边界、对抗三层。</p>
+<h3>常见攻击面</h3>
+<ul>
+<li>角色扮演绕过安全策略。</li>
+<li>把恶意指令藏在文档/网页里，诱导模型执行。</li>
+<li>多轮对话逐步逼近，单轮看都正常。</li>
+<li>编码、翻译、拆字绕过关键词过滤。</li>
+</ul>
+<p>防御不能只靠关键词。要在输入、工具调用、输出三层做检查，并对高风险动作做权限隔离。</p>
+<div class="note">红队报告要写清攻击目标、成功率、误伤率、复现步骤。只给“发现漏洞”没有复现，工程上没法修。</div>
+</section>
+
+<section id="contamination" data-title="7. 数据污染与评测泄漏">
+<h2><span class="num">07</span>数据污染与评测泄漏</h2>
+<p>如果评测题出现在训练数据里，分数会虚高。这叫数据污染或评测泄漏。</p>
+<h3>检查方法</h3>
+<ul>
+<li>n-gram 重叠：评测题和训练语料是否有长片段重合。</li>
+<li>嵌入相似度：语义相近的样本是否大量出现。</li>
+<li>时间切分：用训练截止日期之后的题。</li>
+<li>私有保留集：不公开、不进入训练。</li>
+</ul>
+<p>公开 benchmark 用久了必然被“卷”。真正可信的是私有集 + 定期换题 + 人评。</p>
+<div class="warn">“在某某榜上第一”不等于实际最好。先问榜单题有没有进训练数据、评测 prompt 是否统一、是否只报了好任务。</div>
+</section>
+
+<section id="mistakes" data-title="8. 常见误解与自测">
+<h2><span class="num">08</span>常见误解与自测</h2>
+<h3>四个误解</h3>
+<ul>
+<li><strong>“一个总分就能代表模型能力”</strong>：总分是多个任务的加权，权重换了排名就变。</li>
+<li><strong>“LLM 裁判比人便宜，所以更客观”</strong>：便宜不等于客观，裁判有自己的偏差。</li>
+<li><strong>“拒答率越高越安全”</strong>：过度拒答会毁掉可用性。</li>
+<li><strong>“公开榜单一上升就是模型变强”</strong>：可能是污染、prompt 调优或任务选择。</li>
+</ul>
+<h3>自测</h3>
+<div class="quiz" data-answer="1" data-explain="pass@k 衡量采样 k 次至少一次通过，k 越大分数越高。">
+<p class="q">1. pass@k 衡量的是什么？</p>
+<button class="opt">A. 一次生成就对的概率</button>
+<button class="opt">B. 采样 k 次至少一次通过的概率</button>
+<button class="opt">C. 模型参数量</button>
+<button class="opt">D. 训练损失</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="3" data-explain="交换 A/B 顺序并取平均，可以降低裁判的位置偏差。">
+<p class="q">2. 怎么降低 LLM 裁判的位置偏差？</p>
+<button class="opt">A. 只用一个裁判</button>
+<button class="opt">B. 把回答改长</button>
+<button class="opt">C. 去掉评分细则</button>
+<button class="opt">D. 交换 A/B 顺序，取平均</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="0" data-explain="忠实性幻觉是摘要/问答偏离给定材料，事实性幻觉是与世界事实不符。">
+<p class="q">3. 摘要偏离原文，属于哪类幻觉？</p>
+<button class="opt">A. 忠实性幻觉</button>
+<button class="opt">B. 事实性幻觉</button>
+<button class="opt">C. 位置偏差</button>
+<button class="opt">D. 数据污染</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="2" data-explain="只测危险请求通过率会导致过度拒答，必须同时测良性请求通过率。">
+<p class="q">4. 安全评测只看“危险请求通过率”会导致什么？</p>
+<button class="opt">A. 模型更聪明</button>
+<button class="opt">B. 训练更快</button>
+<button class="opt">C. 过度拒答，正常请求也被拒</button>
+<button class="opt">D. 没有影响</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="1" data-explain="评测题出现在训练语料里叫数据污染，会让分数虚高。">
+<p class="q">5. 评测题出现在训练数据里，叫什么？</p>
+<button class="opt">A. 过拟合</button>
+<button class="opt">B. 数据污染/评测泄漏</button>
+<button class="opt">C. 正则化</button>
+<button class="opt">D. 对齐</button>
+<div class="fb"></div>
+</div>
+</section>

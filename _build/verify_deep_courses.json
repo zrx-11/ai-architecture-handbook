@@ -268,5 +268,455 @@
   "check": "13-train-infer-deep 控制台",
   "pass": true,
   "extra": ""
+ },
+ {
+  "check": "14-math-deep 打开",
+  "pass": true,
+  "extra": "数学基础 · 深潜课"
+ },
+ {
+  "check": "14-math-deep 节数",
+  "pass": true,
+  "extra": "12"
+ },
+ {
+  "check": "14-math-deep 目录",
+  "pass": true,
+  "extra": "12"
+ },
+ {
+  "check": "14-math-deep 公式",
+  "pass": true,
+  "extra": "159"
+ },
+ {
+  "check": "14-math-deep 测验",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "14-math-deep 正确反馈",
+  "pass": true,
+  "extra": "正确。 g(f(2))=(2⋅2+1)2=25g(f(2))=(2\\cdot2+"
+ },
+ {
+  "check": "14-math-deep 错误反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "14-math-deep 下一节",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "14-math-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "14-math-deep 控制台",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "15-python-deep 打开",
+  "pass": true,
+  "extra": "Python 与 NumPy · 深潜课"
+ },
+ {
+  "check": "15-python-deep 节数",
+  "pass": true,
+  "extra": "10"
+ },
+ {
+  "check": "15-python-deep 目录",
+  "pass": true,
+  "extra": "10"
+ },
+ {
+  "check": "15-python-deep 公式",
+  "pass": true,
+  "extra": "14"
+ },
+ {
+  "check": "15-python-deep 测验",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "15-python-deep 正确反馈",
+  "pass": true,
+  "extra": "正确。 `7 / 2` 是普通除法，返回 3.5；`7 // 2` 才是 3。"
+ },
+ {
+  "check": "15-python-deep 错误反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "15-python-deep 下一节",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "15-python-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "15-python-deep 控制台",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "16-classical-ml-deep 打开",
+  "pass": true,
+  "extra": "经典机器学习 · 深潜课"
+ },
+ {
+  "check": "16-classical-ml-deep 节数",
+  "pass": true,
+  "extra": "12"
+ },
+ {
+  "check": "16-classical-ml-deep 目录",
+  "pass": true,
+  "extra": "12"
+ },
+ {
+  "check": "16-classical-ml-deep 公式",
+  "pass": true,
+  "extra": "22"
+ },
+ {
+  "check": "16-classical-ml-deep 测验",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "16-classical-ml-deep 正确反馈",
+  "pass": true,
+  "extra": "正确。 逻辑回归先算线性分数，再经 sigmoid 输出 0–1 的概率。"
+ },
+ {
+  "check": "16-classical-ml-deep 错误反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "16-classical-ml-deep 下一节",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "16-classical-ml-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "16-classical-ml-deep 控制台",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "17-cnn-rnn-deep 打开",
+  "pass": true,
+  "extra": "CNN 与 RNN · 深潜课"
+ },
+ {
+  "check": "17-cnn-rnn-deep 节数",
+  "pass": true,
+  "extra": "10"
+ },
+ {
+  "check": "17-cnn-rnn-deep 目录",
+  "pass": true,
+  "extra": "10"
+ },
+ {
+  "check": "17-cnn-rnn-deep 公式",
+  "pass": true,
+  "extra": "32"
+ },
+ {
+  "check": "17-cnn-rnn-deep 测验",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "17-cnn-rnn-deep 正确反馈",
+  "pass": true,
+  "extra": "正确。 输出尺寸 (5−3+1)/1=3(5-3+1)/1=3(5−3+1)/1"
+ },
+ {
+  "check": "17-cnn-rnn-deep 错误反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "17-cnn-rnn-deep 下一节",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "17-cnn-rnn-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "17-cnn-rnn-deep 控制台",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "18-rl-grpo-deep 打开",
+  "pass": true,
+  "extra": "强化学习与 GRPO · 深潜课"
+ },
+ {
+  "check": "18-rl-grpo-deep 节数",
+  "pass": true,
+  "extra": "10"
+ },
+ {
+  "check": "18-rl-grpo-deep 目录",
+  "pass": true,
+  "extra": "10"
+ },
+ {
+  "check": "18-rl-grpo-deep 公式",
+  "pass": true,
+  "extra": "53"
+ },
+ {
+  "check": "18-rl-grpo-deep 测验",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "18-rl-grpo-deep 正确反馈",
+  "pass": true,
+  "extra": "正确。 优势 A=Q−VA=Q-VA=Q−V，表示动作比平均水平好多少；为正就提"
+ },
+ {
+  "check": "18-rl-grpo-deep 错误反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "18-rl-grpo-deep 下一节",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "18-rl-grpo-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "18-rl-grpo-deep 控制台",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "19-deepseek-arch-deep 打开",
+  "pass": true,
+  "extra": "DeepSeek 架构深潜 · 深潜课"
+ },
+ {
+  "check": "19-deepseek-arch-deep 节数",
+  "pass": true,
+  "extra": "13"
+ },
+ {
+  "check": "19-deepseek-arch-deep 目录",
+  "pass": true,
+  "extra": "13"
+ },
+ {
+  "check": "19-deepseek-arch-deep 公式",
+  "pass": true,
+  "extra": "14"
+ },
+ {
+  "check": "19-deepseek-arch-deep 测验",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "19-deepseek-arch-deep 正确反馈",
+  "pass": true,
+  "extra": "正确。 V3 是 671B 总参数、37B 激活，61 层，256 路由 + 1"
+ },
+ {
+  "check": "19-deepseek-arch-deep 错误反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "19-deepseek-arch-deep 下一节",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "19-deepseek-arch-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "19-deepseek-arch-deep 控制台",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "20-multimodal-deep 打开",
+  "pass": true,
+  "extra": "多模态模型 · 深潜课"
+ },
+ {
+  "check": "20-multimodal-deep 节数",
+  "pass": true,
+  "extra": "9"
+ },
+ {
+  "check": "20-multimodal-deep 目录",
+  "pass": true,
+  "extra": "9"
+ },
+ {
+  "check": "20-multimodal-deep 公式",
+  "pass": true,
+  "extra": "8"
+ },
+ {
+  "check": "20-multimodal-deep 测验",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "20-multimodal-deep 正确反馈",
+  "pass": true,
+  "extra": "正确。 224/16=14，14×14=196 个 patch。"
+ },
+ {
+  "check": "20-multimodal-deep 错误反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "20-multimodal-deep 下一节",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "20-multimodal-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "20-multimodal-deep 控制台",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "21-eval-safety-deep 打开",
+  "pass": true,
+  "extra": "大模型评测与安全 · 深潜课"
+ },
+ {
+  "check": "21-eval-safety-deep 节数",
+  "pass": true,
+  "extra": "9"
+ },
+ {
+  "check": "21-eval-safety-deep 目录",
+  "pass": true,
+  "extra": "9"
+ },
+ {
+  "check": "21-eval-safety-deep 公式",
+  "pass": true,
+  "extra": "3"
+ },
+ {
+  "check": "21-eval-safety-deep 测验",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "21-eval-safety-deep 正确反馈",
+  "pass": true,
+  "extra": "正确。 pass@k 衡量采样 k 次至少一次通过，k 越大分数越高。"
+ },
+ {
+  "check": "21-eval-safety-deep 错误反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "21-eval-safety-deep 下一节",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "21-eval-safety-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "21-eval-safety-deep 控制台",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "22-serving-deep 打开",
+  "pass": true,
+  "extra": "推理部署 · 深潜课"
+ },
+ {
+  "check": "22-serving-deep 节数",
+  "pass": true,
+  "extra": "9"
+ },
+ {
+  "check": "22-serving-deep 目录",
+  "pass": true,
+  "extra": "9"
+ },
+ {
+  "check": "22-serving-deep 公式",
+  "pass": true,
+  "extra": "2"
+ },
+ {
+  "check": "22-serving-deep 测验",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "22-serving-deep 正确反馈",
+  "pass": true,
+  "extra": "正确。 prefill 一次处理整段 prompt，计算密集；decode 逐 "
+ },
+ {
+  "check": "22-serving-deep 错误反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "22-serving-deep 下一节",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "22-serving-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "22-serving-deep 控制台",
+  "pass": true,
+  "extra": ""
  }
 ]
