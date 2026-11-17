@@ -1,5 +1,8 @@
 # DeepSeek 架构学习系统
 
+**在线访问**：<https://zrx-11.github.io/deepseek-architecture-learning/>  
+**仓库**：<https://github.com/zrx-11/deepseek-architecture-learning>
+
 给数学和代码接近零基础的学习者，把 DeepSeek-R1、DeepSeek-V4、DeepSeek-V4.1 三篇技术报告拆成一套能按依赖顺序学、答错能倒推根因、难点能展开完整推导的交互式学习手册。
 
 ## 先说明一个事实
