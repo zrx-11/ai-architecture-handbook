@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>架构阐释：三代模型的设计逻辑</title>
+<link rel="stylesheet" href="https://registry.npmmirror.com/katex/0.16.9/files/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.0.6/css/pico.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vis-network@9.1.9/dist/dist/vis-network.min.css">
+<style>
+:root{
+  --bg:#f7f7f8; --panel:#ffffff; --text:#1f2328; --muted:#6b7280;
+  --accent:#2563eb; --accent-soft:#dbeafe; --border:#e5e7eb;
+  --ok:#16a34a; --bad:#dc2626; --code-bg:#f3f4f6;
+  --depth-bg:#fef9c3; --depth-border:#ca8a04;
+}
+[data-theme="dark"]{
+  --bg:#111318; --panel:#1a1d24; --text:#e5e7eb; --muted:#9ca3af;
+  --accent:#60a5fa; --accent-soft:#1e3a5f; --border:#2d333d;
+  --ok:#4ade80; --bad:#f87171; --code-bg:#20242c;
+  --depth-bg:#2a2410; --depth-border:#a16207;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.7;font-size:15px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:290px;flex:none;background:var(--panel);border-right:1px solid var(--border);
+  padding:14px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar h1{font-size:17px;margin:2px 0 2px}
+.sidebar .sub{font-size:12px;color:var(--muted);margin-bottom:10px}
+#q{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);margin-bottom:10px}
+.nav-sec{font-size:12px;color:var(--muted);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.4px}
+.nav-item{display:block;padding:5px 10px;border-radius:6px;color:var(--text);font-size:14px}
+.nav-item:hover{background:var(--accent-soft);text-decoration:none}
+.nav-item.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav-item .done{float:right;color:var(--ok);font-size:12px}
+#nav-toggle{display:none}
+.main{flex:1;min-width:0;padding:28px 40px 80px;max-width:920px;margin:0 auto}
+.page h1{font-size:26px;border-bottom:2px solid var(--border);padding-bottom:8px;margin-top:0}
+.page h2{font-size:20px;margin-top:26px}
+.page h3{font-size:17px;margin-top:22px}
+.page table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+.page th,.page td{border:1px solid var(--border);padding:6px 10px;text-align:left}
+.page th{background:var(--code-bg)}
+.page code{background:var(--code-bg);padding:2px 5px;border-radius:4px;font-size:.9em}
+.page pre{background:var(--code-bg);padding:12px;border-radius:8px;overflow-x:auto;font-size:13px}
+.page pre code{background:none;padding:0}
+.page blockquote{border-left:4px solid var(--accent);margin:12px 0;padding:6px 14px;background:var(--accent-soft);border-radius:0 6px 6px 0}
+.page blockquote blockquote{border-color:var(--muted)}
+.page img{max-width:100%}
+.mermaid{background:var(--code-bg);padding:14px;border-radius:8px;overflow-x:auto;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;white-space:pre;color:var(--muted)}
+.mermaid-hint{font-size:12px;color:var(--muted);margin:4px 0 14px}
+svg{max-width:100%;height:auto}
+/* 出处脚注 */
+.source-badge{font-size:12px;color:var(--muted);background:var(--code-bg);padding:4px 10px;border-radius:6px;margin:0 0 12px;display:inline-block}
+/* 前置知识条 */
+.prereq-bar{font-size:13px;color:var(--muted);border-left:3px solid var(--accent);padding:4px 10px;margin:0 0 12px;background:var(--accent-soft)}
+.prereq-hard a{color:var(--bad);font-weight:600}
+.prereq-soft a{color:var(--muted)}
+.prereq-rec a{color:var(--accent)}
+.prereq-tag{display:inline-block;font-size:10px;padding:0 4px;border-radius:3px;margin-right:2px;vertical-align:middle}
+.prereq-hard .prereq-tag{background:var(--bad);color:#fff}
+.prereq-soft .prereq-tag{background:var(--muted);color:#fff}
+.prereq-rec .prereq-tag{background:var(--accent);color:#fff}
+/* 误解卡片 */
+.misconception-card{margin-top:10px;padding:10px 14px;border-left:4px solid var(--bad);background:#fef2f2;border-radius:0 8px 8px 0;font-size:13px}
+.misconception-card b{color:var(--bad)}
+[data-theme="dark"] .misconception-card{background:#2a1215}
+/* 掌握度条 */
+.mastery-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:4px 0}
+.mastery-bar>div{height:100%;background:var(--ok);transition:width .3s}
+.mastery-label{font-size:11px;color:var(--muted)}
+/* 深度推导片段 */
+.depth-fragment{margin:18px 0;border:1px solid var(--depth-border);border-radius:10px;background:var(--depth-bg);overflow:hidden}
+.depth-fragment>summary{padding:10px 14px;cursor:pointer;font-weight:600;font-size:14px;list-style:none}
+.depth-fragment>summary:hover{filter:brightness(.95)}
+.depth-body{padding:14px 18px;border-top:1px dashed var(--depth-border);background:var(--panel)}
+.depth-missing{color:var(--bad);font-size:13px;padding:8px;background:var(--code-bg);border-radius:6px}
+/* KaTeX */
+.katex-inline{font-size:1.05em}
+.katex-block{overflow-x:auto;padding:8px 0;text-align:center}
+.katex-block .katex{font-size:1.1em}
+/* 测验 */
+.quiz-item{border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:14px 0;background:var(--panel)}
+.quiz-q{margin:0 0 8px;font-weight:500}
+.quiz-opts label{display:block;padding:4px 0;cursor:pointer}
+.quiz-blank{width:60%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)}
+.quiz-check{margin-top:10px;padding:6px 16px;border:none;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer}
+.quiz-feedback{margin-left:12px;font-size:13px}
+.fb-ok{color:var(--ok)}.fb-bad{color:var(--bad)}
+.quiz-explain{margin-top:8px;font-size:13px;color:var(--muted);border-top:1px dashed var(--border);padding-top:6px}
+.quiz-remedy{margin-top:8px;padding:8px 12px;background:var(--accent-soft);border-radius:6px;font-size:13px}
+/* 抽认卡 */
+.flashcard{perspective:1200px;margin:24px auto;max-width:520px;cursor:pointer;user-select:none}
+.fc-inner{position:relative;width:100%;height:240px;transform-style:preserve-3d;transition:transform .5s}
+.flashcard.flip .fc-inner{transform:rotateY(180deg)}
+.fc-front,.fc-back{position:absolute;inset:0;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;
+  padding:22px;border-radius:14px;border:1px solid var(--border);background:var(--panel);font-size:16px;text-align:center}
+.fc-back{transform:rotateY(180deg);background:var(--accent-soft);color:var(--text)}
+.card-controls{display:flex;gap:14px;align-items:center;margin:12px 0;flex-wrap:wrap}
+.card-actions{display:flex;gap:12px;justify-content:center}
+.card-actions button{padding:8px 22px;border:none;border-radius:8px;cursor:pointer;font-size:14px}
+#card-known-btn{background:var(--ok);color:#fff}
+#card-again-btn{background:var(--bad);color:#fff}
+.card-counts{color:var(--muted);font-size:13px}
+.path-step{margin:8px 0;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--panel)}
+.path-step.passed{border-color:var(--ok)}
+#glossary-filter{width:100%;max-width:380px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);margin-bottom:10px}
+#glossary-list li{padding:6px 0;border-bottom:1px dashed var(--border)}
+.glossary-ref{color:var(--muted);font-size:12px}
+.search-hit{margin:6px 0}
+.search-group{margin:18px 0}
+.grp-head{font-size:13px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:4px}
+.grp-count{margin-left:6px;font-weight:400;opacity:.75}
+.syn-note{display:inline-block;margin-left:8px;padding:1px 6px;border-radius:4px;background:var(--accent-soft);color:var(--muted);font-size:12px;vertical-align:middle}
+.search-hit mark,.hl{background:#fde68a;color:inherit;padding:0 1px;border-radius:2px}
+.hit-hl{background:#fbbf24;color:inherit;border-radius:3px;box-shadow:0 0 0 2px #fde68a}
+.hit-flash{animation:hitFlash 1.8s ease-out}
+@keyframes hitFlash{from{background:#f59e0b}to{background:#fbbf24}}
+[data-theme="dark"] .search-hit mark,[data-theme="dark"] .hl{background:#92400e;color:#fef3c7}
+[data-theme="dark"] .hit-hl{background:#b45309;color:#fff;box-shadow:0 0 0 2px #78350f}
+.topbar{position:sticky;top:0;background:var(--bg);padding:8px 0;display:flex;justify-content:flex-end;z-index:10}
+#theme-btn{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:8px;padding:5px 12px;cursor:pointer;white-space:nowrap}
+#progress-export,#progress-import{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px;white-space:nowrap;margin-right:8px}
+#progress-bar{height:5px;background:var(--border);border-radius:3px;margin:8px 0;overflow:hidden}
+#progress-bar>div{height:100%;width:0;background:var(--accent);transition:width .3s}
+.empty{color:var(--muted);padding:20px 0}
+/* 诊断 */
+.diag-controls{margin:14px 0;padding:14px;background:var(--panel);border-radius:10px;border:1px solid var(--border)}
+#diag-start{padding:8px 20px;border:none;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer;font-size:14px}
+#diag-progress{margin-left:12px;color:var(--muted);font-size:13px}
+#diag-stage .quiz-item{margin:10px 0}
+#diag-result{margin-top:16px;padding:14px;background:var(--panel);border-radius:10px;border:1px solid var(--border)}
+.diag-remedy-item{padding:10px;margin:8px 0;background:var(--accent-soft);border-radius:8px;font-size:14px}
+@media print{.sidebar,.topbar,.quiz-actions,.card-actions,.card-controls,.diag-controls{display:none!important}.main{max-width:none;padding:0}}
+@media (max-width:760px){.sidebar{width:100%;height:auto;position:static;padding:10px 14px}
+  #nav{display:none;max-height:46vh;overflow-y:auto;overscroll-behavior:contain}.sidebar.open #nav{display:block}
+  .nav-item{padding:9px 10px}
+  #q,#glossary-filter{font-size:16px}
+  .quiz-opts label{padding:8px 0;min-height:30px}
+  .quiz-check{padding:10px 18px;min-height:40px}
+  #diag-start{min-height:40px}
+  .card-actions button{min-height:40px}
+  #nav-toggle{display:block;width:100%;padding:8px 10px;margin:4px 0;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px;text-align:left;cursor:pointer}
+  .layout{flex-direction:column}.main{padding:20px 18px 64px;max-width:none;width:100%}
+  .page{overflow-wrap:anywhere}.page table{display:block;overflow-x:auto;max-width:100%}
+  .page h1,.page h2,.page h3{line-height:1.35}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <h1>架构阐释：三代模型的设计逻辑</h1>
+    <div class="sub">用“瓶颈—机制—代价”解释 V3/R1、V4、V4.1 的每一次架构改动</div>
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+    <div class="sub" id="progress-label">进度 0%</div>
+    <input id="q" type="search" placeholder="搜索章节 / 概念 / 术语 / 全文…">
+    <nav id="nav"></nav>
+  </aside>
+  <main class="main">
+    <div class="topbar"><button id="progress-export">⬇ 导出进度</button><button id="progress-import">⬆ 导入进度</button><button id="theme-btn">🌙 深色</button><input type="file" id="progress-file" accept="application/json" hidden></div>
+    <div id="view" class="page"></div>
+  </main>
+</div>
+<script>
+const DATA = {"manifest": {"slug": "deepseek-architecture", "title": "架构阐释：三代模型的设计逻辑", "subtitle": "用“瓶颈—机制—代价”解释 V3/R1、V4、V4.1 的每一次架构改动", "book": {"title": "架构阐释：三代模型的设计逻辑", "author": "本课程整理", "source": ["DeepSeek-V3（arXiv:2412.19437）", "DeepSeek-R1（arXiv:2501.12948）", "DeepSeek-V4（arXiv:2606.19348）", "DeepSeek-V4.1-Flash（arXiv:2609.19969）"]}, "audience": "读完论文拆解篇、想建立架构判断力的读者", "goal": "能对任意长上下文模型做瓶颈分析、组件拆解和选型评审", "learningPath": [{"step": "01", "title": "三代总览与注意力演进", "chapterIds": ["ch10"], "checkpoint": "能画出注意力演进线并说出每步解决什么"}, {"step": "02", "title": "效率组件的设计逻辑", "chapterIds": ["ch11"], "checkpoint": "能解释 MoE、mHC、Muon、Engram 各自的分工"}, {"step": "03", "title": "训练与后训练", "chapterIds": ["ch12"], "checkpoint": "能对比 R1 的 RL 与 V4/V4.1 的 OPD"}, {"step": "04", "title": "综合检验：架构评审", "chapterIds": ["ch13"], "checkpoint": "完成一份有数字支撑的选型报告"}], "chapters": [{"id": "ch10", "title": "第 10 章：三代架构总览：瓶颈迁移与注意力演进", "file": "chapters/ch10-overview.md", "difficulty": 3, "source": "DeepSeek-V3/V4/V4.1 技术报告", "prerequisites": []}, {"id": "ch11", "title": "第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark", "file": "chapters/ch11-components.md", "difficulty": 3, "source": "DeepSeek-V4/V4.1 技术报告", "prerequisites": ["ch10"]}, {"id": "ch12", "title": "第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程", "file": "chapters/ch12-training.md", "difficulty": 3, "source": "DeepSeek-R1/V4/V4.1 技术报告", "prerequisites": ["ch11"]}, {"id": "ch13", "title": "第 13 章：综合检验：写一份架构评审报告", "file": "chapters/ch13-review.md", "difficulty": 3, "source": "本课程整理 · 综合任务", "prerequisites": ["ch12"]}], "concepts": [{"id": "c32", "title": "推理 FLOPs", "file": "concepts/c32-inference-flops.md", "chapterIds": ["ch10", "ch13"], "difficulty": "高难", "source": "DeepSeek-V4/V4.1 技术报告", "prerequisites": []}, {"id": "c33", "title": "奖励模型", "file": "concepts/c33-reward-model.md", "chapterIds": ["ch12"], "difficulty": "进阶", "source": "DeepSeek-R1/V4 技术报告", "prerequisites": []}, {"id": "c34", "title": "OPD（在线策略蒸馏）", "file": "concepts/c34-opd.md", "chapterIds": ["ch12"], "difficulty": "高难", "source": "DeepSeek-V4/V4.1 技术报告 §5", "prerequisites": ["c33"]}, {"id": "c35", "title": "数据工程", "file": "concepts/c35-data-engineering.md", "chapterIds": ["ch12"], "difficulty": "进阶", "source": "DeepSeek-V4.1 论文 §5", "prerequisites": []}, {"id": "c36", "title": "架构取舍", "file": "concepts/c36-architecture-tradeoffs.md", "chapterIds": ["ch10", "ch11", "ch13"], "difficulty": "进阶", "source": "本课程整理 · 架构分析", "prerequisites": ["c32"]}], "glossary": [{"term": "瓶颈迁移", "def": "部署瓶颈从 KV cache 转向 FLOPs 再转向 prefill/带宽。", "chapterId": "ch10"}, {"term": "激活参数", "def": "单个 token 实际参与计算的参数。", "chapterId": "ch10"}, {"term": "总参数", "def": "模型全部参数，MoE 中远大于激活参数。", "chapterId": "ch10"}, {"term": "非对称架构", "def": "prefill 和 decode 走不同计算路径的架构。", "chapterId": "ch10"}, {"term": "专家并行", "def": "把 MoE 专家分布到不同设备上。", "chapterId": "ch11"}, {"term": "路由", "def": "决定 token 进入哪些专家的机制。", "chapterId": "ch11"}, {"term": "双随机矩阵", "def": "行和、列和都为 1 的非负矩阵。", "chapterId": "ch11"}, {"term": "正交化", "def": "把梯度矩阵的奇异值拉到接近 1。", "chapterId": "ch11"}, {"term": "压缩维度", "def": "条目大小、序列长度、层数、位宽四个可压缩方向。", "chapterId": "ch11"}, {"term": "prefill", "def": "读入整段输入并建立 KV cache 的阶段。", "chapterId": "ch12"}, {"term": "decode", "def": "逐 token 生成输出的阶段。", "chapterId": "ch12"}, {"term": "OPD", "def": "学生在自己轨迹上向多个教师做全词表蒸馏。", "chapterId": "ch12"}, {"term": "GRM", "def": "生成式奖励模型，模型自己生成评分理由和分数。", "chapterId": "ch12"}, {"term": "DSec", "def": "V4.1 用于大规模智能体 RL 的弹性计算沙箱。", "chapterId": "ch12"}, {"term": "任务三元组", "def": "问题、环境、验证系统。", "chapterId": "ch12"}, {"term": "effort", "def": "1–100 的推理力度标量，控制输出长度。", "chapterId": "ch12"}, {"term": "全局 KV cache", "def": "常驻 HBM 的主 KV 缓存。", "chapterId": "ch13"}, {"term": "持久 KV cache", "def": "放 SSD/主机内存、用于前缀复用的缓存。", "chapterId": "ch13"}, {"term": "算术强度", "def": "每字节内存访问对应的计算量。", "chapterId": "ch13"}, {"term": "选型", "def": "在负载、成本、质量约束下选最合适的模型。", "chapterId": "ch13"}], "patterns": {"file": "patterns.md"}, "cheatsheet": {"file": "cheatsheet.md"}, "quizzes": [{"id": "q01", "chapterId": "ch10", "type": "single", "question": "R1 相对于 V3 的主要变化是什么？", "options": ["注意力结构", "后训练方法", "层数", "词表大小"], "answer": 1, "explain": "R1 的模型结构与 V3 相同，变化在 RL 后训练。", "relatedConceptId": "c36"}, {"id": "q02", "chapterId": "ch10", "type": "single", "question": "V4 的 CSA 和 HCA 压缩率分别是？", "options": ["4:1 和 128:1", "2:1 和 64:1", "8:1 和 256:1", "1:1 和 1:1"], "answer": 0, "explain": "CSA 4:1，HCA 128:1。", "relatedConceptId": "c36"}, {"id": "q03", "chapterId": "ch10", "type": "single", "question": "V4.1-Flash 的 prefill 激活参数约是多少？", "options": ["8B", "13B", "16B", "49B"], "answer": 0, "explain": "CED 让 prefill 只跑编码器路径，约 8B；decode 16B。", "relatedConceptId": "c32"}, {"id": "q04", "chapterId": "ch11", "type": "single", "question": "MoE 主要省的是哪一项？", "options": ["显存占用", "单 token 计算量", "通信量", "词表大小"], "answer": 1, "explain": "MoE 只激活部分专家，计算按激活参数算，但所有权重仍要存。", "relatedConceptId": "c36"}, {"id": "q05", "chapterId": "ch11", "type": "single", "question": "mHC 的混合矩阵被约束成什么？", "options": ["正交矩阵", "双随机矩阵", "对角矩阵", "稀疏矩阵"], "answer": 1, "explain": "行和、列和为 1，非负，保证混合不放大信号。", "relatedConceptId": "c36"}, {"id": "q06", "chapterId": "ch11", "type": "single", "question": "Engram 的核心机制是什么？", "options": ["矩阵乘法", "哈希查表", "注意力", "卷积"], "answer": 1, "explain": "Engram 用 N-gram 哈希查表，O(1) 内存访问。", "relatedConceptId": "c36"}, {"id": "q07", "chapterId": "ch12", "type": "single", "question": "V4 用什么方法合并多个领域专家？", "options": ["权重平均", "混合 RL", "在线策略蒸馏（OPD）", "直接 SFT"], "answer": 2, "explain": "V4 用 10 多个教师做全词表 OPD。", "relatedConceptId": "c34"}, {"id": "q08", "chapterId": "ch12", "type": "single", "question": "V4.1 后训练的主要创新在哪里？", "options": ["新的 RL 算法", "新的 OPD 算法", "数据与环境流水线", "新的 SFT 损失"], "answer": 2, "explain": "论文明确说算法没有新东西，收益来自数据与环境工程。", "relatedConceptId": "c35"}, {"id": "q09", "chapterId": "ch12", "type": "single", "question": "R1 四阶段中的第一步是什么？", "options": ["推理 RL", "冷启动 SFT", "拒绝采样", "蒸馏"], "answer": 1, "explain": "R1 先做几千条冷启动 SFT，再做 RL。", "relatedConceptId": "c35"}, {"id": "q10", "chapterId": "ch13", "type": "single", "question": "1M token、每 token 890 B，单请求全局 KV 约多少？", "options": ["89 MB", "890 MB", "8.9 GB", "89 GB"], "answer": 1, "explain": "10^6 × 890 = 8.9×10^8 字节，约 890 MB。", "relatedConceptId": "c32"}, {"id": "q11", "chapterId": "ch13", "type": "single", "question": "输入/输出比 200:1 时，哪种架构收益最明显？", "options": ["MoE", "CED", "Engram", "mHC"], "answer": 1, "explain": "CED 省的是 prefill，输入占比越高收益越大。", "relatedConceptId": "c32"}, {"id": "q12", "chapterId": "ch13", "type": "single", "question": "架构选型的原则是什么？", "options": ["永远选最强模型", "满足要求下总成本最低", "压缩率最高", "参数最大"], "answer": 1, "explain": "选型是够用 + 总成本最低，不是最强。", "relatedConceptId": "c36"}], "flashcards": [{"id": "f01", "chapterId": "ch10", "front": "R1 改变了模型架构吗？", "back": "没有，R1 结构与 V3 相同，变的是后训练。", "tags": ["架构", "R1"]}, {"id": "f02", "chapterId": "ch10", "front": "三代架构的瓶颈迁移顺序？", "back": "KV cache → 注意力 FLOPs + KV → prefill + KV 存储/带宽。", "tags": ["架构", "瓶颈"]}, {"id": "f03", "chapterId": "ch10", "front": "MLA 解决什么？", "back": "用低维潜向量压 KV cache，支撑 128K 上下文。", "tags": ["架构", "MLA"]}, {"id": "f04", "chapterId": "ch10", "front": "CSA2 多了哪个压缩维度？", "back": "层维度：跨层复用主 KV、索引器 K 和 top-k 索引。", "tags": ["架构", "CSA2"]}, {"id": "f05", "chapterId": "ch11", "front": "MoE 的总参数和激活参数区别？", "back": "总参数是全部专家，激活参数是单 token 实际用到的部分。", "tags": ["组件", "MoE"]}, {"id": "f06", "chapterId": "ch11", "front": "mHC 的约束和投影方法？", "back": "双随机矩阵，Sinkhorn-Knopp 迭代。", "tags": ["组件", "mHC"]}, {"id": "f07", "chapterId": "ch11", "front": "Muon 怎么更新？", "back": "Newton-Schulz 正交化梯度矩阵，再动量更新。", "tags": ["组件", "Muon"]}, {"id": "f08", "chapterId": "ch11", "front": "Engram 为什么 O(1)？", "back": "哈希查表，不需要矩阵乘法。", "tags": ["组件", "Engram"]}, {"id": "f09", "chapterId": "ch12", "front": "R1 后训练四阶段？", "back": "冷启动 SFT → 推理 RL → 拒绝采样 SFT → 推理+通用 RL。", "tags": ["训练", "R1"]}, {"id": "f10", "chapterId": "ch12", "front": "V4 后训练两阶段？", "back": "领域专家 SFT+GRPO → 多教师 OPD。", "tags": ["训练", "V4"]}, {"id": "f11", "chapterId": "ch12", "front": "OPD 的“在线”指什么？", "back": "轨迹由学生自己生成，教师在这些轨迹上给 logits。", "tags": ["训练", "OPD"]}, {"id": "f12", "chapterId": "ch12", "front": "V4 的稳定性手段？", "back": "Anticipatory Routing、SwiGLU Clamping、mHC、Muon。", "tags": ["训练", "稳定性"]}, {"id": "f13", "chapterId": "ch13", "front": "单请求 KV 怎么算？", "back": "token 数 × 每 token 字节数。", "tags": ["选型", "KV"]}, {"id": "f14", "chapterId": "ch13", "front": "CED 适合什么负载？", "back": "输入密集、prefill 占比高的智能体负载。", "tags": ["选型", "CED"]}, {"id": "f15", "chapterId": "ch13", "front": "选型三问？", "back": "瓶颈是什么、代价是什么、实验验证了什么。", "tags": ["选型", "方法"]}, {"id": "f16", "chapterId": "ch13", "front": "评审报告六节？", "back": "画像、瓶颈、对比、建议、风险、结论。", "tags": ["选型", "报告"]}]}, "pages": {"ch10": {"html": "<div class=\"source-badge\">📖 出处：DeepSeek-V3/V4/V4.1 技术报告<\/div><h1>第 10 章：三代架构总览：瓶颈迁移与注意力演进<\/h1>\n<ul><li>\n<strong>难度<\/strong>：★★★ | <strong>预估学时<\/strong>：5 小时 | <strong>前置<\/strong>：论文篇第 6–9 章\n<\/ul>\n<h2>学习目标<\/h2>\n<p>学完本章，你能：<\/p>\n<ol><li>\n用一张表对比 V3、R1、V4、V4.1 的架构与规模。\n<\/li><li>\n说出每一代被哪个部署瓶颈逼着改架构。\n<\/li><li>\n画出注意力从 MHA 到 MLA、CSA/HCA、CSA2 的演进线，并说明每步解决了什么、放弃了什么。\n<\/li><li>\n解释为什么 R1 不算一次“架构升级”。\n<\/ol>\n<h2>一句话核心<\/h2>\n<p>三代架构不是参数越堆越大，而是瓶颈不断迁移：从 KV cache，到注意力 FLOPs，再到 prefill 计算与 KV 存储/带宽；每一代都在替上一代还债。<\/p>\n<h2>零基础讲解<\/h2>\n<h3>概念 1：先把“架构”和“后训练”分开（难度：基础）<\/h3>\n<p>很多人把 R1 当成“新一代架构”，这是错的。R1 的模型结构和 DeepSeek-V3 完全一样：同样是 671B 总参数、37B 激活、61 层、MLA 注意力、DeepSeekMoE、MTP。R1 改的是<strong>后训练<\/strong>：在 V3-Base 上用 GRPO 做强化学习，把推理能力激发出来。<\/p>\n<p>架构回答“模型长什么样、怎么算”；后训练回答“用什麼数据、什么目标、什么奖励去调它”。两者可以独立变化。R1 是后训练的革命，不是架构的革命。<\/p>\n<h3>概念 2：一张表看三代（难度：基础）<\/h3>\n<table><thead><tr><th>项目<\/th><th>V3（2024.12）<\/th><th>R1（2025.01）<\/th><th>V4-Pro（2026.04）<\/th><th>V4-Flash（2026.04）<\/th><th>V4.1-Flash（2026.09）<\/th><\/tr><\/thead><tbody><tr><td>总参数<\/td><td>671B<\/td><td>671B<\/td><td>1.6T<\/td><td>284B<\/td><td>552B + 196B Engram<\/td><\/tr><tr><td>激活参数<\/td><td>37B<\/td><td>37B<\/td><td>49B<\/td><td>13B<\/td><td>prefill 8B / decode 16B<\/td><\/tr><tr><td>层数<\/td><td>61<\/td><td>61<\/td><td>61<\/td><td>43<\/td><td>40（20 编码 + 20 解码）<\/td><\/tr><tr><td>注意力<\/td><td>MLA<\/td><td>MLA<\/td><td>CSA + HCA 交错<\/td><td>CSA + HCA 交错<\/td><td>CSA2（纯）<\/td><\/tr><tr><td>残差<\/td><td>标准<\/td><td>标准<\/td><td>mHC<\/td><td>mHC<\/td><td>Single-Pass mHC<\/td><\/tr><tr><td>优化器<\/td><td>AdamW<\/td><td>AdamW<\/td><td>Muon 为主<\/td><td>Muon 为主<\/td><td>Muon 为主<\/td><\/tr><tr><td>上下文<\/td><td>128K<\/td><td>128K<\/td><td>1M<\/td><td>1M<\/td><td>1M<\/td><\/tr><tr><td>预训练 token<\/td><td>14.8T<\/td><td>继承 V3<\/td><td>33T<\/td><td>32T<\/td><td>45T（多模态）<\/td><\/tr><\/tbody><\/table>\n<p>读表先看两个反直觉的地方：<\/p>\n<ul><li>\nV4-Flash 的总参数 284B 比 V3 的 671B 小，但论文说 V4-Flash-Base 在多数基准上超过 V3.2-Base。参数少不等于能力弱，架构和数据效率更重要。\n<\/li><li>\nV4.1-Flash 主干 552B，比 V4-Flash 大，但 prefill 只激活 8B。它不是“更大的模型”，是“更会分配计算的模型”。\n<\/ul>\n<h3>概念 3：瓶颈迁移：每一代在还什么债（难度：进阶）<\/h3>\n<p><strong>V3 时代（128K 上下文）<\/strong>：主要矛盾是 KV cache。上下文一长，每个 token 的 K/V 缓存线性增长，显存先撑不住。MLA 的答案是把 K/V 压成低维潜向量，缓存降一个数量级。<\/p>\n<p><strong>V4 时代（1M 上下文）<\/strong>：光压 KV 不够了。1M token 的注意力计算是平方级，FLOPs 成为新瓶颈；同时 KV cache 仍然很大。CSA 用 4:1 压缩 + top-k 稀疏砍计算，HCA 用 128:1 压缩砍全局候选，两者交错覆盖不同视野。<\/p>\n<p><strong>V4.1 时代（智能体、输入密集）<\/strong>：请求变成“读 100 万 token、写几千 token”。prefill 计算和 KV 的存储/带宽成为主矛盾。CED 让 prefill 只算一半层，CSA2 跨层复用 KV，FP4 压位宽，SWA Bounded Replay 把持久缓存里的 SWA 部分去掉。<\/p>\n<p>这条线说明：架构创新不是“想到一个好结构”，而是“部署时哪笔账最疼，就改哪里”。<\/p>\n<h3>概念 4：注意力演进线（难度：高难）<\/h3>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  A[&quot;MHA：每头独立 K/V&quot;] --&gt; B[&quot;GQA：多 query 共享 KV 头&quot;]\n  B --&gt; C[&quot;MLA：低秩潜向量 + 解耦 RoPE&quot;]\n  C --&gt; D[&quot;CSA：4:1 压缩 + top-k 稀疏&quot;]\n  D --&gt; E[&quot;HCA：128:1 压缩 + 稠密&quot;]\n  E --&gt; F[&quot;CSA2：跨层复用 + 分层索引&quot;]<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<p>每一步解决什么、放弃什么：<\/p>\n<table><thead><tr><th>方法<\/th><th>压缩维度<\/th><th>解决什么<\/th><th>代价<\/th><\/tr><\/thead><tbody><tr><td>MHA<\/td><td>无<\/td><td>表达能力强，基线<\/td><td>KV cache 最大<\/td><\/tr><tr><td>GQA<\/td><td>KV 头数<\/td><td>减少 KV 头，省缓存<\/td><td>表达多样性下降<\/td><\/tr><tr><td>MLA<\/td><td>表示维度<\/td><td>潜向量压缩，缓存大降<\/td><td>计算图复杂，需解耦 RoPE<\/td><\/tr><tr><td>CSA<\/td><td>序列 + 稀疏<\/td><td>4:1 压缩 + top-k，砍 FLOPs<\/td><td>索引器成本，局部细节需 SWA 补<\/td><\/tr><tr><td>HCA<\/td><td>序列（重压缩）<\/td><td>128:1，全局粗览<\/td><td>细节丢失，只适合粗粒度<\/td><\/tr><tr><td>CSA2<\/td><td>层 + 序列 + 位宽<\/td><td>跨层复用 + FP4，缓存极限<\/td><td>结构复杂，训练工程难<\/td><\/tr><\/tbody><\/table>\n<p>一个容易忽略的点：这些方法不是替代关系。V4 同时用 CSA、HCA、SWA；V4.1 用 CSA2 + SWA。它们是不同视野、不同压缩维度的组合，不是“新一代一定淘汰旧一代”。<\/p>\n<h3>概念 5：为什么 V4.1 敢做“非对称”（难度：高难）<\/h3>\n<p>标准 Transformer 每层都做同样的事，prefill 和 decode 的计算路径基本一致。V4.1 把 40 层分成编码器和解码器，让 prefill 只跑前 20 层，decode 跑完整 40 层。<\/p>\n<p>这背后是一个部署观察：智能体请求的输入/输出比例严重不对称。如果 prefill 和 decode 用同样的计算路径，读输入的成本就无法单独优化。CED 把“读”和“写”拆开，让计算匹配负载。<\/p>\n<p>风险：编码器末端的 <span class=\"katex-inline\">H_{20}<\/span> 要承载全部全局信息，表达能力受压；SWA 回放有额外成本；训练流水线更复杂。V4.1 用每层独立投影、Bounded Replay 和工程优化来补偿。<\/p>\n<h3>概念 6：架构评价的三个问题（难度：进阶）<\/h3>\n<p>看到任何一个架构改动，问三件事：<\/p>\n<ol><li>\n<strong>它替哪笔账还债？<\/strong> 是 KV cache、FLOPs、prefill、带宽，还是训练稳定性？\n<\/li><li>\n<strong>代价是什么？<\/strong> 精度、显存、工程复杂度、训练难度，总有一项要付。\n<\/li><li>\n<strong>有没有被实验验证？<\/strong> 论文给的是 FLOPs 估算、benchmark，还是端到端延迟？三者不是一回事。\n<\/ol>\n<p>这三个问题，比背“CSA 压缩 4 倍、HCA 压缩 128 倍”有用得多。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart TB\n  subgraph 瓶颈[&quot;部署瓶颈&quot;]\n    A[&quot;128K：KV cache&quot;] --&gt; B[&quot;1M：注意力 FLOPs + KV&quot;]\n    B --&gt; C[&quot;智能体：prefill + KV 存储/带宽&quot;]\n  end\n  subgraph 架构[&quot;架构回应&quot;]\n    A --&gt; D[&quot;MLA&quot;]\n    B --&gt; E[&quot;CSA + HCA&quot;]\n    C --&gt; F[&quot;CED + CSA2 + FP4&quot;]\n  end<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<p>看图说明：瓶颈和架构是一一对应的。不要把三代看成“参数增长史”，它是“还债史”。<\/p>\n<h2>类比与实例<\/h2>\n<ul><li>\n<strong>类比<\/strong>：一家快递公司。第一代问题是仓库放不下（KV cache），于是把包裹压缩（MLA）；第二代问题是分拣太慢（FLOPs），于是先粗分再精选（CSA/HCA）；第三代问题是每天大量进货、少量出货（prefill 重），于是把进货和出货分成两条线（CED）。\n<\/li><li>\n<strong>实例<\/strong>：V4-Pro 在 1M 上下文下，单 token FLOPs 是 V3.2 的 27%，KV cache 是 10%。这两个数字不是“模型变小了”，是“同样长度的上下文，算得更省、存得更少”。\n<\/ul>\n<h2>常见误解<\/h2>\n<ul><li>\n<strong>别以为 R1 是新架构<\/strong>——R1 的模型结构就是 V3，变的是后训练。\n<\/li><li>\n<strong>别以为 V4.1 一定比 V4-Pro 强<\/strong>——V4.1 目前只有 Flash，论文对标的是 V4-Flash；不同规模不能直接横比。\n<\/li><li>\n<strong>别以为压缩率越高越好<\/strong>——HCA 128:1 只适合全局粗览，细节还得靠 SWA 和 CSA。\n<\/li><li>\n<strong>别以为 FLOPs 降了延迟就一定降<\/strong>——还要看带宽、kernel、批大小。\n<\/ul>\n<h2>自测题（答案）<\/h2>\n<p>1.（单选）R1 相对于 V3 的主要变化是什么？ A. 注意力结构 B. 后训练方法 C. 层数 D. 词表大小 <strong>答案：B<\/strong>；解析：R1 的模型结构与 V3 相同，变化在 RL 后训练。<\/p>\n<p>2.（填空）V4 的 CSA 压缩率是 ______，HCA 压缩率是 ______。 <strong>答案：4:1，128:1<\/strong>；解析：论文配置明确。<\/p>\n<p>3.（简答）V4.1 为什么要把 40 层分成编码器和解码器？ <strong>答案要点<\/strong>：智能体输入密集，prefill 成本高；CED 让 prefill 只跑前 20 层，解码器全局 KV 从 H20 投影，prefill 计算近似减半。<\/p>\n<h2>复习锚点<\/h2>\n<ul><li>\n架构与后训练分开看：R1 是后训练革命，不是架构革命。\n<\/li><li>\n瓶颈迁移：KV cache → 注意力 FLOPs → prefill + KV 存储/带宽。\n<\/li><li>\n注意力演进：MHA → GQA → MLA → CSA/HCA → CSA2，压缩维度越来越多。\n<\/li><li>\n评价架构三问：替谁还债、代价是什么、实验验证了什么。\n<\/ul>", "kind": "chapter", "title": "第 10 章：三代架构总览：瓶颈迁移与注意力演进"}, "ch11": {"html": "<div class=\"source-badge\">📖 出处：DeepSeek-V4/V4.1 技术报告<\/div><div class=\"prereq-bar\">⬅ 前置：<span class=\"prereq-hard\"><span class=\"prereq-tag\">必<\/span> <a href=\"#/chapter/ch10\">第 10 章：三代架构总览：瓶颈迁移与注意力演进<\/a><\/span><\/div><h1>第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark<\/h1>\n<ul><li>\n<strong>难度<\/strong>：★★★ | <strong>预估学时<\/strong>：5 小时 | <strong>前置<\/strong>：第 10 章\n<\/ul>\n<h2>学习目标<\/h2>\n<p>学完本章，你能：<\/p>\n<ol><li>\n对每个效率组件说出“它替哪笔账还债、代价是什么”。\n<\/li><li>\n区分 MoE 的“总参数”和“激活参数”，并解释共享专家的作用。\n<\/li><li>\n说清 MTP 与 DSpark 的分工：一个偏训练，一个偏推理。\n<\/li><li>\n解释 mHC 的双随机约束和 Muon 的正交化为什麼能提升训练稳定性。\n<\/li><li>\n说出 Engram 为什么能在增加参数的同时不增加矩阵计算。\n<\/ol>\n<h2>一句话核心<\/h2>\n<p>这些组件不是“堆料”，而是三种设计策略：把记忆和计算解耦、把压缩做到多个维度、用数学约束换训练稳定。<\/p>\n<h2>零基础讲解<\/h2>\n<h3>概念 1：MoE：参数做大，计算不跟着涨（难度：进阶）<\/h3>\n<p>普通 FFN 每个 token 都过全部参数。MoE 把 FFN 拆成很多专家，每个 token 只过其中几个，于是总参数可以很大，单 token 计算只按激活参数算。<\/p>\n<p>三代配置：<\/p>\n<table><thead><tr><th>模型<\/th><th>共享专家<\/th><th>路由专家<\/th><th>激活路由专家<\/th><th>专家中间维度<\/th><\/tr><\/thead><tbody><tr><td>V3<\/td><td>1<\/td><td>256<\/td><td>8<\/td><td>2048<\/td><\/tr><tr><td>V4-Flash<\/td><td>1<\/td><td>256<\/td><td>6<\/td><td>2048<\/td><\/tr><tr><td>V4-Pro<\/td><td>1<\/td><td>384<\/td><td>6<\/td><td>3072<\/td><\/tr><tr><td>V4.1-Flash<\/td><td>1<\/td><td>384<\/td><td>6<\/td><td>2304<\/td><\/tr><\/tbody><\/table>\n<p>两个细节：<\/p>\n<ul><li>\n<strong>前 3 个 MoE 层用 Hash 路由<\/strong>（V4/V4.1）：训练早期路由网络还不稳，先用固定哈希分配，避免专家塌缩。\n<\/li><li>\n<strong>无辅助损失负载均衡<\/strong>：给每个专家一个偏置，按负载调，不往主损失里加辅助项。\n<\/ul>\n<p>MoE 的代价：专家并行带来跨卡通信；路由不稳会导致训练尖峰；显存要装下所有专家，即使当前 token 只用几个。<\/p>\n<h3>概念 2：MTP 与 DSpark：一个管训练，一个管推理（难度：进阶）<\/h3>\n<p><strong>MTP<\/strong> 挂在主干上，训练时让每个位置多预测一个未来 token，增加信号密度。V3/V4 都保留 MTP，深度 1。推理时 MTP 头可以当投机解码草稿。<\/p>\n<p><strong>DSpark<\/strong> 是 V4.1 独立训练的 drafter，3 个 Transformer 块、窗口 128，一次并行给出 5 个草稿位置，再用置信度调度验证。V4.1 主干预训练时不用 MTP，把投机解码完全交给 DSpark。<\/p>\n<p>为什么分开：<\/p>\n<ul><li>\nMTP 和主干预训练绑在一起，改动会影响主干训练。\n<\/li><li>\nDSpark 单独训练，可以独立优化草稿接受率，不干扰主干。\n<\/li><li>\n两者目标不同：MTP 提升训练信号，DSpark 提升 decode 速度。\n<\/ul>\n<h3>概念 3：mHC：用矩阵混合替代简单相加（难度：高难）<\/h3>\n<p>标准残差是一条流：<span class=\"katex-inline\">y=x+F(x)<\/span>。mHC 把残差扩成 4 条，层间用 <span class=\"katex-inline\">4\\times4<\/span> 双随机矩阵 <span class=\"katex-inline\">M<\/span> 混合：<\/p>\n<div class=\"katex-block\">X_{\\text{out}}=M X_{\\text{in}}+F(X_{\\text{in}})<\/div>\n<p>双随机约束（行和 1、列和 1、非负）保证混合不放大信号。训练时用 Sinkhorn-Knopp 迭代 20 次，把学到的矩阵投影回约束流形。<\/p>\n<p>为什么有效：多条流给不同层更多“写入通道”，矩阵混合让模型学“哪些流该合并”，双随机约束防止数值爆炸。<\/p>\n<p>代价：4 倍激活存储和跨层通信。V4 用融合核、重计算、DualPipe 调整，把开销压到流水线阶段的 6.7%；V4.1 的 Single-Pass mHC 把多个 kernel 合成一个，激活访存减半。<\/p>\n<h3>概念 4：Muon：把梯度矩阵正交化（难度：高难）<\/h3>\n<p>AdamW 逐元素更新，Muon 把参数矩阵的梯度当成整体，做 Newton-Schulz 迭代，把奇异值拉到接近 1：<\/p>\n<div class=\"katex-block\">G_{k+1}=aG_k+bG_kG_k^TG_k+c(G_kG_k^T)^2G_k<\/div>\n<p>V4 的配置：前 8 步快速收敛，后 2 步稳定奇异值；动量 0.95，权重衰减 0.1，更新 RMS 缩放到 0.18。Embedding、输出头、RMSNorm 仍用 AdamW。<\/p>\n<p>为什么有效：正交化让不同方向的更新不互相干扰，收敛更快、训练更稳。代价：需要完整梯度矩阵，和 ZeRO 分片冲突，V4 用混合 ZeRO 解决。<\/p>\n<h3>概念 5：Engram：把“记住”从计算里拆出来（难度：进阶）<\/h3>\n<p>Engram 是 V4.1 的条件记忆模块，196B 参数，放在第 1、14 层。它把输入 token 做 N-gram（2、3、4 阶）组合，用 8 个哈希头查表，每张表约 1600 万条目，查到嵌入后门控注入主干。<\/p>\n<p>为什么省算力：查表是内存访问，不是矩阵乘法。模型把“固定搭配、事实、术语”存进 Engram，把矩阵计算留给推理。<\/p>\n<p>代价：196B 参数要占存储；哈希碰撞会带来噪声；推理时要从主机内存预取，带宽是瓶颈。V4.1 用 FP8 存表、确定性寻址、后台 RDMA 预取来缓解。<\/p>\n<h3>概念 6：精度也是架构的一部分（难度：进阶）<\/h3>\n<ul><li>\n<strong>FP8 训练<\/strong>：V3 开始用，矩阵乘法用 FP8，master 权重保持高精度。\n<\/li><li>\n<strong>FP4 QAT<\/strong>：V4 后训练对 MoE 专家权重和索引器 QK 路径做量化感知训练；V4.1 把主 KV 也压到 FP4。\n<\/li><li>\n<strong>混合 KV 存储<\/strong>：V4 的 RoPE 维度用 BF16，其余用 FP8，缓存减半。\n<\/ul>\n<p>精度策略不是“越省越好”，而是“哪里能错、哪里不能错”。RoPE 维度对位置敏感，保留 BF16；专家权重数量大、容错高，可以 FP4。<\/p>\n<h3>概念 7：三条设计原则（难度：进阶）<\/h3>\n<p><strong>解耦<\/strong>：把混在一起的两笔账拆开。Engram 把记忆和计算拆开，CED 把 prefill 和 decode 拆开，MoE 把参数和计算拆开。<\/p>\n<p><strong>多维压缩<\/strong>：KV cache 可以从条目大小、序列长度、层数、位宽四个维度压。V4 用了前两个，V4.1 四个一起用，才有 890 B/token。<\/p>\n<p><strong>约束换稳定<\/strong>：mHC 用双随机约束，Muon 用正交化约束，SwiGLU 用 clamp 约束。大模型训练不稳定，靠“加约束”比“调超参”更可靠。<\/p>\n<p>这三条原则，比记住每个组件的缩写更有用。遇到新架构，先看它在这三条上做了什么。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart TB\n  A[&quot;输入&quot;] --&gt; B[&quot;MoE：参数多、激活少&quot;]\n  B --&gt; C[&quot;mHC：4 条残差流混合&quot;]\n  C --&gt; D[&quot;Muon：正交化更新&quot;]\n  D --&gt; E[&quot;Engram：查表记忆&quot;]\n  E --&gt; F[&quot;输出&quot;]\n  G[&quot;DSpark：推理草稿&quot;] --&gt; F<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<p>看图说明：MoE、mHC、Muon 在训练和推理的主干上；Engram 是旁路记忆；DSpark 只在 decode 阶段接进来。它们解决的不是同一个问题。<\/p>\n<h2>类比与实例<\/h2>\n<ul><li>\n<strong>类比<\/strong>：一家公司。MoE 是“几百个顾问，每个项目只请 6 个”；mHC 是“四条并行汇报线，用固定比例汇总”；Muon 是“每次调整都先对齐方向，避免互相打架”；Engram 是“查档案，不用重新算”；DSpark 是“先写草稿，再让主编校对”。\n<\/li><li>\n<strong>实例<\/strong>：V4-Flash 总参数 284B，激活 13B。如果按稠密模型算，单 token 要过 284B 参数；MoE 只过 13B，计算量约 1/22。但显存仍要装 284B 的权重，这就是“省算力不省显存”。\n<\/ul>\n<h2>常见误解<\/h2>\n<ul><li>\n<strong>别以为 MoE 省显存<\/strong>——它省的是计算，所有权重仍要加载。\n<\/li><li>\n<strong>别以为 mHC 只是“多几条残差”<\/strong>——关键是双随机约束和 Sinkhorn 投影。\n<\/li><li>\n<strong>别以为 Muon 能完全替代 AdamW<\/strong>——V4 仍对 embedding、输出头、RMSNorm 用 AdamW。\n<\/li><li>\n<strong>别以为 Engram 是外挂知识库<\/strong>——它是模型参数的一部分，随训练更新。\n<\/li><li>\n<strong>别以为 FP4 到处都能用<\/strong>——关键位置仍保留 BF16/FP8。\n<\/ul>\n<h2>自测题（答案）<\/h2>\n<p>1.（单选）MoE 主要省的是哪一项？ A. 显存占用 B. 单 token 计算量 C. 通信量 D. 词表大小 <strong>答案：B<\/strong>；解析：MoE 只激活部分专家，计算按激活参数算，但所有权重仍要存储。<\/p>\n<p>2.（填空）mHC 的混合矩阵被约束为 ______ 矩阵，用 ______ 迭代投影。 <strong>答案：双随机，Sinkhorn-Knopp<\/strong>；解析：行和、列和为 1，非负。<\/p>\n<p>3.（简答）Engram 为什么能在增加参数的同时不增加矩阵计算？ <strong>答案要点<\/strong>：它用哈希查表代替矩阵乘法，查表是内存访问，计算复杂度 <span class=\"katex-inline\">O(1)<\/span>。<\/p>\n<h2>复习锚点<\/h2>\n<ul><li>\nMoE：总参数大，激活参数小；共享专家 + 细粒度路由 + 无辅助损失均衡。\n<\/li><li>\nMTP 管训练信号，DSpark 管推理草稿。\n<\/li><li>\nmHC 用双随机矩阵混合 4 条残差流；Muon 正交化梯度矩阵。\n<\/li><li>\nEngram 查表记忆；FP4/FP8 是精度维度的压缩。\n<\/li><li>\n三条原则：解耦、多维压缩、约束换稳定。\n<\/ul>", "kind": "chapter", "title": "第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark"}, "ch12": {"html": "<div class=\"source-badge\">📖 出处：DeepSeek-R1/V4/V4.1 技术报告<\/div><div class=\"prereq-bar\">⬅ 前置：<span class=\"prereq-hard\"><span class=\"prereq-tag\">必<\/span> <a href=\"#/chapter/ch11\">第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark<\/a><\/span><\/div><h1>第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程<\/h1>\n<ul><li>\n<strong>难度<\/strong>：★★★ | <strong>预估学时<\/strong>：5 小时 | <strong>前置<\/strong>：第 11 章、论文篇第 6–7 章\n<\/ul>\n<h2>学习目标<\/h2>\n<p>学完本章，你能：<\/p>\n<ol><li>\n对比 R1 的 RL 后训练与 V4/V4.1 的 OPD 后训练。\n<\/li><li>\n说清预训练规模、数据质量、长上下文 mid-training 各自影响什么。\n<\/li><li>\n解释“专家训练 + 在线策略蒸馏”为什么能替代混合 RL。\n<\/li><li>\n说出 V4.1 为什么把主要精力放在数据与环境流水线，而不是新算法。\n<\/ol>\n<h2>一句话核心<\/h2>\n<p>预训练决定模型的知识底座，后训练决定它会不会用这些知识；R1 用 RL 激发推理，V4/V4.1 用“领域专家 + OPD”把多种能力合并进一个模型。<\/p>\n<h2>零基础讲解<\/h2>\n<h3>概念 1：预训练在做什么（难度：基础）<\/h3>\n<p>预训练就是“拿海量文本，让模型反复预测下一个 token”。损失是交叉熵，数据是万亿级 token。它学到的不是具体任务，而是语言规律、世界知识、代码语法等底座能力。<\/p>\n<p>规模：<\/p>\n<ul><li>\nV3：14.8T token。\n<\/li><li>\nV4-Flash：32T；V4-Pro：33T。\n<\/li><li>\nV4.1-Flash：45T 多模态 token。\n<\/ul>\n<p>预训练数据不是“越多越好”，还要看质量、去重、配比、课程。V4 论文提到数据经过严格清洗和配比；V4.1 把多模态数据从预训练一开始就混入，而不是后期补。<\/p>\n<p>长上下文能力也不是天然就有。V4 在预训练后做长上下文 mid-training，用合成 1M 序列和真实长文档继续训，才让模型适应 1M 窗口。<\/p>\n<h3>概念 2：R1 的后训练：四阶段 RL（难度：进阶）<\/h3>\n<p>R1 的路径：<\/p>\n<ol><li>\n冷启动 SFT：几千条人工长链推理，定格式。\n<\/li><li>\n推理 RL：GRPO + 规则奖励（答案对错 + 格式 + 语言一致性）。\n<\/li><li>\n拒绝采样 SFT：筛出约 80 万条高质量回答（60 万推理 + 20 万通用）。\n<\/li><li>\n第二轮 RL：推理 RL + 通用 RL（通用任务用奖励模型）。\n<\/ol>\n<p>核心是“用 RL 探索，再把探索成果固化成 SFT 数据”。这条路径适合“有明确答案、可规则判分”的任务。<\/p>\n<h3>概念 3：V4 的后训练：专家 + OPD（难度：高难）<\/h3>\n<p>V4 走的是另一条路：<\/p>\n<ol><li>\n<strong>领域专家训练<\/strong>：数学、代码、智能体、指令遵循等领域各训一个专家。每个专家先 SFT，再用 GRPO + 领域奖励模型做 RL。\n<\/li><li>\n<strong>在线策略蒸馏（OPD）<\/strong>：十多个教师模型，把能力合并到一个学生模型。学生在自己的轨迹上采样，教师给全词表 logits，学生最小化反向 KL：\n<\/ol>\n<div class=\"katex-block\">\\mathcal{L}_{\\text{OPD}}(\\theta)=\\sum_{i=1}^{N}w_i D_{\\text{KL}}(\\pi_\\theta\\|\\pi_{E_i})<\/div>\n<p>关键在“在线”：学生自己生成轨迹，教师在这些轨迹上打分，而不是拿固定数据集做离线蒸馏。这样学生能纠正自己的错误分布。<\/p>\n<p>为什么替代混合 RL：把多个专家的能力直接混在一个 RL 里，容易出现任务冲突、奖励尺度不一致、训练不稳。OPD 在 logits 层面合并，绕过权重合并的精度损失。<\/p>\n<p>V4 还引入<strong>生成式奖励模型<\/strong>（GRM）：让模型自己当裁判，给难以规则判分的任务打分，并把 RL 直接作用在 GRM 上。这比传统标量奖励模型更灵活，但也更容易出现奖励黑客，需要配合人工标注和规则。<\/p>\n<h3>概念 4：V4.1 的后训练：数据与环境是主角（难度：高难）<\/h3>\n<p>V4.1 的后训练在算法上没有新东西：SFT → RL → OPD，和 V4 一样。变化在数据：<\/p>\n<ul><li>\n<strong>大规模智能体任务合成<\/strong>：把任务写成（问题、环境、验证系统）三元组，用难度和正确性当奖励，训练模型自己造任务。\n<\/li><li>\n<strong>环境构建<\/strong>：通用智能体环境（模拟真实 SaaS、企业后台接口）、编程智能体环境（从 GitHub 仓库构建可运行、可验证的容器）。\n<\/li><li>\n<strong>DSec 沙箱<\/strong>：大规模并发跑智能体，支持抢占、容错、轨迹记录。\n<\/li><li>\n<strong>可控推理力度<\/strong>：用 1–100 的 effort 标量控制输出长度，API 暴露 max/high/low 三档。\n<\/li><li>\n<strong>OPD 合并<\/strong>：四十多个教师模型，全词表蒸馏。\n<\/ul>\n<p>论文的结论很直接：在当前阶段，数据与环境工程的边际收益，超过后训练算法的创新。这句话值得记住，它解释了为什么 V4.1 的架构创新很多，但后训练算法“没有新东西”。<\/p>\n<h3>概念 5：三条训练路线的对比（难度：进阶）<\/h3>\n<table><thead><tr><th>项目<\/th><th>R1<\/th><th>V4<\/th><th>V4.1<\/th><\/tr><\/thead><tbody><tr><td>基座<\/td><td>V3-Base<\/td><td>V4-Base<\/td><td>V4.1-Base（多模态）<\/td><\/tr><tr><td>后训练主线<\/td><td>冷启动 + RL + 拒绝采样 + RL<\/td><td>专家 SFT+GRPO → OPD<\/td><td>SFT+RL → OPD<\/td><\/tr><tr><td>奖励<\/td><td>规则奖励 + 通用奖励模型<\/td><td>领域奖励模型 + 生成式奖励模型<\/td><td>任务验证 + 规则/奖励模型<\/td><\/tr><tr><td>教师数量<\/td><td>无（蒸馏另算）<\/td><td>10+<\/td><td>40+<\/td><\/tr><tr><td>数据重点<\/td><td>可验证推理题<\/td><td>领域专家数据<\/td><td>合成任务 + 智能体环境<\/td><\/tr><tr><td>产出<\/td><td>671B R1 + 蒸馏小模型<\/td><td>Pro / Flash<\/td><td>Flash 多模态<\/td><\/tr><\/tbody><\/table>\n<p>三条路线的共同点：都依赖“可验证的奖励”和“高质量数据”。不同点是合并方式：R1 靠 SFT 固化，V4/V4.1 靠 OPD 在 logits 层面合并。<\/p>\n<h3>概念 6：训练稳定性为什么单独拿出来讲（难度：进阶）<\/h3>\n<p>大模型训练会出现损失尖峰（loss spike），严重时前功尽弃。V4 论文把稳定性单列一节，给了两个手段：<\/p>\n<ul><li>\n<strong>Anticipatory Routing<\/strong>：把主干和路由网络的更新解耦，提前一步取数据、缓存路由索引，打破路由异常值的恶性循环。\n<\/li><li>\n<strong>SwiGLU Clamping<\/strong>：把 SwiGLU 的线性部分限制在 <span class=\"katex-inline\">[-10,10]<\/span>，门控上界截到 10，消除异常值。\n<\/ul>\n<p>加上 mHC 的双随机约束、Muon 的正交化，V4 的训练稳定性是“结构约束 + 路由调度 + 数值裁剪”三管齐下。这些手段的原理，论文自己承认还没有完全理解，但实验有效。<\/p>\n<h3>概念 7：读训练章节要问的三个问题（难度：进阶）<\/h3>\n<ol><li>\n<strong>数据从哪来、怎么筛？<\/strong> 规模大不等于质量高；合成数据要看验证系统。\n<\/li><li>\n<strong>奖励怎么定义、会不会被 hack？<\/strong> 规则奖励有盲区，奖励模型有偏好，GRM 也会自评偏差。\n<\/li><li>\n<strong>多专家怎么合并？<\/strong> 权重平均、混合 RL、OPD 各有代价；OPD 的关键是教师质量和学生覆盖。\n<\/ol>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart TB\n  A[&quot;预训练：14.8T / 32T / 45T token&quot;] --&gt; B[&quot;长上下文 mid-training&quot;]\n  B --&gt; C[&quot;后训练&quot;]\n  C --&gt; D[&quot;R1：冷启动 → RL → 拒绝采样 → RL&quot;]\n  C --&gt; E[&quot;V4：领域专家 SFT+GRPO → OPD 10+ 教师&quot;]\n  C --&gt; F[&quot;V4.1：SFT+RL → OPD 40+ 教师 + 数据/环境流水线&quot;]\n  D --&gt; G[&quot;R1 + 蒸馏小模型&quot;]\n  E --&gt; H[&quot;V4-Pro / V4-Flash&quot;]\n  F --&gt; I[&quot;V4.1-Flash&quot;]<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<p>看图说明：预训练是共同底座，后训练分三条路线。R1 的重点在“激发”，V4 的重点在“合并专家”，V4.1 的重点在“造数据与环境”。<\/p>\n<h2>类比与实例<\/h2>\n<ul><li>\n<strong>类比<\/strong>：预训练是“读万卷书”，后训练是“分科补课”。R1 是“先做大量模拟题，再把好解法抄成笔记”；V4 是“请十个专科老师分别教，最后让一个学生把十位老师的思路融会贯通”；V4.1 是“自己出题、自己建实验室，让模型在真实环境里练”。\n<\/li><li>\n<strong>实例<\/strong>：V4 的 OPD 有 10 多个教师，V4.1 有 40 多个。教师越多，合并越复杂，需要全词表 logits 和高效调度。V4 论文提到，把全词表 KL 简化为 token 级估计会增大梯度方差，所以他们坚持全词表蒸馏。\n<\/ul>\n<h2>常见误解<\/h2>\n<ul><li>\n<strong>别以为 OPD 是“离线蒸馏”<\/strong>——它要求学生自己采样轨迹，教师在这些轨迹上打分，是在线策略。\n<\/li><li>\n<strong>别以为数据工程是“脏活”<\/strong>——V4.1 明确说，数据与环境的边际收益超过算法创新。\n<\/li><li>\n<strong>别以为 RL 一定比 SFT 强<\/strong>——R1 的失败尝试里，纯 SFT 在泛化上不如 RL，但 RL 也不是所有任务都适用。\n<\/li><li>\n<strong>别以为训练稳定只靠调学习率<\/strong>——结构约束、路由调度、数值裁剪都参与。\n<\/ul>\n<h2>自测题（答案）<\/h2>\n<p>1.（单选）V4 的后训练用什么方法合并多个领域专家？ A. 权重平均 B. 混合 RL C. 在线策略蒸馏 D. 直接 SFT <strong>答案：C<\/strong>；解析：V4 用多教师 OPD，在 logits 层面合并。<\/p>\n<p>2.（填空）V4.1 的后训练算法是 SFT → ______ → OPD。 <strong>答案：RL<\/strong>；解析：论文明确说算法无新意，标准 SFT+RL+OPD。<\/p>\n<p>3.（简答）为什么 V4 用全词表 OPD，而不是 token 级 KL 估计？ <strong>答案要点<\/strong>：token 级估计梯度方差大、训练不稳；全词表 logits 更稳定，能忠实蒸馏教师知识。<\/p>\n<h2>复习锚点<\/h2>\n<ul><li>\n预训练规模：V3 14.8T、V4 32/33T、V4.1 45T 多模态。\n<\/li><li>\nR1 后训练：冷启动 → RL → 拒绝采样 → RL → 蒸馏。\n<\/li><li>\nV4 后训练：领域专家 → 10+ 教师 OPD；V4.1：SFT+RL+OPD，40+ 教师。\n<\/li><li>\n稳定性手段：Anticipatory Routing、SwiGLU Clamping、mHC、Muon。\n<\/li><li>\n读训练三问：数据、奖励、合并方式。\n<\/ul>", "kind": "chapter", "title": "第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程"}, "ch13": {"html": "<div class=\"source-badge\">📖 出处：本课程整理 · 综合任务<\/div><div class=\"prereq-bar\">⬅ 前置：<span class=\"prereq-hard\"><span class=\"prereq-tag\">必<\/span> <a href=\"#/chapter/ch12\">第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程<\/a><\/span><\/div><h1>第 13 章：综合检验：写一份架构评审报告<\/h1>\n<ul><li>\n<strong>难度<\/strong>：★★★ | <strong>预估学时<\/strong>：3 小时 | <strong>前置<\/strong>：第 10–12 章\n<\/ul>\n<h2>学习目标<\/h2>\n<p>学完本章，你能：<\/p>\n<ol><li>\n把一个模糊的部署需求拆成可计算的负载画像。\n<\/li><li>\n用 KV cache、FLOPs、prefill/decode 三组数字比较候选模型。\n<\/li><li>\n写一份有假设、有数字、有风险清单的架构评审报告。\n<\/ol>\n<h2>一句话核心<\/h2>\n<p>架构选型不是选“最强模型”，而是选“在这个负载画像下，总成本最低且能力够用的模型”。<\/p>\n<h2>零基础讲解<\/h2>\n<h3>概念 1：先画负载画像（难度：进阶）<\/h3>\n<p>假设你在为一款“长文档智能体”选模型，需求如下：<\/p>\n<table><thead><tr><th>维度<\/th><th>假设<\/th><\/tr><\/thead><tbody><tr><td>上下文<\/td><td>单次输入可达 1M token<\/td><\/tr><tr><td>输入/输出比<\/td><td>约 200:1（输入 1M，输出 5K）<\/td><\/tr><tr><td>日请求量<\/td><td>1 万次<\/td><\/tr><tr><td>并发<\/td><td>峰值 50 个请求同时在线<\/td><\/tr><tr><td>模态<\/td><td>90% 纯文本，10% 含图片<\/td><\/tr><tr><td>能力要求<\/td><td>长文档检索、代码修改、工具调用<\/td><\/tr><tr><td>成本约束<\/td><td>单请求成本尽量低，可接受部分请求走更强模型<\/td><\/tr><\/tbody><\/table>\n<p>这张表不是摆设。后面每个数字都要从这里推。<\/p>\n<h3>概念 2：算 KV cache 的账（难度：进阶）<\/h3>\n<p>每个请求的全局 KV cache：<\/p>\n<div class=\"katex-block\">\\text{单请求 KV}=\\text{token 数}\\times\\text{每 token 字节数}<\/div>\n<p>按 1M token 算：<\/p>\n<table><thead><tr><th>模型<\/th><th>每 token 字节<\/th><th>单请求 KV<\/th><th>50 并发总 KV<\/th><\/tr><\/thead><tbody><tr><td>V3.2<\/td><td>48,068 B<\/td><td>约 48 GB<\/td><td>约 2.4 TB<\/td><\/tr><tr><td>V4-Flash<\/td><td>3,514 B<\/td><td>约 3.5 GB<\/td><td>约 175 GB<\/td><\/tr><tr><td>V4.1-Flash<\/td><td>890 B<\/td><td>约 0.89 GB<\/td><td>约 44.5 GB<\/td><\/tr><\/tbody><\/table>\n<p>V3.2 的 2.4 TB 已经超出单机 HBM 范围，必须多卡分片或磁盘卸载；V4.1 的 44.5 GB 可以放在几张 HBM 里。这个差距直接决定“能不能低成本并发”。<\/p>\n<p>注意：890 B 是全局 KV；持久 KV、SWA 缓存、Engram 表是另外的账。做容量规划时不能只乘 890。<\/p>\n<h3>概念 3：算 prefill 与 decode 的账（难度：进阶）<\/h3>\n<ul><li>\n<strong>prefill<\/strong>：读 1M token，计算量按输入长度线性增长。V4.1 的 CED 只跑前 20 层，prefill 激活 8B；V4-Flash 没有 CED，prefill 要跑完整 43 层，激活 13B。\n<\/li><li>\n<strong>decode<\/strong>：生成 5K token，每步都要跑完整层。V4.1 解码激活 16B，V4-Flash 13B。\n<\/ul>\n<p>输入/输出比 200:1 时，prefill 是主要成本。V4.1 的 CED 把 prefill 计算减半，正好命中这个负载。反过来，如果输出很长、输入很短，CED 的收益就没那么大，decode 的 16B 激活反而可能成为负担。<\/p>\n<h3>概念 4：能力与成本的匹配（难度：进阶）<\/h3>\n<p>候选对比：<\/p>\n<table><thead><tr><th>候选<\/th><th>优势<\/th><th>劣势<\/th><th>适用<\/th><\/tr><\/thead><tbody><tr><td>V4.1-Flash<\/td><td>prefill 8B、KV 890 B/token、多模态、智能体数据<\/td><td>只有 Flash 规模，Terminal-Bench 不如 Opus5<\/td><td>输入密集、成本敏感、含图片<\/td><\/tr><tr><td>V4-Flash<\/td><td>284B/13B，纯文本效率高<\/td><td>KV 3.5 KB/token，prefill 未减半<\/td><td>纯文本、输入中等<\/td><\/tr><tr><td>V4-Pro<\/td><td>1.6T/49B，能力上限最高<\/td><td>KV、计算都更贵<\/td><td>最难推理、代码任务<\/td><\/tr><tr><td>V3.2<\/td><td>生态成熟<\/td><td>KV 48 KB/token，1M 场景成本高<\/td><td>短上下文、已有部署<\/td><\/tr><\/tbody><\/table>\n<p>一个务实策略：90% 请求走 V4.1-Flash，10% 最难的代码/推理请求路由到 V4-Pro。这样既控制成本，又不牺牲上限。<\/p>\n<h3>概念 5：写报告的结构（难度：进阶）<\/h3>\n<p>一份合格的架构评审报告，至少包含六节：<\/p>\n<ol><li>\n<strong>负载画像<\/strong>：输入/输出比、并发、模态、上下文分布、缓存命中率。\n<\/li><li>\n<strong>瓶颈量化<\/strong>：KV cache、prefill FLOPs、decode FLOPs、存储带宽、首 token 延迟。\n<\/li><li>\n<strong>候选对比<\/strong>：同一组指标下比较，不混用不同口径。\n<\/li><li>\n<strong>选型建议<\/strong>：主模型 + 路由策略 + 量化/精度配置。\n<\/li><li>\n<strong>风险与验证<\/strong>：精度损失、长文本检索、工具调用、供应商锁定、成本波动。\n<\/li><li>\n<strong>结论<\/strong>：一句话说清“选谁、为什么、什么条件下会改选”。\n<\/ol>\n<p>评分要点（20 分）：<\/p>\n<ul><li>\n负载画像有数字，不是形容词（4 分）。\n<\/li><li>\nKV cache 计算正确，区分全局/持久（4 分）。\n<\/li><li>\n区分 FLOPs 与延迟，不把估算当实测（4 分）。\n<\/li><li>\n选型有取舍，不是“全都要最强”（4 分）。\n<\/li><li>\n风险清单具体，有验证计划（4 分）。\n<\/ul>\n<h3>概念 6：一个示例结论（难度：进阶）<\/h3>\n<blockquote>以 1M 输入、5K 输出、1 万请求/日、50 并发、10% 含图的负载为例，推荐 V4.1-Flash 作为主模型：全局 KV 约 0.89 GB/请求，50 并发约 44.5 GB，可落在单机多卡 HBM；CED 让 prefill 只激活 8B，匹配 200:1 的输入/输出比；原生多模态省去外挂视觉模型。对终端基准最难的 10% 代码任务，路由到 V4-Pro。若实测长文档检索精度不足，回退到 V4-Pro 或增加检索增强，而不是盲目加大上下文。<\/blockquote>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  A[&quot;负载画像&quot;] --&gt; B[&quot;KV cache 账&quot;]\n  A --&gt; C[&quot;prefill/decode 账&quot;]\n  B --&gt; D[&quot;候选对比&quot;]\n  C --&gt; D\n  D --&gt; E[&quot;选型 + 路由&quot;]\n  E --&gt; F[&quot;风险与验证&quot;]\n  F --&gt; G[&quot;结论&quot;]<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<p>看图说明：先算账，再选型。跳过负载画像直接问“哪个模型最强”，得到的答案一定不可落地。<\/p>\n<h2>类比与实例<\/h2>\n<ul><li>\n<strong>类比<\/strong>：买车。不是问“哪辆车最快”，而是先看“每天跑多少公里、载几个人、停车位多宽”，再选动力和尺寸。架构选型同理。\n<\/li><li>\n<strong>实例<\/strong>：50 并发、1M 上下文，V3.2 需要约 2.4 TB KV，V4.1 只要约 44.5 GB。这个数字差，不是“优化一点”，是“能不能上线”的区别。\n<\/ul>\n<h2>常见误解<\/h2>\n<ul><li>\n<strong>别以为每 token 字节数就是全部缓存<\/strong>——全局 KV、持久 KV、SWA、Engram 要分开算。\n<\/li><li>\n<strong>别以为 FLOPs 低就一定便宜<\/strong>——还要看 GPU 利用率、带宽、批大小、缓存命中。\n<\/li><li>\n<strong>别以为最强模型适合所有请求<\/strong>——用路由把难请求分流，比全量上最强更划算。\n<\/ul>\n<h2>自测题（答案）<\/h2>\n<p>1.（单选）1M token、每 token 890 B，单请求全局 KV 约多少？ A. 89 MB B. 890 MB C. 8.9 GB D. 89 GB <strong>答案：B<\/strong>；解析：<span class=\"katex-inline\">10^6\\times890=8.9\\times10^8<\/span> 字节，约 890 MB。<\/p>\n<p>2.（填空）V4.1 的 prefill 激活约 ______，decode 激活约 ______。 <strong>答案：8B，16B<\/strong>；解析：CED 让 prefill 只跑编码器路径。<\/p>\n<p>3.（简答）为什么输入/输出比 200:1 时，CED 的收益比 1:1 时更大？ <strong>答案要点<\/strong>：CED 省的是 prefill；输入占比越高，prefill 在总成本中越大，收益越明显。<\/p>\n<h2>复习锚点<\/h2>\n<ul><li>\n先画负载画像，再算 KV cache 和 prefill/decode。\n<\/li><li>\n全局 KV、持久 KV、SWA、Engram 分开算。\n<\/li><li>\n选型是“够用 + 成本最低”，不是“最强”。\n<\/li><li>\n报告六节：画像、瓶颈、对比、建议、风险、结论。\n<\/ul>", "kind": "chapter", "title": "第 13 章：综合检验：写一份架构评审报告"}, "c32": {"html": "<div class=\"source-badge\">📖 出处：DeepSeek-V4/V4.1 技术报告<\/div><h1>推理 FLOPs<\/h1>\n<ul><li>\n<strong>难度<\/strong>：高难 | <strong>涉及章节<\/strong>：第 10 章、第 13 章\n<\/ul>\n<h2>一句话定义<\/h2>\n<p>推理 FLOPs 是生成一个 token 所需的浮点运算次数，分 prefill 和 decode 两阶段，量级和瓶颈完全不同。<\/p>\n<h2>为什么重要<\/h2>\n<p>论文用 FLOPs 证明架构效率，但 FLOPs 不等于延迟。不懂它的算法，就会被“27% FLOPs”这类数字误导。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  A[&quot;prefill：整段输入并行&quot;] --&gt; B[&quot;计算密集，O(N·L)&quot;]\n  B --&gt; C[&quot;建立 KV cache&quot;]\n  C --&gt; D[&quot;decode：逐个 token&quot;]\n  D --&gt; E[&quot;带宽密集，每步读全部 KV&quot;]<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<h2>详解<\/h2>\n<p><strong>prefill<\/strong>：输入长度 <span class=\"katex-inline\">N<\/span>，层数 <span class=\"katex-inline\">L<\/span>，隐藏维度 <span class=\"katex-inline\">d<\/span>。主要计算是矩阵乘法，量级约 <span class=\"katex-inline\">O(NLd^2)<\/span>，并行度高，GPU 算力容易吃满。<\/p>\n<p><strong>decode<\/strong>：每生成一个 token，要读全部历史 KV 做注意力，计算量约 <span class=\"katex-inline\">O(NLd)<\/span>，但显存带宽是瓶颈。算术强度低，GPU 算力利用率低。<\/p>\n<p>这解释了为什么长上下文 decode 慢：不是算不动，是搬不动。KV cache 越大，每步搬运越多。<\/p>\n<p>FLOPs 与延迟的关系：<\/p>\n<div class=\"katex-block\">\\text{延迟}\\approx\\max\\left(\\frac{\\text{FLOPs}}{\\text{算力}},\\frac{\\text{字节数}}{\\text{带宽}}\\right)+\\text{调度开销}<\/div>\n<p>取两者较大的一个。decode 通常卡在带宽项，所以“FLOPs 降 90%”不一定带来 90% 的延迟下降。<\/p>\n<h2>常见误解<\/h2>\n<ul><li>\nFLOPs 不是延迟，也不是成本。\n<\/li><li>\nprefill 和 decode 的 FLOPs 不能相加成一个“总推理成本”，它们的瓶颈不同。\n<\/li><li>\n论文的 FLOPs 估算通常按等效 FP8 计，不同精度不能直接比。\n<\/ul>\n<h2>在书中出现的脉络<\/h2>\n<table><thead><tr><th>章节<\/th><th>语境<\/th><th>关键结论<\/th><\/tr><\/thead><tbody><tr><td>ch08<\/td><td>V4<\/td><td>1M 上下文 27% FLOPs<\/td><\/tr><tr><td>ch09<\/td><td>V4.1<\/td><td>decode FLOPs 几乎不随上下文增长<\/td><\/tr><tr><td>ch13<\/td><td>选型<\/td><td>区分 FLOPs 与延迟<\/td><\/tr><\/tbody><\/table>\n<h2>相关概念<\/h2>\n<ul><li>\n前置：矩阵乘法、KV cache\n<\/li><li>\n后续：算术强度、带宽、延迟\n<\/ul>", "kind": "concept", "title": "推理 FLOPs"}, "c33": {"html": "<div class=\"source-badge\">📖 出处：DeepSeek-R1/V4 技术报告<\/div><h1>奖励模型<\/h1>\n<ul><li>\n<strong>难度<\/strong>：进阶 | <strong>涉及章节<\/strong>：第 6 章、第 12 章\n<\/ul>\n<h2>一句话定义<\/h2>\n<p>奖励模型是给模型输出打分的模型，替代人工规则或人工偏好，为强化学习提供奖励信号。<\/p>\n<h2>为什么重要<\/h2>\n<p>R1 的推理 RL 用规则奖励，通用 RL 用奖励模型；V4 用生成式奖励模型（GRM）处理难验证任务。奖励怎么设计，直接决定 RL 学到什么。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  A[&quot;模型输出&quot;] --&gt; B[&quot;奖励模型打分&quot;]\n  B --&gt; C[&quot;GRPO 更新&quot;]\n  C --&gt; A\n  D[&quot;人工偏好/规则&quot;] --&gt; B<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<h2>详解<\/h2>\n<p>三类奖励：<\/p>\n<ol><li>\n<strong>规则奖励<\/strong>：答案匹配、单元测试、格式检查。确定性强，但只适用于可验证任务。\n<\/li><li>\n<strong>标量奖励模型<\/strong>：用人工偏好数据训练一个回归模型，输出一个分数。经典 RLHF 做法，成本高、易被 hack。\n<\/li><li>\n<strong>生成式奖励模型（GRM）<\/strong>：让模型自己生成评分理由和分数，V4 还把 RL 直接作用在 GRM 上，让“评判能力”和“生成能力”一起优化。\n<\/ol>\n<p>奖励黑客（reward hacking）：模型找到奖励的漏洞，拿到高分但没真正完成任务。比如格式对、答案错；或者讨好奖励模型的偏好。防御手段：规则 + 模型混合、人工抽检、对抗样本、限制奖励模型的可解释性。<\/p>\n<h2>常见误解<\/h2>\n<ul><li>\n奖励模型不是“客观裁判”，它的偏好来自训练数据。\n<\/li><li>\n奖励高不等于答案对，可能只是“更像奖励模型喜欢的样子”。\n<\/ul>\n<h2>在书中出现的脉络<\/h2>\n<table><thead><tr><th>章节<\/th><th>语境<\/th><th>关键结论<\/th><\/tr><\/thead><tbody><tr><td>ch06<\/td><td>R1-Zero<\/td><td>不用神经奖励模型，只用规则<\/td><\/tr><tr><td>ch07<\/td><td>R1 通用 RL<\/td><td>用奖励模型处理开放任务<\/td><\/tr><tr><td>ch12<\/td><td>V4<\/td><td>生成式奖励模型 + RL<\/td><\/tr><\/tbody><\/table>\n<h2>相关概念<\/h2>\n<ul><li>\n前置：GRPO、规则奖励\n<\/li><li>\n后续：奖励黑客、RLHF\n<\/ul>", "kind": "concept", "title": "奖励模型"}, "c34": {"html": "<div class=\"source-badge\">📖 出处：DeepSeek-V4/V4.1 技术报告 §5<\/div><div class=\"prereq-bar\">⬅ 前置：<span class=\"prereq-hard\"><span class=\"prereq-tag\">必<\/span> <a href=\"#/concept/c33\">奖励模型<\/a><\/span><\/div><h1>OPD（在线策略蒸馏）<\/h1>\n<ul><li>\n<strong>难度<\/strong>：高难 | <strong>涉及章节<\/strong>：第 12 章\n<\/ul>\n<h2>一句话定义<\/h2>\n<p>OPD 是学生在自己生成的轨迹上学习多个教师模型的输出分布，用反向 KL 把多个专家的能力合并进一个模型。<\/p>\n<h2>为什么重要<\/h2>\n<p>V4 用 10 多个教师、V4.1 用 40 多个教师做最终合并。它是“专家训练”之后的关键一步，替代了传统的混合 RL 和权重平均。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  S[&quot;学生模型&quot;] --&gt; T[&quot;自己生成轨迹&quot;]\n  T --&gt; E1[&quot;数学教师：给 logits&quot;]\n  T --&gt; E2[&quot;代码教师：给 logits&quot;]\n  T --&gt; E3[&quot;智能体教师：给 logits&quot;]\n  E1 --&gt; K[&quot;反向 KL 加权求和&quot;]\n  E2 --&gt; K\n  E3 --&gt; K\n  K --&gt; S<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<h2>详解<\/h2>\n<p>目标函数：<\/p>\n<div class=\"katex-block\">\\mathcal{L}_{\\text{OPD}}(\\theta)=\\sum_{i=1}^{N}w_i D_{\\text{KL}}(\\pi_\\theta\\|\\pi_{E_i})<\/div>\n<p><span class=\"katex-inline\">N<\/span> 是教师数量，<span class=\"katex-inline\">w_i<\/span> 是教师权重。反向 KL 让学生覆盖教师的输出分布，而不是只挑一个模式。<\/p>\n<p>为什么必须“在线”：轨迹由学生自己生成，教师在这些轨迹上打分。学生遇到自己会犯的错误，教师给出正确分布，学生才能纠正。离线蒸馏用固定数据集，学生没见过的状态学不到。<\/p>\n<p>为什么替代混合 RL：多个领域的 RL 混在一起，奖励尺度、任务分布、优化目标会冲突。OPD 在 logits 层面合并，不依赖奖励尺度，也不会有权重平均的精度损失。<\/p>\n<p>代价：每个教师都要跑前向，教师可能有万亿参数。V4 用教师权重分片、隐藏状态缓存、按教师排序调度；V4.1 支持 40 多个异构教师，用异步生成和动态配置。<\/p>\n<h2>常见误解<\/h2>\n<ul><li>\nOPD 不是“把教师权重平均”，它是 logits 层面的蒸馏。\n<\/li><li>\nOPD 不是“离线数据集蒸馏”，轨迹由学生在线生成。\n<\/li><li>\n教师越多不一定越好，教师质量和覆盖度更关键。\n<\/ul>\n<h2>在书中出现的脉络<\/h2>\n<table><thead><tr><th>章节<\/th><th>语境<\/th><th>关键结论<\/th><\/tr><\/thead><tbody><tr><td>ch12<\/td><td>V4<\/td><td>10+ 教师，全词表 OPD<\/td><\/tr><tr><td>ch12<\/td><td>V4.1<\/td><td>40+ 教师，数据/环境为主<\/td><\/tr><tr><td>ch10<\/td><td>架构对比<\/td><td>后训练合并策略<\/td><\/tr><\/tbody><\/table>\n<h2>相关概念<\/h2>\n<ul><li>\n前置：知识蒸馏、KL、GRPO\n<\/li><li>\n后续：全词表蒸馏、教师调度\n<\/ul>", "kind": "concept", "title": "OPD（在线策略蒸馏）"}, "c35": {"html": "<div class=\"source-badge\">📖 出处：DeepSeek-V4.1 论文 §5<\/div><h1>数据工程<\/h1>\n<ul><li>\n<strong>难度<\/strong>：进阶 | <strong>涉及章节<\/strong>：第 12 章\n<\/ul>\n<h2>一句话定义<\/h2>\n<p>数据工程是把原始语料、合成任务、智能体环境加工成可训练、可验证、难度可控的数据流水线。<\/p>\n<h2>为什么重要<\/h2>\n<p>V4.1 明确说：后训练算法没有新东西，收益主要来自数据与环境的规模、多样性、可验证性。数据工程已经是模型能力的一部分。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  A[&quot;原始语料/仓库/工具接口&quot;] --&gt; B[&quot;任务合成：问题+环境+验证&quot;]\n  B --&gt; C[&quot;难度/正确性筛选&quot;]\n  C --&gt; D[&quot;去重 + 课程配比&quot;]\n  D --&gt; E[&quot;RL/OPD 训练&quot;]\n  E --&gt; F[&quot;轨迹回审：再筛数据&quot;]\n  F --&gt; B<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<h2>详解<\/h2>\n<p>V4.1 的任务三元组：<\/p>\n<ol><li>\n<strong>问题<\/strong>：用户要完成什么。\n<\/li><li>\n<strong>环境<\/strong>：工具、文件、接口、容器。\n<\/li><li>\n<strong>验证系统<\/strong>：怎么判断任务完成，比如单元测试、状态检查、参考答案。\n<\/ol>\n<p>质量两个维度：<\/p>\n<ul><li>\n<strong>难度<\/strong>：不能太简单，否则没有学习信号。\n<\/li><li>\n<strong>正确性<\/strong>：三个组件都不能有致命缺陷。\n<\/ul>\n<p>数据来源：<\/p>\n<ul><li>\n真实工作流（内部员工、外部伙伴的交互数据）。\n<\/li><li>\n公开 GitHub 仓库（按 star 阈值筛选）。\n<\/li><li>\n模型自己合成的任务（用难度和正确性当奖励，迭代训练）。\n<\/ul>\n<p>配套：DSec 沙箱、抢占容错、轨迹记录、去重、难度校准、模态配比。<\/p>\n<h2>常见误解<\/h2>\n<ul><li>\n数据工程不是“多爬点网页”，它包括任务设计、环境构建、验证系统。\n<\/li><li>\n合成数据不是“模型随便编”，要有验证和难度控制。\n<\/li><li>\n数据规模不是唯一变量，多样性和可验证性同样重要。\n<\/ul>\n<h2>在书中出现的脉络<\/h2>\n<table><thead><tr><th>章节<\/th><th>语境<\/th><th>关键结论<\/th><\/tr><\/thead><tbody><tr><td>ch12<\/td><td>V4.1<\/td><td>数据/环境边际收益超过算法<\/td><\/tr><tr><td>ch07<\/td><td>R1<\/td><td>拒绝采样是数据工程的一种<\/td><\/tr><tr><td>ch13<\/td><td>选型<\/td><td>数据质量影响能力上限<\/td><\/tr><\/tbody><\/table>\n<h2>相关概念<\/h2>\n<ul><li>\n前置：拒绝采样、RL\n<\/li><li>\n后续：智能体环境、合成任务\n<\/ul>", "kind": "concept", "title": "数据工程"}, "c36": {"html": "<div class=\"source-badge\">📖 出处：本课程整理 · 架构分析<\/div><div class=\"prereq-bar\">⬅ 前置：<span class=\"prereq-hard\"><span class=\"prereq-tag\">必<\/span> <a href=\"#/concept/c32\">推理 FLOPs<\/a><\/span><\/div><h1>架构取舍<\/h1>\n<ul><li>\n<strong>难度<\/strong>：进阶 | <strong>涉及章节<\/strong>：第 10–13 章\n<\/ul>\n<h2>一句话定义<\/h2>\n<p>架构取舍是在给定负载、成本和质量约束下，选择“哪笔账可以省、哪笔账不能省”的决策过程。<\/p>\n<h2>为什么重要<\/h2>\n<p>每个架构组件都有代价。看懂取舍，才能在选型和评审时不迷信“最新”“最大”“压缩率最高”。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  A[&quot;负载画像&quot;] --&gt; B[&quot;瓶颈：KV/FLOPs/prefill/带宽&quot;]\n  B --&gt; C[&quot;候选机制&quot;]\n  C --&gt; D[&quot;代价：精度/显存/工程复杂度&quot;]\n  D --&gt; E[&quot;决策：够用且总成本最低&quot;]<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<h2>详解<\/h2>\n<p>常见取舍：<\/p>\n<table><thead><tr><th>选择<\/th><th>省什么<\/th><th>付出什么<\/th><th>适合<\/th><\/tr><\/thead><tbody><tr><td>MoE<\/td><td>单 token 计算<\/td><td>显存、通信、路由不稳<\/td><td>参数要大、算力受限<\/td><\/tr><tr><td>MLA<\/td><td>KV cache<\/td><td>计算图复杂<\/td><td>长上下文、显存紧张<\/td><\/tr><tr><td>CSA/HCA<\/td><td>注意力 FLOPs + KV<\/td><td>索引器、精度损失<\/td><td>1M 上下文<\/td><\/tr><tr><td>CED<\/td><td>prefill 计算<\/td><td>编码器表达受压、工程复杂<\/td><td>输入密集<\/td><\/tr><tr><td>mHC<\/td><td>训练稳定性<\/td><td>激活/通信开销<\/td><td>超深模型<\/td><\/tr><tr><td>Muon<\/td><td>收敛速度/稳定性<\/td><td>ZeRO 复杂<\/td><td>大规模预训练<\/td><\/tr><tr><td>Engram<\/td><td>矩阵计算<\/td><td>存储、带宽<\/td><td>记忆密集型任务<\/td><\/tr><tr><td>FP4<\/td><td>存储/带宽<\/td><td>精度风险<\/td><td>成本敏感推理<\/td><\/tr><\/tbody><\/table>\n<p>决策规则：<\/p>\n<ol><li>\n先量化瓶颈，不凭感觉。\n<\/li><li>\n只选“能解决当前瓶颈”的机制，不为用不上的能力付费。\n<\/li><li>\n给精度损失留验证计划。\n<\/li><li>\n算总成本，不算单项指标。\n<\/ol>\n<h2>常见误解<\/h2>\n<ul><li>\n压缩率越高不一定越好，精度和工程复杂度要一起算。\n<\/li><li>\n参数越大不一定越强，数据和架构效率同样重要。\n<\/li><li>\n最新一代不一定适合所有负载，V4.1-Flash 也不全面超过 V4-Pro。\n<\/ul>\n<h2>在书中出现的脉络<\/h2>\n<table><thead><tr><th>章节<\/th><th>语境<\/th><th>关键结论<\/th><\/tr><\/thead><tbody><tr><td>ch10<\/td><td>瓶颈迁移<\/td><td>架构是还债<\/td><\/tr><tr><td>ch11<\/td><td>组件<\/td><td>每个组件都有代价<\/td><\/tr><tr><td>ch13<\/td><td>评审<\/td><td>选型是总成本决策<\/td><\/tr><\/tbody><\/table>\n<h2>相关概念<\/h2>\n<ul><li>\n前置：KV cache、MoE、推理 FLOPs\n<\/li><li>\n后续：部署、成本模型\n<\/ul>", "kind": "concept", "title": "架构取舍"}, "__path__": {"html": "<h1>学习路径<\/h1><p>按推荐顺序学习；每步通过检查点（自测题）后再继续。<\/p><ol class='path-list'><li class='path-step' id='path-01'><strong>步骤 01：三代总览与注意力演进<\/strong><br>阅读：<a href=\"#/chapter/ch10\">第 10 章：三代架构总览：瓶颈迁移与注意力演进<\/a><br>检查点：能画出注意力演进线并说出每步解决什么<\/li><li class='path-step' id='path-02'><strong>步骤 02：效率组件的设计逻辑<\/strong><br>阅读：<a href=\"#/chapter/ch11\">第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark<\/a><br>检查点：能解释 MoE、mHC、Muon、Engram 各自的分工<\/li><li class='path-step' id='path-03'><strong>步骤 03：训练与后训练<\/strong><br>阅读：<a href=\"#/chapter/ch12\">第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程<\/a><br>检查点：能对比 R1 的 RL 与 V4/V4.1 的 OPD<\/li><li class='path-step' id='path-04'><strong>步骤 04：综合检验：架构评审<\/strong><br>阅读：<a href=\"#/chapter/ch13\">第 13 章：综合检验：写一份架构评审报告<\/a><br>检查点：完成一份有数字支撑的选型报告<\/li><\/ol><p>进度：<span id='path-progress-label'>0/0<\/span><\/p>", "kind": "path", "title": "学习路径"}, "__graph__": {"html": "<h1>🕸 知识图谱<\/h1><p>节点是概念，边是先修关系。拖拽节点、滚轮缩放，点击节点跳转到对应概念页。<\/p><div id=\"graph-container\" style=\"height:520px;border:1px solid var(--border);border-radius:10px;background:var(--panel)\"><\/div><p class=\"sub\">红线 = 必学前置 · 灰线 = 建议先看 · 蓝线 = 拓展阅读<\/p>", "kind": "graph", "title": "知识图谱"}, "__quiz_all__": {"html": "<p>（无综合题）<\/p>", "kind": "quiz", "title": "综合测验"}, "__quiz_ch10__": {"html": "<h1>测验：第 10 章：三代架构总览：瓶颈迁移与注意力演进<\/h1><div class='quiz-item' data-qid='q01' data-type='single' data-concept='c36' data-chapter='ch10'><p class='quiz-q'><b>Q1.<\/b> R1 相对于 V3 的主要变化是什么？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q01' value='0'> 注意力结构<\/label><label class='quiz-opt'><input type='radio' name='q01' value='1'> 后训练方法<\/label><label class='quiz-opt'><input type='radio' name='q01' value='2'> 层数<\/label><label class='quiz-opt'><input type='radio' name='q01' value='3'> 词表大小<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q02' data-type='single' data-concept='c36' data-chapter='ch10'><p class='quiz-q'><b>Q2.<\/b> V4 的 CSA 和 HCA 压缩率分别是？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q02' value='0'> 4:1 和 128:1<\/label><label class='quiz-opt'><input type='radio' name='q02' value='1'> 2:1 和 64:1<\/label><label class='quiz-opt'><input type='radio' name='q02' value='2'> 8:1 和 256:1<\/label><label class='quiz-opt'><input type='radio' name='q02' value='3'> 1:1 和 1:1<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q03' data-type='single' data-concept='c32' data-chapter='ch10'><p class='quiz-q'><b>Q3.<\/b> V4.1-Flash 的 prefill 激活参数约是多少？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q03' value='0'> 8B<\/label><label class='quiz-opt'><input type='radio' name='q03' value='1'> 13B<\/label><label class='quiz-opt'><input type='radio' name='q03' value='2'> 16B<\/label><label class='quiz-opt'><input type='radio' name='q03' value='3'> 49B<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><p class='quiz-summary'>完成作答后点击「检查答案」查看得分与解析。<\/p>", "kind": "quiz", "title": "测验"}, "__quiz_ch11__": {"html": "<h1>测验：第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark<\/h1><div class='quiz-item' data-qid='q04' data-type='single' data-concept='c36' data-chapter='ch11'><p class='quiz-q'><b>Q1.<\/b> MoE 主要省的是哪一项？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q04' value='0'> 显存占用<\/label><label class='quiz-opt'><input type='radio' name='q04' value='1'> 单 token 计算量<\/label><label class='quiz-opt'><input type='radio' name='q04' value='2'> 通信量<\/label><label class='quiz-opt'><input type='radio' name='q04' value='3'> 词表大小<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q05' data-type='single' data-concept='c36' data-chapter='ch11'><p class='quiz-q'><b>Q2.<\/b> mHC 的混合矩阵被约束成什么？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q05' value='0'> 正交矩阵<\/label><label class='quiz-opt'><input type='radio' name='q05' value='1'> 双随机矩阵<\/label><label class='quiz-opt'><input type='radio' name='q05' value='2'> 对角矩阵<\/label><label class='quiz-opt'><input type='radio' name='q05' value='3'> 稀疏矩阵<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q06' data-type='single' data-concept='c36' data-chapter='ch11'><p class='quiz-q'><b>Q3.<\/b> Engram 的核心机制是什么？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q06' value='0'> 矩阵乘法<\/label><label class='quiz-opt'><input type='radio' name='q06' value='1'> 哈希查表<\/label><label class='quiz-opt'><input type='radio' name='q06' value='2'> 注意力<\/label><label class='quiz-opt'><input type='radio' name='q06' value='3'> 卷积<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><p class='quiz-summary'>完成作答后点击「检查答案」查看得分与解析。<\/p>", "kind": "quiz", "title": "测验"}, "__quiz_ch12__": {"html": "<h1>测验：第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程<\/h1><div class='quiz-item' data-qid='q07' data-type='single' data-concept='c34' data-chapter='ch12'><p class='quiz-q'><b>Q1.<\/b> V4 用什么方法合并多个领域专家？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q07' value='0'> 权重平均<\/label><label class='quiz-opt'><input type='radio' name='q07' value='1'> 混合 RL<\/label><label class='quiz-opt'><input type='radio' name='q07' value='2'> 在线策略蒸馏（OPD）<\/label><label class='quiz-opt'><input type='radio' name='q07' value='3'> 直接 SFT<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q08' data-type='single' data-concept='c35' data-chapter='ch12'><p class='quiz-q'><b>Q2.<\/b> V4.1 后训练的主要创新在哪里？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q08' value='0'> 新的 RL 算法<\/label><label class='quiz-opt'><input type='radio' name='q08' value='1'> 新的 OPD 算法<\/label><label class='quiz-opt'><input type='radio' name='q08' value='2'> 数据与环境流水线<\/label><label class='quiz-opt'><input type='radio' name='q08' value='3'> 新的 SFT 损失<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q09' data-type='single' data-concept='c35' data-chapter='ch12'><p class='quiz-q'><b>Q3.<\/b> R1 四阶段中的第一步是什么？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q09' value='0'> 推理 RL<\/label><label class='quiz-opt'><input type='radio' name='q09' value='1'> 冷启动 SFT<\/label><label class='quiz-opt'><input type='radio' name='q09' value='2'> 拒绝采样<\/label><label class='quiz-opt'><input type='radio' name='q09' value='3'> 蒸馏<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><p class='quiz-summary'>完成作答后点击「检查答案」查看得分与解析。<\/p>", "kind": "quiz", "title": "测验"}, "__quiz_ch13__": {"html": "<h1>测验：第 13 章：综合检验：写一份架构评审报告<\/h1><div class='quiz-item' data-qid='q10' data-type='single' data-concept='c32' data-chapter='ch13'><p class='quiz-q'><b>Q1.<\/b> 1M token、每 token 890 B，单请求全局 KV 约多少？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q10' value='0'> 89 MB<\/label><label class='quiz-opt'><input type='radio' name='q10' value='1'> 890 MB<\/label><label class='quiz-opt'><input type='radio' name='q10' value='2'> 8.9 GB<\/label><label class='quiz-opt'><input type='radio' name='q10' value='3'> 89 GB<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q11' data-type='single' data-concept='c32' data-chapter='ch13'><p class='quiz-q'><b>Q2.<\/b> 输入/输出比 200:1 时，哪种架构收益最明显？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q11' value='0'> MoE<\/label><label class='quiz-opt'><input type='radio' name='q11' value='1'> CED<\/label><label class='quiz-opt'><input type='radio' name='q11' value='2'> Engram<\/label><label class='quiz-opt'><input type='radio' name='q11' value='3'> mHC<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q12' data-type='single' data-concept='c36' data-chapter='ch13'><p class='quiz-q'><b>Q3.<\/b> 架构选型的原则是什么？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q12' value='0'> 永远选最强模型<\/label><label class='quiz-opt'><input type='radio' name='q12' value='1'> 满足要求下总成本最低<\/label><label class='quiz-opt'><input type='radio' name='q12' value='2'> 压缩率最高<\/label><label class='quiz-opt'><input type='radio' name='q12' value='3'> 参数最大<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><p class='quiz-summary'>完成作答后点击「检查答案」查看得分与解析。<\/p>", "kind": "quiz", "title": "测验"}, "__cards__": {"html": "<h1>抽认卡<\/h1><p>点击卡片翻面；判断「认识 / 不熟」以记录复习状态。<\/p><div class='card-controls'><label>按章节筛选：<select id='card-filter'><option value=''>全部<\/option><\/select><\/label><span class='card-counts'>认识 <b id='card-known'>0<\/b> · 不熟 <b id='card-again'>0<\/b> · 剩余 <b id='card-left'>0<\/b><\/span><\/div><div id='card-stage'><div class='flashcard' id='flashcard'><div class='fc-inner'><div class='fc-front'><\/div><div class='fc-back'><\/div><\/div><\/div><\/div><div class='card-actions'><button id='card-again-btn'>不熟<\/button><button id='card-known-btn'>认识<\/button><\/div>", "kind": "cards", "title": "抽认卡"}, "__glossary__": {"html": "<h1>术语表<\/h1><input id='glossary-filter' type='search' placeholder='筛选术语…'><ul id='glossary-list'><li data-term='瓶颈迁移'>瓶颈迁移 — 部署瓶颈从 KV cache 转向 FLOPs 再转向 prefill/带宽。 <span class=glossary-ref>（第 10 章：三代架构总览：瓶颈迁移与注意力演进）<\/span><\/li><li data-term='激活参数'>激活参数 — 单个 token 实际参与计算的参数。 <span class=glossary-ref>（第 10 章：三代架构总览：瓶颈迁移与注意力演进）<\/span><\/li><li data-term='总参数'>总参数 — 模型全部参数，MoE 中远大于激活参数。 <span class=glossary-ref>（第 10 章：三代架构总览：瓶颈迁移与注意力演进）<\/span><\/li><li data-term='非对称架构'>非对称架构 — prefill 和 decode 走不同计算路径的架构。 <span class=glossary-ref>（第 10 章：三代架构总览：瓶颈迁移与注意力演进）<\/span><\/li><li data-term='专家并行'>专家并行 — 把 MoE 专家分布到不同设备上。 <span class=glossary-ref>（第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark）<\/span><\/li><li data-term='路由'>路由 — 决定 token 进入哪些专家的机制。 <span class=glossary-ref>（第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark）<\/span><\/li><li data-term='双随机矩阵'>双随机矩阵 — 行和、列和都为 1 的非负矩阵。 <span class=glossary-ref>（第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark）<\/span><\/li><li data-term='正交化'>正交化 — 把梯度矩阵的奇异值拉到接近 1。 <span class=glossary-ref>（第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark）<\/span><\/li><li data-term='压缩维度'>压缩维度 — 条目大小、序列长度、层数、位宽四个可压缩方向。 <span class=glossary-ref>（第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark）<\/span><\/li><li data-term='prefill'>prefill — 读入整段输入并建立 KV cache 的阶段。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='decode'>decode — 逐 token 生成输出的阶段。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='opd'>OPD — 学生在自己轨迹上向多个教师做全词表蒸馏。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='grm'>GRM — 生成式奖励模型，模型自己生成评分理由和分数。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='dsec'>DSec — V4.1 用于大规模智能体 RL 的弹性计算沙箱。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='任务三元组'>任务三元组 — 问题、环境、验证系统。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='effort'>effort — 1–100 的推理力度标量，控制输出长度。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='全局 kv cache'>全局 KV cache — 常驻 HBM 的主 KV 缓存。 <span class=glossary-ref>（第 13 章：综合检验：写一份架构评审报告）<\/span><\/li><li data-term='持久 kv cache'>持久 KV cache — 放 SSD/主机内存、用于前缀复用的缓存。 <span class=glossary-ref>（第 13 章：综合检验：写一份架构评审报告）<\/span><\/li><li data-term='算术强度'>算术强度 — 每字节内存访问对应的计算量。 <span class=glossary-ref>（第 13 章：综合检验：写一份架构评审报告）<\/span><\/li><li data-term='选型'>选型 — 在负载、成本、质量约束下选最合适的模型。 <span class=glossary-ref>（第 13 章：综合检验：写一份架构评审报告）<\/span><\/li><\/ul>", "kind": "glossary", "title": "术语表"}, "__diagnosis__": {"html": "<h1>🩺 诊断测试<\/h1><p>系统会从全书中抽题。答错的题会自动沿知识依赖链回溯，告诉你真正需要补的前置知识点。<\/p><div class='diag-controls'><button id='diag-start'>开始诊断（随机抽 5 题）<\/button><span id='diag-progress'><\/span><\/div><div id='diag-stage'><\/div><div id='diag-result'><\/div>", "kind": "diagnosis", "title": "诊断测试"}, "__patterns__": {"html": "<h1>模式与框架库<\/h1>\n<h2>框架：瓶颈—机制—代价<\/h2>\n<p>解释任何架构改动：它替哪笔账还债、用什么机制、付出什么代价。三个都说清才算解释。<\/p>\n<h2>框架：多维压缩<\/h2>\n<p>KV cache 可从条目大小、序列长度、层数、位宽四个维度压缩；先看论文压了哪几个维度。<\/p>\n<h2>决策规则<\/h2>\n<ul><li>\n先量化负载，再选模型。\n<\/li><li>\n只为自己用得上的能力付费。\n<\/li><li>\nFLOPs、KV、延迟、成本分开算。\n<\/ul>\n<h2>反模式<\/h2>\n<ul><li>\n把“最新一代”当成“最适合”。\n<\/li><li>\n把压缩率当成唯一指标。\n<\/li><li>\n用 FLOPs 估算代替端到端实测。\n<\/ul>", "kind": "模式库", "title": "模式库"}, "__cheatsheet__": {"html": "<h1>速查表<\/h1>\n<h2>关键数字<\/h2>\n<table><thead><tr><th>项目<\/th><th>数值<\/th><\/tr><\/thead><tbody><tr><td>V3<\/td><td>671B / 37B，61 层，MLA，14.8T token<\/td><\/tr><tr><td>V4-Pro<\/td><td>1.6T / 49B，61 层，CSA+HCA，33T token<\/td><\/tr><tr><td>V4-Flash<\/td><td>284B / 13B，43 层，CSA+HCA，32T token<\/td><\/tr><tr><td>V4.1-Flash<\/td><td>552B + 196B Engram，40 层，prefill 8B / decode 16B，45T token<\/td><\/tr><tr><td>V4 1M 效率<\/td><td>Pro 27% FLOPs / 10% KV；Flash 10% / 7%<\/td><\/tr><tr><td>V4.1 全局 KV<\/td><td>890 B/token；持久 KV 约 V4-Flash 的 1/8<\/td><\/tr><tr><td>CSA / HCA<\/td><td>4:1 / 128:1<\/td><\/tr><tr><td>R1 后训练<\/td><td>冷启动 → RL → 拒绝采样 → RL<\/td><\/tr><tr><td>V4 后训练<\/td><td>专家 SFT+GRPO → 10+ 教师 OPD<\/td><\/tr><tr><td>V4.1 后训练<\/td><td>SFT+RL → 40+ 教师 OPD<\/td><\/tr><\/tbody><\/table>\n<h2>公式<\/h2>\n<table><thead><tr><th>场景<\/th><th>内容<\/th><\/tr><\/thead><tbody><tr><td>单请求 KV<\/td><td>token 数 × 每 token 字节<\/td><\/tr><tr><td>延迟近似<\/td><td>max(FLOPs/算力, 字节/带宽) + 调度<\/td><\/tr><tr><td>OPD<\/td><td><span class=\"katex-inline\">\\sum_i w_i D_{KL}(\\pi_\\theta\\|\\pi_{E_i})<\/span><\/td><\/tr><\/tbody><\/table>", "kind": "速查表", "title": "速查表"}}, "base_dir": "/home/user/Doubao/chats/38454307882185474/deepseek-architecture-learning/03-architecture", "nav": [{"label": "学习路径", "href": "#/path"}, {"label": "🕸 知识图谱", "href": "#/graph"}, {"label": "🩺 诊断测试", "href": "#/diagnosis"}, {"label": "章节", "children": [{"label": "第 10 章：三代架构总览：瓶颈迁移与注意力演进", "href": "#/chapter/ch10"}, {"label": "第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark", "href": "#/chapter/ch11"}, {"label": "第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程", "href": "#/chapter/ch12"}, {"label": "第 13 章：综合检验：写一份架构评审报告", "href": "#/chapter/ch13"}]}, {"label": "概念", "children": [{"label": "推理 FLOPs", "href": "#/concept/c32"}, {"label": "奖励模型", "href": "#/concept/c33"}, {"label": "OPD（在线策略蒸馏）", "href": "#/concept/c34"}, {"label": "数据工程", "href": "#/concept/c35"}, {"label": "架构取舍", "href": "#/concept/c36"}]}, {"label": "测验", "children": [{"label": "综合测验", "href": "#/quiz/all"}, {"label": "测验：第 10 章：三代架构总览：瓶颈迁移与注意力演进", "href": "#/quiz/ch10"}, {"label": "测验：第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark", "href": "#/quiz/ch11"}, {"label": "测验：第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程", "href": "#/quiz/ch12"}, {"label": "测验：第 13 章：综合检验：写一份架构评审报告", "href": "#/quiz/ch13"}]}, {"label": "抽认卡", "href": "#/cards"}, {"label": "术语表", "href": "#/glossary"}, {"label": "模式库", "href": "#/patterns"}, {"label": "速查表", "href": "#/cheatsheet"}], "rendered": {"ch10": "<div class=\"source-badge\">📖 出处：DeepSeek-V3/V4/V4.1 技术报告<\/div><h1>第 10 章：三代架构总览：瓶颈迁移与注意力演进<\/h1>\n<ul><li>\n<strong>难度<\/strong>：★★★ | <strong>预估学时<\/strong>：5 小时 | <strong>前置<\/strong>：论文篇第 6–9 章\n<\/ul>\n<h2>学习目标<\/h2>\n<p>学完本章，你能：<\/p>\n<ol><li>\n用一张表对比 V3、R1、V4、V4.1 的架构与规模。\n<\/li><li>\n说出每一代被哪个部署瓶颈逼着改架构。\n<\/li><li>\n画出注意力从 MHA 到 MLA、CSA/HCA、CSA2 的演进线，并说明每步解决了什么、放弃了什么。\n<\/li><li>\n解释为什么 R1 不算一次“架构升级”。\n<\/ol>\n<h2>一句话核心<\/h2>\n<p>三代架构不是参数越堆越大，而是瓶颈不断迁移：从 KV cache，到注意力 FLOPs，再到 prefill 计算与 KV 存储/带宽；每一代都在替上一代还债。<\/p>\n<h2>零基础讲解<\/h2>\n<h3>概念 1：先把“架构”和“后训练”分开（难度：基础）<\/h3>\n<p>很多人把 R1 当成“新一代架构”，这是错的。R1 的模型结构和 DeepSeek-V3 完全一样：同样是 671B 总参数、37B 激活、61 层、MLA 注意力、DeepSeekMoE、MTP。R1 改的是<strong>后训练<\/strong>：在 V3-Base 上用 GRPO 做强化学习，把推理能力激发出来。<\/p>\n<p>架构回答“模型长什么样、怎么算”；后训练回答“用什麼数据、什么目标、什么奖励去调它”。两者可以独立变化。R1 是后训练的革命，不是架构的革命。<\/p>\n<h3>概念 2：一张表看三代（难度：基础）<\/h3>\n<table><thead><tr><th>项目<\/th><th>V3（2024.12）<\/th><th>R1（2025.01）<\/th><th>V4-Pro（2026.04）<\/th><th>V4-Flash（2026.04）<\/th><th>V4.1-Flash（2026.09）<\/th><\/tr><\/thead><tbody><tr><td>总参数<\/td><td>671B<\/td><td>671B<\/td><td>1.6T<\/td><td>284B<\/td><td>552B + 196B Engram<\/td><\/tr><tr><td>激活参数<\/td><td>37B<\/td><td>37B<\/td><td>49B<\/td><td>13B<\/td><td>prefill 8B / decode 16B<\/td><\/tr><tr><td>层数<\/td><td>61<\/td><td>61<\/td><td>61<\/td><td>43<\/td><td>40（20 编码 + 20 解码）<\/td><\/tr><tr><td>注意力<\/td><td>MLA<\/td><td>MLA<\/td><td>CSA + HCA 交错<\/td><td>CSA + HCA 交错<\/td><td>CSA2（纯）<\/td><\/tr><tr><td>残差<\/td><td>标准<\/td><td>标准<\/td><td>mHC<\/td><td>mHC<\/td><td>Single-Pass mHC<\/td><\/tr><tr><td>优化器<\/td><td>AdamW<\/td><td>AdamW<\/td><td>Muon 为主<\/td><td>Muon 为主<\/td><td>Muon 为主<\/td><\/tr><tr><td>上下文<\/td><td>128K<\/td><td>128K<\/td><td>1M<\/td><td>1M<\/td><td>1M<\/td><\/tr><tr><td>预训练 token<\/td><td>14.8T<\/td><td>继承 V3<\/td><td>33T<\/td><td>32T<\/td><td>45T（多模态）<\/td><\/tr><\/tbody><\/table>\n<p>读表先看两个反直觉的地方：<\/p>\n<ul><li>\nV4-Flash 的总参数 284B 比 V3 的 671B 小，但论文说 V4-Flash-Base 在多数基准上超过 V3.2-Base。参数少不等于能力弱，架构和数据效率更重要。\n<\/li><li>\nV4.1-Flash 主干 552B，比 V4-Flash 大，但 prefill 只激活 8B。它不是“更大的模型”，是“更会分配计算的模型”。\n<\/ul>\n<h3>概念 3：瓶颈迁移：每一代在还什么债（难度：进阶）<\/h3>\n<p><strong>V3 时代（128K 上下文）<\/strong>：主要矛盾是 KV cache。上下文一长，每个 token 的 K/V 缓存线性增长，显存先撑不住。MLA 的答案是把 K/V 压成低维潜向量，缓存降一个数量级。<\/p>\n<p><strong>V4 时代（1M 上下文）<\/strong>：光压 KV 不够了。1M token 的注意力计算是平方级，FLOPs 成为新瓶颈；同时 KV cache 仍然很大。CSA 用 4:1 压缩 + top-k 稀疏砍计算，HCA 用 128:1 压缩砍全局候选，两者交错覆盖不同视野。<\/p>\n<p><strong>V4.1 时代（智能体、输入密集）<\/strong>：请求变成“读 100 万 token、写几千 token”。prefill 计算和 KV 的存储/带宽成为主矛盾。CED 让 prefill 只算一半层，CSA2 跨层复用 KV，FP4 压位宽，SWA Bounded Replay 把持久缓存里的 SWA 部分去掉。<\/p>\n<p>这条线说明：架构创新不是“想到一个好结构”，而是“部署时哪笔账最疼，就改哪里”。<\/p>\n<h3>概念 4：注意力演进线（难度：高难）<\/h3>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  A[&quot;MHA：每头独立 K/V&quot;] --&gt; B[&quot;GQA：多 query 共享 KV 头&quot;]\n  B --&gt; C[&quot;MLA：低秩潜向量 + 解耦 RoPE&quot;]\n  C --&gt; D[&quot;CSA：4:1 压缩 + top-k 稀疏&quot;]\n  D --&gt; E[&quot;HCA：128:1 压缩 + 稠密&quot;]\n  E --&gt; F[&quot;CSA2：跨层复用 + 分层索引&quot;]<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<p>每一步解决什么、放弃什么：<\/p>\n<table><thead><tr><th>方法<\/th><th>压缩维度<\/th><th>解决什么<\/th><th>代价<\/th><\/tr><\/thead><tbody><tr><td>MHA<\/td><td>无<\/td><td>表达能力强，基线<\/td><td>KV cache 最大<\/td><\/tr><tr><td>GQA<\/td><td>KV 头数<\/td><td>减少 KV 头，省缓存<\/td><td>表达多样性下降<\/td><\/tr><tr><td>MLA<\/td><td>表示维度<\/td><td>潜向量压缩，缓存大降<\/td><td>计算图复杂，需解耦 RoPE<\/td><\/tr><tr><td>CSA<\/td><td>序列 + 稀疏<\/td><td>4:1 压缩 + top-k，砍 FLOPs<\/td><td>索引器成本，局部细节需 SWA 补<\/td><\/tr><tr><td>HCA<\/td><td>序列（重压缩）<\/td><td>128:1，全局粗览<\/td><td>细节丢失，只适合粗粒度<\/td><\/tr><tr><td>CSA2<\/td><td>层 + 序列 + 位宽<\/td><td>跨层复用 + FP4，缓存极限<\/td><td>结构复杂，训练工程难<\/td><\/tr><\/tbody><\/table>\n<p>一个容易忽略的点：这些方法不是替代关系。V4 同时用 CSA、HCA、SWA；V4.1 用 CSA2 + SWA。它们是不同视野、不同压缩维度的组合，不是“新一代一定淘汰旧一代”。<\/p>\n<h3>概念 5：为什么 V4.1 敢做“非对称”（难度：高难）<\/h3>\n<p>标准 Transformer 每层都做同样的事，prefill 和 decode 的计算路径基本一致。V4.1 把 40 层分成编码器和解码器，让 prefill 只跑前 20 层，decode 跑完整 40 层。<\/p>\n<p>这背后是一个部署观察：智能体请求的输入/输出比例严重不对称。如果 prefill 和 decode 用同样的计算路径，读输入的成本就无法单独优化。CED 把“读”和“写”拆开，让计算匹配负载。<\/p>\n<p>风险：编码器末端的 <span class=\"katex-inline\">H_{20}<\/span> 要承载全部全局信息，表达能力受压；SWA 回放有额外成本；训练流水线更复杂。V4.1 用每层独立投影、Bounded Replay 和工程优化来补偿。<\/p>\n<h3>概念 6：架构评价的三个问题（难度：进阶）<\/h3>\n<p>看到任何一个架构改动，问三件事：<\/p>\n<ol><li>\n<strong>它替哪笔账还债？<\/strong> 是 KV cache、FLOPs、prefill、带宽，还是训练稳定性？\n<\/li><li>\n<strong>代价是什么？<\/strong> 精度、显存、工程复杂度、训练难度，总有一项要付。\n<\/li><li>\n<strong>有没有被实验验证？<\/strong> 论文给的是 FLOPs 估算、benchmark，还是端到端延迟？三者不是一回事。\n<\/ol>\n<p>这三个问题，比背“CSA 压缩 4 倍、HCA 压缩 128 倍”有用得多。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart TB\n  subgraph 瓶颈[&quot;部署瓶颈&quot;]\n    A[&quot;128K：KV cache&quot;] --&gt; B[&quot;1M：注意力 FLOPs + KV&quot;]\n    B --&gt; C[&quot;智能体：prefill + KV 存储/带宽&quot;]\n  end\n  subgraph 架构[&quot;架构回应&quot;]\n    A --&gt; D[&quot;MLA&quot;]\n    B --&gt; E[&quot;CSA + HCA&quot;]\n    C --&gt; F[&quot;CED + CSA2 + FP4&quot;]\n  end<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<p>看图说明：瓶颈和架构是一一对应的。不要把三代看成“参数增长史”，它是“还债史”。<\/p>\n<h2>类比与实例<\/h2>\n<ul><li>\n<strong>类比<\/strong>：一家快递公司。第一代问题是仓库放不下（KV cache），于是把包裹压缩（MLA）；第二代问题是分拣太慢（FLOPs），于是先粗分再精选（CSA/HCA）；第三代问题是每天大量进货、少量出货（prefill 重），于是把进货和出货分成两条线（CED）。\n<\/li><li>\n<strong>实例<\/strong>：V4-Pro 在 1M 上下文下，单 token FLOPs 是 V3.2 的 27%，KV cache 是 10%。这两个数字不是“模型变小了”，是“同样长度的上下文，算得更省、存得更少”。\n<\/ul>\n<h2>常见误解<\/h2>\n<ul><li>\n<strong>别以为 R1 是新架构<\/strong>——R1 的模型结构就是 V3，变的是后训练。\n<\/li><li>\n<strong>别以为 V4.1 一定比 V4-Pro 强<\/strong>——V4.1 目前只有 Flash，论文对标的是 V4-Flash；不同规模不能直接横比。\n<\/li><li>\n<strong>别以为压缩率越高越好<\/strong>——HCA 128:1 只适合全局粗览，细节还得靠 SWA 和 CSA。\n<\/li><li>\n<strong>别以为 FLOPs 降了延迟就一定降<\/strong>——还要看带宽、kernel、批大小。\n<\/ul>\n<h2>自测题（答案）<\/h2>\n<p>1.（单选）R1 相对于 V3 的主要变化是什么？ A. 注意力结构 B. 后训练方法 C. 层数 D. 词表大小 <strong>答案：B<\/strong>；解析：R1 的模型结构与 V3 相同，变化在 RL 后训练。<\/p>\n<p>2.（填空）V4 的 CSA 压缩率是 ______，HCA 压缩率是 ______。 <strong>答案：4:1，128:1<\/strong>；解析：论文配置明确。<\/p>\n<p>3.（简答）V4.1 为什么要把 40 层分成编码器和解码器？ <strong>答案要点<\/strong>：智能体输入密集，prefill 成本高；CED 让 prefill 只跑前 20 层，解码器全局 KV 从 H20 投影，prefill 计算近似减半。<\/p>\n<h2>复习锚点<\/h2>\n<ul><li>\n架构与后训练分开看：R1 是后训练革命，不是架构革命。\n<\/li><li>\n瓶颈迁移：KV cache → 注意力 FLOPs → prefill + KV 存储/带宽。\n<\/li><li>\n注意力演进：MHA → GQA → MLA → CSA/HCA → CSA2，压缩维度越来越多。\n<\/li><li>\n评价架构三问：替谁还债、代价是什么、实验验证了什么。\n<\/ul>", "ch11": "<div class=\"source-badge\">📖 出处：DeepSeek-V4/V4.1 技术报告<\/div><div class=\"prereq-bar\">⬅ 前置：<span class=\"prereq-hard\"><span class=\"prereq-tag\">必<\/span> <a href=\"#/chapter/ch10\">第 10 章：三代架构总览：瓶颈迁移与注意力演进<\/a><\/span><\/div><h1>第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark<\/h1>\n<ul><li>\n<strong>难度<\/strong>：★★★ | <strong>预估学时<\/strong>：5 小时 | <strong>前置<\/strong>：第 10 章\n<\/ul>\n<h2>学习目标<\/h2>\n<p>学完本章，你能：<\/p>\n<ol><li>\n对每个效率组件说出“它替哪笔账还债、代价是什么”。\n<\/li><li>\n区分 MoE 的“总参数”和“激活参数”，并解释共享专家的作用。\n<\/li><li>\n说清 MTP 与 DSpark 的分工：一个偏训练，一个偏推理。\n<\/li><li>\n解释 mHC 的双随机约束和 Muon 的正交化为什麼能提升训练稳定性。\n<\/li><li>\n说出 Engram 为什么能在增加参数的同时不增加矩阵计算。\n<\/ol>\n<h2>一句话核心<\/h2>\n<p>这些组件不是“堆料”，而是三种设计策略：把记忆和计算解耦、把压缩做到多个维度、用数学约束换训练稳定。<\/p>\n<h2>零基础讲解<\/h2>\n<h3>概念 1：MoE：参数做大，计算不跟着涨（难度：进阶）<\/h3>\n<p>普通 FFN 每个 token 都过全部参数。MoE 把 FFN 拆成很多专家，每个 token 只过其中几个，于是总参数可以很大，单 token 计算只按激活参数算。<\/p>\n<p>三代配置：<\/p>\n<table><thead><tr><th>模型<\/th><th>共享专家<\/th><th>路由专家<\/th><th>激活路由专家<\/th><th>专家中间维度<\/th><\/tr><\/thead><tbody><tr><td>V3<\/td><td>1<\/td><td>256<\/td><td>8<\/td><td>2048<\/td><\/tr><tr><td>V4-Flash<\/td><td>1<\/td><td>256<\/td><td>6<\/td><td>2048<\/td><\/tr><tr><td>V4-Pro<\/td><td>1<\/td><td>384<\/td><td>6<\/td><td>3072<\/td><\/tr><tr><td>V4.1-Flash<\/td><td>1<\/td><td>384<\/td><td>6<\/td><td>2304<\/td><\/tr><\/tbody><\/table>\n<p>两个细节：<\/p>\n<ul><li>\n<strong>前 3 个 MoE 层用 Hash 路由<\/strong>（V4/V4.1）：训练早期路由网络还不稳，先用固定哈希分配，避免专家塌缩。\n<\/li><li>\n<strong>无辅助损失负载均衡<\/strong>：给每个专家一个偏置，按负载调，不往主损失里加辅助项。\n<\/ul>\n<p>MoE 的代价：专家并行带来跨卡通信；路由不稳会导致训练尖峰；显存要装下所有专家，即使当前 token 只用几个。<\/p>\n<h3>概念 2：MTP 与 DSpark：一个管训练，一个管推理（难度：进阶）<\/h3>\n<p><strong>MTP<\/strong> 挂在主干上，训练时让每个位置多预测一个未来 token，增加信号密度。V3/V4 都保留 MTP，深度 1。推理时 MTP 头可以当投机解码草稿。<\/p>\n<p><strong>DSpark<\/strong> 是 V4.1 独立训练的 drafter，3 个 Transformer 块、窗口 128，一次并行给出 5 个草稿位置，再用置信度调度验证。V4.1 主干预训练时不用 MTP，把投机解码完全交给 DSpark。<\/p>\n<p>为什么分开：<\/p>\n<ul><li>\nMTP 和主干预训练绑在一起，改动会影响主干训练。\n<\/li><li>\nDSpark 单独训练，可以独立优化草稿接受率，不干扰主干。\n<\/li><li>\n两者目标不同：MTP 提升训练信号，DSpark 提升 decode 速度。\n<\/ul>\n<h3>概念 3：mHC：用矩阵混合替代简单相加（难度：高难）<\/h3>\n<p>标准残差是一条流：<span class=\"katex-inline\">y=x+F(x)<\/span>。mHC 把残差扩成 4 条，层间用 <span class=\"katex-inline\">4\\times4<\/span> 双随机矩阵 <span class=\"katex-inline\">M<\/span> 混合：<\/p>\n<div class=\"katex-block\">X_{\\text{out}}=M X_{\\text{in}}+F(X_{\\text{in}})<\/div>\n<p>双随机约束（行和 1、列和 1、非负）保证混合不放大信号。训练时用 Sinkhorn-Knopp 迭代 20 次，把学到的矩阵投影回约束流形。<\/p>\n<p>为什么有效：多条流给不同层更多“写入通道”，矩阵混合让模型学“哪些流该合并”，双随机约束防止数值爆炸。<\/p>\n<p>代价：4 倍激活存储和跨层通信。V4 用融合核、重计算、DualPipe 调整，把开销压到流水线阶段的 6.7%；V4.1 的 Single-Pass mHC 把多个 kernel 合成一个，激活访存减半。<\/p>\n<h3>概念 4：Muon：把梯度矩阵正交化（难度：高难）<\/h3>\n<p>AdamW 逐元素更新，Muon 把参数矩阵的梯度当成整体，做 Newton-Schulz 迭代，把奇异值拉到接近 1：<\/p>\n<div class=\"katex-block\">G_{k+1}=aG_k+bG_kG_k^TG_k+c(G_kG_k^T)^2G_k<\/div>\n<p>V4 的配置：前 8 步快速收敛，后 2 步稳定奇异值；动量 0.95，权重衰减 0.1，更新 RMS 缩放到 0.18。Embedding、输出头、RMSNorm 仍用 AdamW。<\/p>\n<p>为什么有效：正交化让不同方向的更新不互相干扰，收敛更快、训练更稳。代价：需要完整梯度矩阵，和 ZeRO 分片冲突，V4 用混合 ZeRO 解决。<\/p>\n<h3>概念 5：Engram：把“记住”从计算里拆出来（难度：进阶）<\/h3>\n<p>Engram 是 V4.1 的条件记忆模块，196B 参数，放在第 1、14 层。它把输入 token 做 N-gram（2、3、4 阶）组合，用 8 个哈希头查表，每张表约 1600 万条目，查到嵌入后门控注入主干。<\/p>\n<p>为什么省算力：查表是内存访问，不是矩阵乘法。模型把“固定搭配、事实、术语”存进 Engram，把矩阵计算留给推理。<\/p>\n<p>代价：196B 参数要占存储；哈希碰撞会带来噪声；推理时要从主机内存预取，带宽是瓶颈。V4.1 用 FP8 存表、确定性寻址、后台 RDMA 预取来缓解。<\/p>\n<h3>概念 6：精度也是架构的一部分（难度：进阶）<\/h3>\n<ul><li>\n<strong>FP8 训练<\/strong>：V3 开始用，矩阵乘法用 FP8，master 权重保持高精度。\n<\/li><li>\n<strong>FP4 QAT<\/strong>：V4 后训练对 MoE 专家权重和索引器 QK 路径做量化感知训练；V4.1 把主 KV 也压到 FP4。\n<\/li><li>\n<strong>混合 KV 存储<\/strong>：V4 的 RoPE 维度用 BF16，其余用 FP8，缓存减半。\n<\/ul>\n<p>精度策略不是“越省越好”，而是“哪里能错、哪里不能错”。RoPE 维度对位置敏感，保留 BF16；专家权重数量大、容错高，可以 FP4。<\/p>\n<h3>概念 7：三条设计原则（难度：进阶）<\/h3>\n<p><strong>解耦<\/strong>：把混在一起的两笔账拆开。Engram 把记忆和计算拆开，CED 把 prefill 和 decode 拆开，MoE 把参数和计算拆开。<\/p>\n<p><strong>多维压缩<\/strong>：KV cache 可以从条目大小、序列长度、层数、位宽四个维度压。V4 用了前两个，V4.1 四个一起用，才有 890 B/token。<\/p>\n<p><strong>约束换稳定<\/strong>：mHC 用双随机约束，Muon 用正交化约束，SwiGLU 用 clamp 约束。大模型训练不稳定，靠“加约束”比“调超参”更可靠。<\/p>\n<p>这三条原则，比记住每个组件的缩写更有用。遇到新架构，先看它在这三条上做了什么。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart TB\n  A[&quot;输入&quot;] --&gt; B[&quot;MoE：参数多、激活少&quot;]\n  B --&gt; C[&quot;mHC：4 条残差流混合&quot;]\n  C --&gt; D[&quot;Muon：正交化更新&quot;]\n  D --&gt; E[&quot;Engram：查表记忆&quot;]\n  E --&gt; F[&quot;输出&quot;]\n  G[&quot;DSpark：推理草稿&quot;] --&gt; F<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<p>看图说明：MoE、mHC、Muon 在训练和推理的主干上；Engram 是旁路记忆；DSpark 只在 decode 阶段接进来。它们解决的不是同一个问题。<\/p>\n<h2>类比与实例<\/h2>\n<ul><li>\n<strong>类比<\/strong>：一家公司。MoE 是“几百个顾问，每个项目只请 6 个”；mHC 是“四条并行汇报线，用固定比例汇总”；Muon 是“每次调整都先对齐方向，避免互相打架”；Engram 是“查档案，不用重新算”；DSpark 是“先写草稿，再让主编校对”。\n<\/li><li>\n<strong>实例<\/strong>：V4-Flash 总参数 284B，激活 13B。如果按稠密模型算，单 token 要过 284B 参数；MoE 只过 13B，计算量约 1/22。但显存仍要装 284B 的权重，这就是“省算力不省显存”。\n<\/ul>\n<h2>常见误解<\/h2>\n<ul><li>\n<strong>别以为 MoE 省显存<\/strong>——它省的是计算，所有权重仍要加载。\n<\/li><li>\n<strong>别以为 mHC 只是“多几条残差”<\/strong>——关键是双随机约束和 Sinkhorn 投影。\n<\/li><li>\n<strong>别以为 Muon 能完全替代 AdamW<\/strong>——V4 仍对 embedding、输出头、RMSNorm 用 AdamW。\n<\/li><li>\n<strong>别以为 Engram 是外挂知识库<\/strong>——它是模型参数的一部分，随训练更新。\n<\/li><li>\n<strong>别以为 FP4 到处都能用<\/strong>——关键位置仍保留 BF16/FP8。\n<\/ul>\n<h2>自测题（答案）<\/h2>\n<p>1.（单选）MoE 主要省的是哪一项？ A. 显存占用 B. 单 token 计算量 C. 通信量 D. 词表大小 <strong>答案：B<\/strong>；解析：MoE 只激活部分专家，计算按激活参数算，但所有权重仍要存储。<\/p>\n<p>2.（填空）mHC 的混合矩阵被约束为 ______ 矩阵，用 ______ 迭代投影。 <strong>答案：双随机，Sinkhorn-Knopp<\/strong>；解析：行和、列和为 1，非负。<\/p>\n<p>3.（简答）Engram 为什么能在增加参数的同时不增加矩阵计算？ <strong>答案要点<\/strong>：它用哈希查表代替矩阵乘法，查表是内存访问，计算复杂度 <span class=\"katex-inline\">O(1)<\/span>。<\/p>\n<h2>复习锚点<\/h2>\n<ul><li>\nMoE：总参数大，激活参数小；共享专家 + 细粒度路由 + 无辅助损失均衡。\n<\/li><li>\nMTP 管训练信号，DSpark 管推理草稿。\n<\/li><li>\nmHC 用双随机矩阵混合 4 条残差流；Muon 正交化梯度矩阵。\n<\/li><li>\nEngram 查表记忆；FP4/FP8 是精度维度的压缩。\n<\/li><li>\n三条原则：解耦、多维压缩、约束换稳定。\n<\/ul>", "ch12": "<div class=\"source-badge\">📖 出处：DeepSeek-R1/V4/V4.1 技术报告<\/div><div class=\"prereq-bar\">⬅ 前置：<span class=\"prereq-hard\"><span class=\"prereq-tag\">必<\/span> <a href=\"#/chapter/ch11\">第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark<\/a><\/span><\/div><h1>第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程<\/h1>\n<ul><li>\n<strong>难度<\/strong>：★★★ | <strong>预估学时<\/strong>：5 小时 | <strong>前置<\/strong>：第 11 章、论文篇第 6–7 章\n<\/ul>\n<h2>学习目标<\/h2>\n<p>学完本章，你能：<\/p>\n<ol><li>\n对比 R1 的 RL 后训练与 V4/V4.1 的 OPD 后训练。\n<\/li><li>\n说清预训练规模、数据质量、长上下文 mid-training 各自影响什么。\n<\/li><li>\n解释“专家训练 + 在线策略蒸馏”为什么能替代混合 RL。\n<\/li><li>\n说出 V4.1 为什么把主要精力放在数据与环境流水线，而不是新算法。\n<\/ol>\n<h2>一句话核心<\/h2>\n<p>预训练决定模型的知识底座，后训练决定它会不会用这些知识；R1 用 RL 激发推理，V4/V4.1 用“领域专家 + OPD”把多种能力合并进一个模型。<\/p>\n<h2>零基础讲解<\/h2>\n<h3>概念 1：预训练在做什么（难度：基础）<\/h3>\n<p>预训练就是“拿海量文本，让模型反复预测下一个 token”。损失是交叉熵，数据是万亿级 token。它学到的不是具体任务，而是语言规律、世界知识、代码语法等底座能力。<\/p>\n<p>规模：<\/p>\n<ul><li>\nV3：14.8T token。\n<\/li><li>\nV4-Flash：32T；V4-Pro：33T。\n<\/li><li>\nV4.1-Flash：45T 多模态 token。\n<\/ul>\n<p>预训练数据不是“越多越好”，还要看质量、去重、配比、课程。V4 论文提到数据经过严格清洗和配比；V4.1 把多模态数据从预训练一开始就混入，而不是后期补。<\/p>\n<p>长上下文能力也不是天然就有。V4 在预训练后做长上下文 mid-training，用合成 1M 序列和真实长文档继续训，才让模型适应 1M 窗口。<\/p>\n<h3>概念 2：R1 的后训练：四阶段 RL（难度：进阶）<\/h3>\n<p>R1 的路径：<\/p>\n<ol><li>\n冷启动 SFT：几千条人工长链推理，定格式。\n<\/li><li>\n推理 RL：GRPO + 规则奖励（答案对错 + 格式 + 语言一致性）。\n<\/li><li>\n拒绝采样 SFT：筛出约 80 万条高质量回答（60 万推理 + 20 万通用）。\n<\/li><li>\n第二轮 RL：推理 RL + 通用 RL（通用任务用奖励模型）。\n<\/ol>\n<p>核心是“用 RL 探索，再把探索成果固化成 SFT 数据”。这条路径适合“有明确答案、可规则判分”的任务。<\/p>\n<h3>概念 3：V4 的后训练：专家 + OPD（难度：高难）<\/h3>\n<p>V4 走的是另一条路：<\/p>\n<ol><li>\n<strong>领域专家训练<\/strong>：数学、代码、智能体、指令遵循等领域各训一个专家。每个专家先 SFT，再用 GRPO + 领域奖励模型做 RL。\n<\/li><li>\n<strong>在线策略蒸馏（OPD）<\/strong>：十多个教师模型，把能力合并到一个学生模型。学生在自己的轨迹上采样，教师给全词表 logits，学生最小化反向 KL：\n<\/ol>\n<div class=\"katex-block\">\\mathcal{L}_{\\text{OPD}}(\\theta)=\\sum_{i=1}^{N}w_i D_{\\text{KL}}(\\pi_\\theta\\|\\pi_{E_i})<\/div>\n<p>关键在“在线”：学生自己生成轨迹，教师在这些轨迹上打分，而不是拿固定数据集做离线蒸馏。这样学生能纠正自己的错误分布。<\/p>\n<p>为什么替代混合 RL：把多个专家的能力直接混在一个 RL 里，容易出现任务冲突、奖励尺度不一致、训练不稳。OPD 在 logits 层面合并，绕过权重合并的精度损失。<\/p>\n<p>V4 还引入<strong>生成式奖励模型<\/strong>（GRM）：让模型自己当裁判，给难以规则判分的任务打分，并把 RL 直接作用在 GRM 上。这比传统标量奖励模型更灵活，但也更容易出现奖励黑客，需要配合人工标注和规则。<\/p>\n<h3>概念 4：V4.1 的后训练：数据与环境是主角（难度：高难）<\/h3>\n<p>V4.1 的后训练在算法上没有新东西：SFT → RL → OPD，和 V4 一样。变化在数据：<\/p>\n<ul><li>\n<strong>大规模智能体任务合成<\/strong>：把任务写成（问题、环境、验证系统）三元组，用难度和正确性当奖励，训练模型自己造任务。\n<\/li><li>\n<strong>环境构建<\/strong>：通用智能体环境（模拟真实 SaaS、企业后台接口）、编程智能体环境（从 GitHub 仓库构建可运行、可验证的容器）。\n<\/li><li>\n<strong>DSec 沙箱<\/strong>：大规模并发跑智能体，支持抢占、容错、轨迹记录。\n<\/li><li>\n<strong>可控推理力度<\/strong>：用 1–100 的 effort 标量控制输出长度，API 暴露 max/high/low 三档。\n<\/li><li>\n<strong>OPD 合并<\/strong>：四十多个教师模型，全词表蒸馏。\n<\/ul>\n<p>论文的结论很直接：在当前阶段，数据与环境工程的边际收益，超过后训练算法的创新。这句话值得记住，它解释了为什么 V4.1 的架构创新很多，但后训练算法“没有新东西”。<\/p>\n<h3>概念 5：三条训练路线的对比（难度：进阶）<\/h3>\n<table><thead><tr><th>项目<\/th><th>R1<\/th><th>V4<\/th><th>V4.1<\/th><\/tr><\/thead><tbody><tr><td>基座<\/td><td>V3-Base<\/td><td>V4-Base<\/td><td>V4.1-Base（多模态）<\/td><\/tr><tr><td>后训练主线<\/td><td>冷启动 + RL + 拒绝采样 + RL<\/td><td>专家 SFT+GRPO → OPD<\/td><td>SFT+RL → OPD<\/td><\/tr><tr><td>奖励<\/td><td>规则奖励 + 通用奖励模型<\/td><td>领域奖励模型 + 生成式奖励模型<\/td><td>任务验证 + 规则/奖励模型<\/td><\/tr><tr><td>教师数量<\/td><td>无（蒸馏另算）<\/td><td>10+<\/td><td>40+<\/td><\/tr><tr><td>数据重点<\/td><td>可验证推理题<\/td><td>领域专家数据<\/td><td>合成任务 + 智能体环境<\/td><\/tr><tr><td>产出<\/td><td>671B R1 + 蒸馏小模型<\/td><td>Pro / Flash<\/td><td>Flash 多模态<\/td><\/tr><\/tbody><\/table>\n<p>三条路线的共同点：都依赖“可验证的奖励”和“高质量数据”。不同点是合并方式：R1 靠 SFT 固化，V4/V4.1 靠 OPD 在 logits 层面合并。<\/p>\n<h3>概念 6：训练稳定性为什么单独拿出来讲（难度：进阶）<\/h3>\n<p>大模型训练会出现损失尖峰（loss spike），严重时前功尽弃。V4 论文把稳定性单列一节，给了两个手段：<\/p>\n<ul><li>\n<strong>Anticipatory Routing<\/strong>：把主干和路由网络的更新解耦，提前一步取数据、缓存路由索引，打破路由异常值的恶性循环。\n<\/li><li>\n<strong>SwiGLU Clamping<\/strong>：把 SwiGLU 的线性部分限制在 <span class=\"katex-inline\">[-10,10]<\/span>，门控上界截到 10，消除异常值。\n<\/ul>\n<p>加上 mHC 的双随机约束、Muon 的正交化，V4 的训练稳定性是“结构约束 + 路由调度 + 数值裁剪”三管齐下。这些手段的原理，论文自己承认还没有完全理解，但实验有效。<\/p>\n<h3>概念 7：读训练章节要问的三个问题（难度：进阶）<\/h3>\n<ol><li>\n<strong>数据从哪来、怎么筛？<\/strong> 规模大不等于质量高；合成数据要看验证系统。\n<\/li><li>\n<strong>奖励怎么定义、会不会被 hack？<\/strong> 规则奖励有盲区，奖励模型有偏好，GRM 也会自评偏差。\n<\/li><li>\n<strong>多专家怎么合并？<\/strong> 权重平均、混合 RL、OPD 各有代价；OPD 的关键是教师质量和学生覆盖。\n<\/ol>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart TB\n  A[&quot;预训练：14.8T / 32T / 45T token&quot;] --&gt; B[&quot;长上下文 mid-training&quot;]\n  B --&gt; C[&quot;后训练&quot;]\n  C --&gt; D[&quot;R1：冷启动 → RL → 拒绝采样 → RL&quot;]\n  C --&gt; E[&quot;V4：领域专家 SFT+GRPO → OPD 10+ 教师&quot;]\n  C --&gt; F[&quot;V4.1：SFT+RL → OPD 40+ 教师 + 数据/环境流水线&quot;]\n  D --&gt; G[&quot;R1 + 蒸馏小模型&quot;]\n  E --&gt; H[&quot;V4-Pro / V4-Flash&quot;]\n  F --&gt; I[&quot;V4.1-Flash&quot;]<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<p>看图说明：预训练是共同底座，后训练分三条路线。R1 的重点在“激发”，V4 的重点在“合并专家”，V4.1 的重点在“造数据与环境”。<\/p>\n<h2>类比与实例<\/h2>\n<ul><li>\n<strong>类比<\/strong>：预训练是“读万卷书”，后训练是“分科补课”。R1 是“先做大量模拟题，再把好解法抄成笔记”；V4 是“请十个专科老师分别教，最后让一个学生把十位老师的思路融会贯通”；V4.1 是“自己出题、自己建实验室，让模型在真实环境里练”。\n<\/li><li>\n<strong>实例<\/strong>：V4 的 OPD 有 10 多个教师，V4.1 有 40 多个。教师越多，合并越复杂，需要全词表 logits 和高效调度。V4 论文提到，把全词表 KL 简化为 token 级估计会增大梯度方差，所以他们坚持全词表蒸馏。\n<\/ul>\n<h2>常见误解<\/h2>\n<ul><li>\n<strong>别以为 OPD 是“离线蒸馏”<\/strong>——它要求学生自己采样轨迹，教师在这些轨迹上打分，是在线策略。\n<\/li><li>\n<strong>别以为数据工程是“脏活”<\/strong>——V4.1 明确说，数据与环境的边际收益超过算法创新。\n<\/li><li>\n<strong>别以为 RL 一定比 SFT 强<\/strong>——R1 的失败尝试里，纯 SFT 在泛化上不如 RL，但 RL 也不是所有任务都适用。\n<\/li><li>\n<strong>别以为训练稳定只靠调学习率<\/strong>——结构约束、路由调度、数值裁剪都参与。\n<\/ul>\n<h2>自测题（答案）<\/h2>\n<p>1.（单选）V4 的后训练用什么方法合并多个领域专家？ A. 权重平均 B. 混合 RL C. 在线策略蒸馏 D. 直接 SFT <strong>答案：C<\/strong>；解析：V4 用多教师 OPD，在 logits 层面合并。<\/p>\n<p>2.（填空）V4.1 的后训练算法是 SFT → ______ → OPD。 <strong>答案：RL<\/strong>；解析：论文明确说算法无新意，标准 SFT+RL+OPD。<\/p>\n<p>3.（简答）为什么 V4 用全词表 OPD，而不是 token 级 KL 估计？ <strong>答案要点<\/strong>：token 级估计梯度方差大、训练不稳；全词表 logits 更稳定，能忠实蒸馏教师知识。<\/p>\n<h2>复习锚点<\/h2>\n<ul><li>\n预训练规模：V3 14.8T、V4 32/33T、V4.1 45T 多模态。\n<\/li><li>\nR1 后训练：冷启动 → RL → 拒绝采样 → RL → 蒸馏。\n<\/li><li>\nV4 后训练：领域专家 → 10+ 教师 OPD；V4.1：SFT+RL+OPD，40+ 教师。\n<\/li><li>\n稳定性手段：Anticipatory Routing、SwiGLU Clamping、mHC、Muon。\n<\/li><li>\n读训练三问：数据、奖励、合并方式。\n<\/ul>", "ch13": "<div class=\"source-badge\">📖 出处：本课程整理 · 综合任务<\/div><div class=\"prereq-bar\">⬅ 前置：<span class=\"prereq-hard\"><span class=\"prereq-tag\">必<\/span> <a href=\"#/chapter/ch12\">第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程<\/a><\/span><\/div><h1>第 13 章：综合检验：写一份架构评审报告<\/h1>\n<ul><li>\n<strong>难度<\/strong>：★★★ | <strong>预估学时<\/strong>：3 小时 | <strong>前置<\/strong>：第 10–12 章\n<\/ul>\n<h2>学习目标<\/h2>\n<p>学完本章，你能：<\/p>\n<ol><li>\n把一个模糊的部署需求拆成可计算的负载画像。\n<\/li><li>\n用 KV cache、FLOPs、prefill/decode 三组数字比较候选模型。\n<\/li><li>\n写一份有假设、有数字、有风险清单的架构评审报告。\n<\/ol>\n<h2>一句话核心<\/h2>\n<p>架构选型不是选“最强模型”，而是选“在这个负载画像下，总成本最低且能力够用的模型”。<\/p>\n<h2>零基础讲解<\/h2>\n<h3>概念 1：先画负载画像（难度：进阶）<\/h3>\n<p>假设你在为一款“长文档智能体”选模型，需求如下：<\/p>\n<table><thead><tr><th>维度<\/th><th>假设<\/th><\/tr><\/thead><tbody><tr><td>上下文<\/td><td>单次输入可达 1M token<\/td><\/tr><tr><td>输入/输出比<\/td><td>约 200:1（输入 1M，输出 5K）<\/td><\/tr><tr><td>日请求量<\/td><td>1 万次<\/td><\/tr><tr><td>并发<\/td><td>峰值 50 个请求同时在线<\/td><\/tr><tr><td>模态<\/td><td>90% 纯文本，10% 含图片<\/td><\/tr><tr><td>能力要求<\/td><td>长文档检索、代码修改、工具调用<\/td><\/tr><tr><td>成本约束<\/td><td>单请求成本尽量低，可接受部分请求走更强模型<\/td><\/tr><\/tbody><\/table>\n<p>这张表不是摆设。后面每个数字都要从这里推。<\/p>\n<h3>概念 2：算 KV cache 的账（难度：进阶）<\/h3>\n<p>每个请求的全局 KV cache：<\/p>\n<div class=\"katex-block\">\\text{单请求 KV}=\\text{token 数}\\times\\text{每 token 字节数}<\/div>\n<p>按 1M token 算：<\/p>\n<table><thead><tr><th>模型<\/th><th>每 token 字节<\/th><th>单请求 KV<\/th><th>50 并发总 KV<\/th><\/tr><\/thead><tbody><tr><td>V3.2<\/td><td>48,068 B<\/td><td>约 48 GB<\/td><td>约 2.4 TB<\/td><\/tr><tr><td>V4-Flash<\/td><td>3,514 B<\/td><td>约 3.5 GB<\/td><td>约 175 GB<\/td><\/tr><tr><td>V4.1-Flash<\/td><td>890 B<\/td><td>约 0.89 GB<\/td><td>约 44.5 GB<\/td><\/tr><\/tbody><\/table>\n<p>V3.2 的 2.4 TB 已经超出单机 HBM 范围，必须多卡分片或磁盘卸载；V4.1 的 44.5 GB 可以放在几张 HBM 里。这个差距直接决定“能不能低成本并发”。<\/p>\n<p>注意：890 B 是全局 KV；持久 KV、SWA 缓存、Engram 表是另外的账。做容量规划时不能只乘 890。<\/p>\n<h3>概念 3：算 prefill 与 decode 的账（难度：进阶）<\/h3>\n<ul><li>\n<strong>prefill<\/strong>：读 1M token，计算量按输入长度线性增长。V4.1 的 CED 只跑前 20 层，prefill 激活 8B；V4-Flash 没有 CED，prefill 要跑完整 43 层，激活 13B。\n<\/li><li>\n<strong>decode<\/strong>：生成 5K token，每步都要跑完整层。V4.1 解码激活 16B，V4-Flash 13B。\n<\/ul>\n<p>输入/输出比 200:1 时，prefill 是主要成本。V4.1 的 CED 把 prefill 计算减半，正好命中这个负载。反过来，如果输出很长、输入很短，CED 的收益就没那么大，decode 的 16B 激活反而可能成为负担。<\/p>\n<h3>概念 4：能力与成本的匹配（难度：进阶）<\/h3>\n<p>候选对比：<\/p>\n<table><thead><tr><th>候选<\/th><th>优势<\/th><th>劣势<\/th><th>适用<\/th><\/tr><\/thead><tbody><tr><td>V4.1-Flash<\/td><td>prefill 8B、KV 890 B/token、多模态、智能体数据<\/td><td>只有 Flash 规模，Terminal-Bench 不如 Opus5<\/td><td>输入密集、成本敏感、含图片<\/td><\/tr><tr><td>V4-Flash<\/td><td>284B/13B，纯文本效率高<\/td><td>KV 3.5 KB/token，prefill 未减半<\/td><td>纯文本、输入中等<\/td><\/tr><tr><td>V4-Pro<\/td><td>1.6T/49B，能力上限最高<\/td><td>KV、计算都更贵<\/td><td>最难推理、代码任务<\/td><\/tr><tr><td>V3.2<\/td><td>生态成熟<\/td><td>KV 48 KB/token，1M 场景成本高<\/td><td>短上下文、已有部署<\/td><\/tr><\/tbody><\/table>\n<p>一个务实策略：90% 请求走 V4.1-Flash，10% 最难的代码/推理请求路由到 V4-Pro。这样既控制成本，又不牺牲上限。<\/p>\n<h3>概念 5：写报告的结构（难度：进阶）<\/h3>\n<p>一份合格的架构评审报告，至少包含六节：<\/p>\n<ol><li>\n<strong>负载画像<\/strong>：输入/输出比、并发、模态、上下文分布、缓存命中率。\n<\/li><li>\n<strong>瓶颈量化<\/strong>：KV cache、prefill FLOPs、decode FLOPs、存储带宽、首 token 延迟。\n<\/li><li>\n<strong>候选对比<\/strong>：同一组指标下比较，不混用不同口径。\n<\/li><li>\n<strong>选型建议<\/strong>：主模型 + 路由策略 + 量化/精度配置。\n<\/li><li>\n<strong>风险与验证<\/strong>：精度损失、长文本检索、工具调用、供应商锁定、成本波动。\n<\/li><li>\n<strong>结论<\/strong>：一句话说清“选谁、为什么、什么条件下会改选”。\n<\/ol>\n<p>评分要点（20 分）：<\/p>\n<ul><li>\n负载画像有数字，不是形容词（4 分）。\n<\/li><li>\nKV cache 计算正确，区分全局/持久（4 分）。\n<\/li><li>\n区分 FLOPs 与延迟，不把估算当实测（4 分）。\n<\/li><li>\n选型有取舍，不是“全都要最强”（4 分）。\n<\/li><li>\n风险清单具体，有验证计划（4 分）。\n<\/ul>\n<h3>概念 6：一个示例结论（难度：进阶）<\/h3>\n<blockquote>以 1M 输入、5K 输出、1 万请求/日、50 并发、10% 含图的负载为例，推荐 V4.1-Flash 作为主模型：全局 KV 约 0.89 GB/请求，50 并发约 44.5 GB，可落在单机多卡 HBM；CED 让 prefill 只激活 8B，匹配 200:1 的输入/输出比；原生多模态省去外挂视觉模型。对终端基准最难的 10% 代码任务，路由到 V4-Pro。若实测长文档检索精度不足，回退到 V4-Pro 或增加检索增强，而不是盲目加大上下文。<\/blockquote>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  A[&quot;负载画像&quot;] --&gt; B[&quot;KV cache 账&quot;]\n  A --&gt; C[&quot;prefill/decode 账&quot;]\n  B --&gt; D[&quot;候选对比&quot;]\n  C --&gt; D\n  D --&gt; E[&quot;选型 + 路由&quot;]\n  E --&gt; F[&quot;风险与验证&quot;]\n  F --&gt; G[&quot;结论&quot;]<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<p>看图说明：先算账，再选型。跳过负载画像直接问“哪个模型最强”，得到的答案一定不可落地。<\/p>\n<h2>类比与实例<\/h2>\n<ul><li>\n<strong>类比<\/strong>：买车。不是问“哪辆车最快”，而是先看“每天跑多少公里、载几个人、停车位多宽”，再选动力和尺寸。架构选型同理。\n<\/li><li>\n<strong>实例<\/strong>：50 并发、1M 上下文，V3.2 需要约 2.4 TB KV，V4.1 只要约 44.5 GB。这个数字差，不是“优化一点”，是“能不能上线”的区别。\n<\/ul>\n<h2>常见误解<\/h2>\n<ul><li>\n<strong>别以为每 token 字节数就是全部缓存<\/strong>——全局 KV、持久 KV、SWA、Engram 要分开算。\n<\/li><li>\n<strong>别以为 FLOPs 低就一定便宜<\/strong>——还要看 GPU 利用率、带宽、批大小、缓存命中。\n<\/li><li>\n<strong>别以为最强模型适合所有请求<\/strong>——用路由把难请求分流，比全量上最强更划算。\n<\/ul>\n<h2>自测题（答案）<\/h2>\n<p>1.（单选）1M token、每 token 890 B，单请求全局 KV 约多少？ A. 89 MB B. 890 MB C. 8.9 GB D. 89 GB <strong>答案：B<\/strong>；解析：<span class=\"katex-inline\">10^6\\times890=8.9\\times10^8<\/span> 字节，约 890 MB。<\/p>\n<p>2.（填空）V4.1 的 prefill 激活约 ______，decode 激活约 ______。 <strong>答案：8B，16B<\/strong>；解析：CED 让 prefill 只跑编码器路径。<\/p>\n<p>3.（简答）为什么输入/输出比 200:1 时，CED 的收益比 1:1 时更大？ <strong>答案要点<\/strong>：CED 省的是 prefill；输入占比越高，prefill 在总成本中越大，收益越明显。<\/p>\n<h2>复习锚点<\/h2>\n<ul><li>\n先画负载画像，再算 KV cache 和 prefill/decode。\n<\/li><li>\n全局 KV、持久 KV、SWA、Engram 分开算。\n<\/li><li>\n选型是“够用 + 成本最低”，不是“最强”。\n<\/li><li>\n报告六节：画像、瓶颈、对比、建议、风险、结论。\n<\/ul>", "c32": "<div class=\"source-badge\">📖 出处：DeepSeek-V4/V4.1 技术报告<\/div><h1>推理 FLOPs<\/h1>\n<ul><li>\n<strong>难度<\/strong>：高难 | <strong>涉及章节<\/strong>：第 10 章、第 13 章\n<\/ul>\n<h2>一句话定义<\/h2>\n<p>推理 FLOPs 是生成一个 token 所需的浮点运算次数，分 prefill 和 decode 两阶段，量级和瓶颈完全不同。<\/p>\n<h2>为什么重要<\/h2>\n<p>论文用 FLOPs 证明架构效率，但 FLOPs 不等于延迟。不懂它的算法，就会被“27% FLOPs”这类数字误导。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  A[&quot;prefill：整段输入并行&quot;] --&gt; B[&quot;计算密集，O(N·L)&quot;]\n  B --&gt; C[&quot;建立 KV cache&quot;]\n  C --&gt; D[&quot;decode：逐个 token&quot;]\n  D --&gt; E[&quot;带宽密集，每步读全部 KV&quot;]<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<h2>详解<\/h2>\n<p><strong>prefill<\/strong>：输入长度 <span class=\"katex-inline\">N<\/span>，层数 <span class=\"katex-inline\">L<\/span>，隐藏维度 <span class=\"katex-inline\">d<\/span>。主要计算是矩阵乘法，量级约 <span class=\"katex-inline\">O(NLd^2)<\/span>，并行度高，GPU 算力容易吃满。<\/p>\n<p><strong>decode<\/strong>：每生成一个 token，要读全部历史 KV 做注意力，计算量约 <span class=\"katex-inline\">O(NLd)<\/span>，但显存带宽是瓶颈。算术强度低，GPU 算力利用率低。<\/p>\n<p>这解释了为什么长上下文 decode 慢：不是算不动，是搬不动。KV cache 越大，每步搬运越多。<\/p>\n<p>FLOPs 与延迟的关系：<\/p>\n<div class=\"katex-block\">\\text{延迟}\\approx\\max\\left(\\frac{\\text{FLOPs}}{\\text{算力}},\\frac{\\text{字节数}}{\\text{带宽}}\\right)+\\text{调度开销}<\/div>\n<p>取两者较大的一个。decode 通常卡在带宽项，所以“FLOPs 降 90%”不一定带来 90% 的延迟下降。<\/p>\n<h2>常见误解<\/h2>\n<ul><li>\nFLOPs 不是延迟，也不是成本。\n<\/li><li>\nprefill 和 decode 的 FLOPs 不能相加成一个“总推理成本”，它们的瓶颈不同。\n<\/li><li>\n论文的 FLOPs 估算通常按等效 FP8 计，不同精度不能直接比。\n<\/ul>\n<h2>在书中出现的脉络<\/h2>\n<table><thead><tr><th>章节<\/th><th>语境<\/th><th>关键结论<\/th><\/tr><\/thead><tbody><tr><td>ch08<\/td><td>V4<\/td><td>1M 上下文 27% FLOPs<\/td><\/tr><tr><td>ch09<\/td><td>V4.1<\/td><td>decode FLOPs 几乎不随上下文增长<\/td><\/tr><tr><td>ch13<\/td><td>选型<\/td><td>区分 FLOPs 与延迟<\/td><\/tr><\/tbody><\/table>\n<h2>相关概念<\/h2>\n<ul><li>\n前置：矩阵乘法、KV cache\n<\/li><li>\n后续：算术强度、带宽、延迟\n<\/ul>", "c33": "<div class=\"source-badge\">📖 出处：DeepSeek-R1/V4 技术报告<\/div><h1>奖励模型<\/h1>\n<ul><li>\n<strong>难度<\/strong>：进阶 | <strong>涉及章节<\/strong>：第 6 章、第 12 章\n<\/ul>\n<h2>一句话定义<\/h2>\n<p>奖励模型是给模型输出打分的模型，替代人工规则或人工偏好，为强化学习提供奖励信号。<\/p>\n<h2>为什么重要<\/h2>\n<p>R1 的推理 RL 用规则奖励，通用 RL 用奖励模型；V4 用生成式奖励模型（GRM）处理难验证任务。奖励怎么设计，直接决定 RL 学到什么。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  A[&quot;模型输出&quot;] --&gt; B[&quot;奖励模型打分&quot;]\n  B --&gt; C[&quot;GRPO 更新&quot;]\n  C --&gt; A\n  D[&quot;人工偏好/规则&quot;] --&gt; B<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<h2>详解<\/h2>\n<p>三类奖励：<\/p>\n<ol><li>\n<strong>规则奖励<\/strong>：答案匹配、单元测试、格式检查。确定性强，但只适用于可验证任务。\n<\/li><li>\n<strong>标量奖励模型<\/strong>：用人工偏好数据训练一个回归模型，输出一个分数。经典 RLHF 做法，成本高、易被 hack。\n<\/li><li>\n<strong>生成式奖励模型（GRM）<\/strong>：让模型自己生成评分理由和分数，V4 还把 RL 直接作用在 GRM 上，让“评判能力”和“生成能力”一起优化。\n<\/ol>\n<p>奖励黑客（reward hacking）：模型找到奖励的漏洞，拿到高分但没真正完成任务。比如格式对、答案错；或者讨好奖励模型的偏好。防御手段：规则 + 模型混合、人工抽检、对抗样本、限制奖励模型的可解释性。<\/p>\n<h2>常见误解<\/h2>\n<ul><li>\n奖励模型不是“客观裁判”，它的偏好来自训练数据。\n<\/li><li>\n奖励高不等于答案对，可能只是“更像奖励模型喜欢的样子”。\n<\/ul>\n<h2>在书中出现的脉络<\/h2>\n<table><thead><tr><th>章节<\/th><th>语境<\/th><th>关键结论<\/th><\/tr><\/thead><tbody><tr><td>ch06<\/td><td>R1-Zero<\/td><td>不用神经奖励模型，只用规则<\/td><\/tr><tr><td>ch07<\/td><td>R1 通用 RL<\/td><td>用奖励模型处理开放任务<\/td><\/tr><tr><td>ch12<\/td><td>V4<\/td><td>生成式奖励模型 + RL<\/td><\/tr><\/tbody><\/table>\n<h2>相关概念<\/h2>\n<ul><li>\n前置：GRPO、规则奖励\n<\/li><li>\n后续：奖励黑客、RLHF\n<\/ul>", "c34": "<div class=\"source-badge\">📖 出处：DeepSeek-V4/V4.1 技术报告 §5<\/div><div class=\"prereq-bar\">⬅ 前置：<span class=\"prereq-hard\"><span class=\"prereq-tag\">必<\/span> <a href=\"#/concept/c33\">奖励模型<\/a><\/span><\/div><h1>OPD（在线策略蒸馏）<\/h1>\n<ul><li>\n<strong>难度<\/strong>：高难 | <strong>涉及章节<\/strong>：第 12 章\n<\/ul>\n<h2>一句话定义<\/h2>\n<p>OPD 是学生在自己生成的轨迹上学习多个教师模型的输出分布，用反向 KL 把多个专家的能力合并进一个模型。<\/p>\n<h2>为什么重要<\/h2>\n<p>V4 用 10 多个教师、V4.1 用 40 多个教师做最终合并。它是“专家训练”之后的关键一步，替代了传统的混合 RL 和权重平均。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  S[&quot;学生模型&quot;] --&gt; T[&quot;自己生成轨迹&quot;]\n  T --&gt; E1[&quot;数学教师：给 logits&quot;]\n  T --&gt; E2[&quot;代码教师：给 logits&quot;]\n  T --&gt; E3[&quot;智能体教师：给 logits&quot;]\n  E1 --&gt; K[&quot;反向 KL 加权求和&quot;]\n  E2 --&gt; K\n  E3 --&gt; K\n  K --&gt; S<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<h2>详解<\/h2>\n<p>目标函数：<\/p>\n<div class=\"katex-block\">\\mathcal{L}_{\\text{OPD}}(\\theta)=\\sum_{i=1}^{N}w_i D_{\\text{KL}}(\\pi_\\theta\\|\\pi_{E_i})<\/div>\n<p><span class=\"katex-inline\">N<\/span> 是教师数量，<span class=\"katex-inline\">w_i<\/span> 是教师权重。反向 KL 让学生覆盖教师的输出分布，而不是只挑一个模式。<\/p>\n<p>为什么必须“在线”：轨迹由学生自己生成，教师在这些轨迹上打分。学生遇到自己会犯的错误，教师给出正确分布，学生才能纠正。离线蒸馏用固定数据集，学生没见过的状态学不到。<\/p>\n<p>为什么替代混合 RL：多个领域的 RL 混在一起，奖励尺度、任务分布、优化目标会冲突。OPD 在 logits 层面合并，不依赖奖励尺度，也不会有权重平均的精度损失。<\/p>\n<p>代价：每个教师都要跑前向，教师可能有万亿参数。V4 用教师权重分片、隐藏状态缓存、按教师排序调度；V4.1 支持 40 多个异构教师，用异步生成和动态配置。<\/p>\n<h2>常见误解<\/h2>\n<ul><li>\nOPD 不是“把教师权重平均”，它是 logits 层面的蒸馏。\n<\/li><li>\nOPD 不是“离线数据集蒸馏”，轨迹由学生在线生成。\n<\/li><li>\n教师越多不一定越好，教师质量和覆盖度更关键。\n<\/ul>\n<h2>在书中出现的脉络<\/h2>\n<table><thead><tr><th>章节<\/th><th>语境<\/th><th>关键结论<\/th><\/tr><\/thead><tbody><tr><td>ch12<\/td><td>V4<\/td><td>10+ 教师，全词表 OPD<\/td><\/tr><tr><td>ch12<\/td><td>V4.1<\/td><td>40+ 教师，数据/环境为主<\/td><\/tr><tr><td>ch10<\/td><td>架构对比<\/td><td>后训练合并策略<\/td><\/tr><\/tbody><\/table>\n<h2>相关概念<\/h2>\n<ul><li>\n前置：知识蒸馏、KL、GRPO\n<\/li><li>\n后续：全词表蒸馏、教师调度\n<\/ul>", "c35": "<div class=\"source-badge\">📖 出处：DeepSeek-V4.1 论文 §5<\/div><h1>数据工程<\/h1>\n<ul><li>\n<strong>难度<\/strong>：进阶 | <strong>涉及章节<\/strong>：第 12 章\n<\/ul>\n<h2>一句话定义<\/h2>\n<p>数据工程是把原始语料、合成任务、智能体环境加工成可训练、可验证、难度可控的数据流水线。<\/p>\n<h2>为什么重要<\/h2>\n<p>V4.1 明确说：后训练算法没有新东西，收益主要来自数据与环境的规模、多样性、可验证性。数据工程已经是模型能力的一部分。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  A[&quot;原始语料/仓库/工具接口&quot;] --&gt; B[&quot;任务合成：问题+环境+验证&quot;]\n  B --&gt; C[&quot;难度/正确性筛选&quot;]\n  C --&gt; D[&quot;去重 + 课程配比&quot;]\n  D --&gt; E[&quot;RL/OPD 训练&quot;]\n  E --&gt; F[&quot;轨迹回审：再筛数据&quot;]\n  F --&gt; B<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<h2>详解<\/h2>\n<p>V4.1 的任务三元组：<\/p>\n<ol><li>\n<strong>问题<\/strong>：用户要完成什么。\n<\/li><li>\n<strong>环境<\/strong>：工具、文件、接口、容器。\n<\/li><li>\n<strong>验证系统<\/strong>：怎么判断任务完成，比如单元测试、状态检查、参考答案。\n<\/ol>\n<p>质量两个维度：<\/p>\n<ul><li>\n<strong>难度<\/strong>：不能太简单，否则没有学习信号。\n<\/li><li>\n<strong>正确性<\/strong>：三个组件都不能有致命缺陷。\n<\/ul>\n<p>数据来源：<\/p>\n<ul><li>\n真实工作流（内部员工、外部伙伴的交互数据）。\n<\/li><li>\n公开 GitHub 仓库（按 star 阈值筛选）。\n<\/li><li>\n模型自己合成的任务（用难度和正确性当奖励，迭代训练）。\n<\/ul>\n<p>配套：DSec 沙箱、抢占容错、轨迹记录、去重、难度校准、模态配比。<\/p>\n<h2>常见误解<\/h2>\n<ul><li>\n数据工程不是“多爬点网页”，它包括任务设计、环境构建、验证系统。\n<\/li><li>\n合成数据不是“模型随便编”，要有验证和难度控制。\n<\/li><li>\n数据规模不是唯一变量，多样性和可验证性同样重要。\n<\/ul>\n<h2>在书中出现的脉络<\/h2>\n<table><thead><tr><th>章节<\/th><th>语境<\/th><th>关键结论<\/th><\/tr><\/thead><tbody><tr><td>ch12<\/td><td>V4.1<\/td><td>数据/环境边际收益超过算法<\/td><\/tr><tr><td>ch07<\/td><td>R1<\/td><td>拒绝采样是数据工程的一种<\/td><\/tr><tr><td>ch13<\/td><td>选型<\/td><td>数据质量影响能力上限<\/td><\/tr><\/tbody><\/table>\n<h2>相关概念<\/h2>\n<ul><li>\n前置：拒绝采样、RL\n<\/li><li>\n后续：智能体环境、合成任务\n<\/ul>", "c36": "<div class=\"source-badge\">📖 出处：本课程整理 · 架构分析<\/div><div class=\"prereq-bar\">⬅ 前置：<span class=\"prereq-hard\"><span class=\"prereq-tag\">必<\/span> <a href=\"#/concept/c32\">推理 FLOPs<\/a><\/span><\/div><h1>架构取舍<\/h1>\n<ul><li>\n<strong>难度<\/strong>：进阶 | <strong>涉及章节<\/strong>：第 10–13 章\n<\/ul>\n<h2>一句话定义<\/h2>\n<p>架构取舍是在给定负载、成本和质量约束下，选择“哪笔账可以省、哪笔账不能省”的决策过程。<\/p>\n<h2>为什么重要<\/h2>\n<p>每个架构组件都有代价。看懂取舍，才能在选型和评审时不迷信“最新”“最大”“压缩率最高”。<\/p>\n<h2>图示<\/h2>\n<div class=\"mermaid\" data-src=\"1\">flowchart LR\n  A[&quot;负载画像&quot;] --&gt; B[&quot;瓶颈：KV/FLOPs/prefill/带宽&quot;]\n  B --&gt; C[&quot;候选机制&quot;]\n  C --&gt; D[&quot;代价：精度/显存/工程复杂度&quot;]\n  D --&gt; E[&quot;决策：够用且总成本最低&quot;]<\/div><p class=\"mermaid-hint\">↑ Mermaid 图示：联网时自动渲染为图表；离线时请阅读上方源码与正文说明。<\/p>\n<h2>详解<\/h2>\n<p>常见取舍：<\/p>\n<table><thead><tr><th>选择<\/th><th>省什么<\/th><th>付出什么<\/th><th>适合<\/th><\/tr><\/thead><tbody><tr><td>MoE<\/td><td>单 token 计算<\/td><td>显存、通信、路由不稳<\/td><td>参数要大、算力受限<\/td><\/tr><tr><td>MLA<\/td><td>KV cache<\/td><td>计算图复杂<\/td><td>长上下文、显存紧张<\/td><\/tr><tr><td>CSA/HCA<\/td><td>注意力 FLOPs + KV<\/td><td>索引器、精度损失<\/td><td>1M 上下文<\/td><\/tr><tr><td>CED<\/td><td>prefill 计算<\/td><td>编码器表达受压、工程复杂<\/td><td>输入密集<\/td><\/tr><tr><td>mHC<\/td><td>训练稳定性<\/td><td>激活/通信开销<\/td><td>超深模型<\/td><\/tr><tr><td>Muon<\/td><td>收敛速度/稳定性<\/td><td>ZeRO 复杂<\/td><td>大规模预训练<\/td><\/tr><tr><td>Engram<\/td><td>矩阵计算<\/td><td>存储、带宽<\/td><td>记忆密集型任务<\/td><\/tr><tr><td>FP4<\/td><td>存储/带宽<\/td><td>精度风险<\/td><td>成本敏感推理<\/td><\/tr><\/tbody><\/table>\n<p>决策规则：<\/p>\n<ol><li>\n先量化瓶颈，不凭感觉。\n<\/li><li>\n只选“能解决当前瓶颈”的机制，不为用不上的能力付费。\n<\/li><li>\n给精度损失留验证计划。\n<\/li><li>\n算总成本，不算单项指标。\n<\/ol>\n<h2>常见误解<\/h2>\n<ul><li>\n压缩率越高不一定越好，精度和工程复杂度要一起算。\n<\/li><li>\n参数越大不一定越强，数据和架构效率同样重要。\n<\/li><li>\n最新一代不一定适合所有负载，V4.1-Flash 也不全面超过 V4-Pro。\n<\/ul>\n<h2>在书中出现的脉络<\/h2>\n<table><thead><tr><th>章节<\/th><th>语境<\/th><th>关键结论<\/th><\/tr><\/thead><tbody><tr><td>ch10<\/td><td>瓶颈迁移<\/td><td>架构是还债<\/td><\/tr><tr><td>ch11<\/td><td>组件<\/td><td>每个组件都有代价<\/td><\/tr><tr><td>ch13<\/td><td>评审<\/td><td>选型是总成本决策<\/td><\/tr><\/tbody><\/table>\n<h2>相关概念<\/h2>\n<ul><li>\n前置：KV cache、MoE、推理 FLOPs\n<\/li><li>\n后续：部署、成本模型\n<\/ul>", "__path__": "<h1>学习路径<\/h1><p>按推荐顺序学习；每步通过检查点（自测题）后再继续。<\/p><ol class='path-list'><li class='path-step' id='path-01'><strong>步骤 01：三代总览与注意力演进<\/strong><br>阅读：<a href=\"#/chapter/ch10\">第 10 章：三代架构总览：瓶颈迁移与注意力演进<\/a><br>检查点：能画出注意力演进线并说出每步解决什么<\/li><li class='path-step' id='path-02'><strong>步骤 02：效率组件的设计逻辑<\/strong><br>阅读：<a href=\"#/chapter/ch11\">第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark<\/a><br>检查点：能解释 MoE、mHC、Muon、Engram 各自的分工<\/li><li class='path-step' id='path-03'><strong>步骤 03：训练与后训练<\/strong><br>阅读：<a href=\"#/chapter/ch12\">第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程<\/a><br>检查点：能对比 R1 的 RL 与 V4/V4.1 的 OPD<\/li><li class='path-step' id='path-04'><strong>步骤 04：综合检验：架构评审<\/strong><br>阅读：<a href=\"#/chapter/ch13\">第 13 章：综合检验：写一份架构评审报告<\/a><br>检查点：完成一份有数字支撑的选型报告<\/li><\/ol><p>进度：<span id='path-progress-label'>0/0<\/span><\/p>", "__graph__": "<h1>🕸 知识图谱<\/h1><p>节点是概念，边是先修关系。拖拽节点、滚轮缩放，点击节点跳转到对应概念页。<\/p><div id=\"graph-container\" style=\"height:520px;border:1px solid var(--border);border-radius:10px;background:var(--panel)\"><\/div><p class=\"sub\">红线 = 必学前置 · 灰线 = 建议先看 · 蓝线 = 拓展阅读<\/p>", "__quiz_all__": "<p>（无综合题）<\/p>", "__quiz_ch10__": "<h1>测验：第 10 章：三代架构总览：瓶颈迁移与注意力演进<\/h1><div class='quiz-item' data-qid='q01' data-type='single' data-concept='c36' data-chapter='ch10'><p class='quiz-q'><b>Q1.<\/b> R1 相对于 V3 的主要变化是什么？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q01' value='0'> 注意力结构<\/label><label class='quiz-opt'><input type='radio' name='q01' value='1'> 后训练方法<\/label><label class='quiz-opt'><input type='radio' name='q01' value='2'> 层数<\/label><label class='quiz-opt'><input type='radio' name='q01' value='3'> 词表大小<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q02' data-type='single' data-concept='c36' data-chapter='ch10'><p class='quiz-q'><b>Q2.<\/b> V4 的 CSA 和 HCA 压缩率分别是？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q02' value='0'> 4:1 和 128:1<\/label><label class='quiz-opt'><input type='radio' name='q02' value='1'> 2:1 和 64:1<\/label><label class='quiz-opt'><input type='radio' name='q02' value='2'> 8:1 和 256:1<\/label><label class='quiz-opt'><input type='radio' name='q02' value='3'> 1:1 和 1:1<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q03' data-type='single' data-concept='c32' data-chapter='ch10'><p class='quiz-q'><b>Q3.<\/b> V4.1-Flash 的 prefill 激活参数约是多少？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q03' value='0'> 8B<\/label><label class='quiz-opt'><input type='radio' name='q03' value='1'> 13B<\/label><label class='quiz-opt'><input type='radio' name='q03' value='2'> 16B<\/label><label class='quiz-opt'><input type='radio' name='q03' value='3'> 49B<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><p class='quiz-summary'>完成作答后点击「检查答案」查看得分与解析。<\/p>", "__quiz_ch11__": "<h1>测验：第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark<\/h1><div class='quiz-item' data-qid='q04' data-type='single' data-concept='c36' data-chapter='ch11'><p class='quiz-q'><b>Q1.<\/b> MoE 主要省的是哪一项？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q04' value='0'> 显存占用<\/label><label class='quiz-opt'><input type='radio' name='q04' value='1'> 单 token 计算量<\/label><label class='quiz-opt'><input type='radio' name='q04' value='2'> 通信量<\/label><label class='quiz-opt'><input type='radio' name='q04' value='3'> 词表大小<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q05' data-type='single' data-concept='c36' data-chapter='ch11'><p class='quiz-q'><b>Q2.<\/b> mHC 的混合矩阵被约束成什么？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q05' value='0'> 正交矩阵<\/label><label class='quiz-opt'><input type='radio' name='q05' value='1'> 双随机矩阵<\/label><label class='quiz-opt'><input type='radio' name='q05' value='2'> 对角矩阵<\/label><label class='quiz-opt'><input type='radio' name='q05' value='3'> 稀疏矩阵<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q06' data-type='single' data-concept='c36' data-chapter='ch11'><p class='quiz-q'><b>Q3.<\/b> Engram 的核心机制是什么？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q06' value='0'> 矩阵乘法<\/label><label class='quiz-opt'><input type='radio' name='q06' value='1'> 哈希查表<\/label><label class='quiz-opt'><input type='radio' name='q06' value='2'> 注意力<\/label><label class='quiz-opt'><input type='radio' name='q06' value='3'> 卷积<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><p class='quiz-summary'>完成作答后点击「检查答案」查看得分与解析。<\/p>", "__quiz_ch12__": "<h1>测验：第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程<\/h1><div class='quiz-item' data-qid='q07' data-type='single' data-concept='c34' data-chapter='ch12'><p class='quiz-q'><b>Q1.<\/b> V4 用什么方法合并多个领域专家？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q07' value='0'> 权重平均<\/label><label class='quiz-opt'><input type='radio' name='q07' value='1'> 混合 RL<\/label><label class='quiz-opt'><input type='radio' name='q07' value='2'> 在线策略蒸馏（OPD）<\/label><label class='quiz-opt'><input type='radio' name='q07' value='3'> 直接 SFT<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q08' data-type='single' data-concept='c35' data-chapter='ch12'><p class='quiz-q'><b>Q2.<\/b> V4.1 后训练的主要创新在哪里？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q08' value='0'> 新的 RL 算法<\/label><label class='quiz-opt'><input type='radio' name='q08' value='1'> 新的 OPD 算法<\/label><label class='quiz-opt'><input type='radio' name='q08' value='2'> 数据与环境流水线<\/label><label class='quiz-opt'><input type='radio' name='q08' value='3'> 新的 SFT 损失<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q09' data-type='single' data-concept='c35' data-chapter='ch12'><p class='quiz-q'><b>Q3.<\/b> R1 四阶段中的第一步是什么？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q09' value='0'> 推理 RL<\/label><label class='quiz-opt'><input type='radio' name='q09' value='1'> 冷启动 SFT<\/label><label class='quiz-opt'><input type='radio' name='q09' value='2'> 拒绝采样<\/label><label class='quiz-opt'><input type='radio' name='q09' value='3'> 蒸馏<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><p class='quiz-summary'>完成作答后点击「检查答案」查看得分与解析。<\/p>", "__quiz_ch13__": "<h1>测验：第 13 章：综合检验：写一份架构评审报告<\/h1><div class='quiz-item' data-qid='q10' data-type='single' data-concept='c32' data-chapter='ch13'><p class='quiz-q'><b>Q1.<\/b> 1M token、每 token 890 B，单请求全局 KV 约多少？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q10' value='0'> 89 MB<\/label><label class='quiz-opt'><input type='radio' name='q10' value='1'> 890 MB<\/label><label class='quiz-opt'><input type='radio' name='q10' value='2'> 8.9 GB<\/label><label class='quiz-opt'><input type='radio' name='q10' value='3'> 89 GB<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q11' data-type='single' data-concept='c32' data-chapter='ch13'><p class='quiz-q'><b>Q2.<\/b> 输入/输出比 200:1 时，哪种架构收益最明显？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q11' value='0'> MoE<\/label><label class='quiz-opt'><input type='radio' name='q11' value='1'> CED<\/label><label class='quiz-opt'><input type='radio' name='q11' value='2'> Engram<\/label><label class='quiz-opt'><input type='radio' name='q11' value='3'> mHC<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><div class='quiz-item' data-qid='q12' data-type='single' data-concept='c36' data-chapter='ch13'><p class='quiz-q'><b>Q3.<\/b> 架构选型的原则是什么？<\/p><div class='quiz-opts'><label class='quiz-opt'><input type='radio' name='q12' value='0'> 永远选最强模型<\/label><label class='quiz-opt'><input type='radio' name='q12' value='1'> 满足要求下总成本最低<\/label><label class='quiz-opt'><input type='radio' name='q12' value='2'> 压缩率最高<\/label><label class='quiz-opt'><input type='radio' name='q12' value='3'> 参数最大<\/label><\/div><div class='quiz-actions'><button class='quiz-check'>检查答案<\/button><span class='quiz-feedback'><\/span><\/div><\/div><p class='quiz-summary'>完成作答后点击「检查答案」查看得分与解析。<\/p>", "__cards__": "<h1>抽认卡<\/h1><p>点击卡片翻面；判断「认识 / 不熟」以记录复习状态。<\/p><div class='card-controls'><label>按章节筛选：<select id='card-filter'><option value=''>全部<\/option><\/select><\/label><span class='card-counts'>认识 <b id='card-known'>0<\/b> · 不熟 <b id='card-again'>0<\/b> · 剩余 <b id='card-left'>0<\/b><\/span><\/div><div id='card-stage'><div class='flashcard' id='flashcard'><div class='fc-inner'><div class='fc-front'><\/div><div class='fc-back'><\/div><\/div><\/div><\/div><div class='card-actions'><button id='card-again-btn'>不熟<\/button><button id='card-known-btn'>认识<\/button><\/div>", "__glossary__": "<h1>术语表<\/h1><input id='glossary-filter' type='search' placeholder='筛选术语…'><ul id='glossary-list'><li data-term='瓶颈迁移'>瓶颈迁移 — 部署瓶颈从 KV cache 转向 FLOPs 再转向 prefill/带宽。 <span class=glossary-ref>（第 10 章：三代架构总览：瓶颈迁移与注意力演进）<\/span><\/li><li data-term='激活参数'>激活参数 — 单个 token 实际参与计算的参数。 <span class=glossary-ref>（第 10 章：三代架构总览：瓶颈迁移与注意力演进）<\/span><\/li><li data-term='总参数'>总参数 — 模型全部参数，MoE 中远大于激活参数。 <span class=glossary-ref>（第 10 章：三代架构总览：瓶颈迁移与注意力演进）<\/span><\/li><li data-term='非对称架构'>非对称架构 — prefill 和 decode 走不同计算路径的架构。 <span class=glossary-ref>（第 10 章：三代架构总览：瓶颈迁移与注意力演进）<\/span><\/li><li data-term='专家并行'>专家并行 — 把 MoE 专家分布到不同设备上。 <span class=glossary-ref>（第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark）<\/span><\/li><li data-term='路由'>路由 — 决定 token 进入哪些专家的机制。 <span class=glossary-ref>（第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark）<\/span><\/li><li data-term='双随机矩阵'>双随机矩阵 — 行和、列和都为 1 的非负矩阵。 <span class=glossary-ref>（第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark）<\/span><\/li><li data-term='正交化'>正交化 — 把梯度矩阵的奇异值拉到接近 1。 <span class=glossary-ref>（第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark）<\/span><\/li><li data-term='压缩维度'>压缩维度 — 条目大小、序列长度、层数、位宽四个可压缩方向。 <span class=glossary-ref>（第 11 章：效率组件：MoE、mHC、Muon、Engram、DSpark）<\/span><\/li><li data-term='prefill'>prefill — 读入整段输入并建立 KV cache 的阶段。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='decode'>decode — 逐 token 生成输出的阶段。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='opd'>OPD — 学生在自己轨迹上向多个教师做全词表蒸馏。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='grm'>GRM — 生成式奖励模型，模型自己生成评分理由和分数。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='dsec'>DSec — V4.1 用于大规模智能体 RL 的弹性计算沙箱。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='任务三元组'>任务三元组 — 问题、环境、验证系统。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='effort'>effort — 1–100 的推理力度标量，控制输出长度。 <span class=glossary-ref>（第 12 章：训练与后训练：预训练、RL、蒸馏、数据工程）<\/span><\/li><li data-term='全局 kv cache'>全局 KV cache — 常驻 HBM 的主 KV 缓存。 <span class=glossary-ref>（第 13 章：综合检验：写一份架构评审报告）<\/span><\/li><li data-term='持久 kv cache'>持久 KV cache — 放 SSD/主机内存、用于前缀复用的缓存。 <span class=glossary-ref>（第 13 章：综合检验：写一份架构评审报告）<\/span><\/li><li data-term='算术强度'>算术强度 — 每字节内存访问对应的计算量。 <span class=glossary-ref>（第 13 章：综合检验：写一份架构评审报告）<\/span><\/li><li data-term='选型'>选型 — 在负载、成本、质量约束下选最合适的模型。 <span class=glossary-ref>（第 13 章：综合检验：写一份架构评审报告）<\/span><\/li><\/ul>", "__diagnosis__": "<h1>🩺 诊断测试<\/h1><p>系统会从全书中抽题。答错的题会自动沿知识依赖链回溯，告诉你真正需要补的前置知识点。<\/p><div class='diag-controls'><button id='diag-start'>开始诊断（随机抽 5 题）<\/button><span id='diag-progress'><\/span><\/div><div id='diag-stage'><\/div><div id='diag-result'><\/div>", "__patterns__": "<h1>模式与框架库<\/h1>\n<h2>框架：瓶颈—机制—代价<\/h2>\n<p>解释任何架构改动：它替哪笔账还债、用什么机制、付出什么代价。三个都说清才算解释。<\/p>\n<h2>框架：多维压缩<\/h2>\n<p>KV cache 可从条目大小、序列长度、层数、位宽四个维度压缩；先看论文压了哪几个维度。<\/p>\n<h2>决策规则<\/h2>\n<ul><li>\n先量化负载，再选模型。\n<\/li><li>\n只为自己用得上的能力付费。\n<\/li><li>\nFLOPs、KV、延迟、成本分开算。\n<\/ul>\n<h2>反模式<\/h2>\n<ul><li>\n把“最新一代”当成“最适合”。\n<\/li><li>\n把压缩率当成唯一指标。\n<\/li><li>\n用 FLOPs 估算代替端到端实测。\n<\/ul>", "__cheatsheet__": "<h1>速查表<\/h1>\n<h2>关键数字<\/h2>\n<table><thead><tr><th>项目<\/th><th>数值<\/th><\/tr><\/thead><tbody><tr><td>V3<\/td><td>671B / 37B，61 层，MLA，14.8T token<\/td><\/tr><tr><td>V4-Pro<\/td><td>1.6T / 49B，61 层，CSA+HCA，33T token<\/td><\/tr><tr><td>V4-Flash<\/td><td>284B / 13B，43 层，CSA+HCA，32T token<\/td><\/tr><tr><td>V4.1-Flash<\/td><td>552B + 196B Engram，40 层，prefill 8B / decode 16B，45T token<\/td><\/tr><tr><td>V4 1M 效率<\/td><td>Pro 27% FLOPs / 10% KV；Flash 10% / 7%<\/td><\/tr><tr><td>V4.1 全局 KV<\/td><td>890 B/token；持久 KV 约 V4-Flash 的 1/8<\/td><\/tr><tr><td>CSA / HCA<\/td><td>4:1 / 128:1<\/td><\/tr><tr><td>R1 后训练<\/td><td>冷启动 → RL → 拒绝采样 → RL<\/td><\/tr><tr><td>V4 后训练<\/td><td>专家 SFT+GRPO → 10+ 教师 OPD<\/td><\/tr><tr><td>V4.1 后训练<\/td><td>SFT+RL → 40+ 教师 OPD<\/td><\/tr><\/tbody><\/table>\n<h2>公式<\/h2>\n<table><thead><tr><th>场景<\/th><th>内容<\/th><\/tr><\/thead><tbody><tr><td>单请求 KV<\/td><td>token 数 × 每 token 字节<\/td><\/tr><tr><td>延迟近似<\/td><td>max(FLOPs/算力, 字节/带宽) + 调度<\/td><\/tr><tr><td>OPD<\/td><td><span class=\"katex-inline\">\\sum_i w_i D_{KL}(\\pi_\\theta\\|\\pi_{E_i})<\/span><\/td><\/tr><\/tbody><\/table>"}};
+const pages = DATA.rendered;
+const manifest = DATA.manifest;
+const SYN_GROUPS = [["定义", "含义", "释义", "概念"], ["例题", "算例", "示例", "例子", "案例"], ["习题", "题目", "练习", "测验", "自测"], ["推导", "证明", "论证", "演算"], ["步骤", "流程", "过程", "环节"], ["性质", "特性", "特点", "属性"], ["公式", "表达式", "式子"], ["定理", "定律", "法则", "准则"], ["图像", "图形", "图示", "曲线"], ["计算", "求解", "算出", "求值"], ["平均值", "均值", "平均数"], ["误差", "偏差", "偏离"], ["函数", "映射", "对应关系"], ["导数", "变化率", "切线斜率", "微商"], ["原函数", "不定积分", "反导数"], ["概率", "几率", "可能性"]];
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const SLUG = manifest.slug || 'book';
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem(SLUG+':'+k)||'null') }catch(e){ return null } },
+  set(k,v){ try{ localStorage.setItem(SLUG+':'+k, JSON.stringify(v)) }catch(e){} }
+};
+const ZS_VERSION = '1.5.0';
+/* ---------- 进度导出 / 导入（跨设备） ---------- */
+function exportProgress(){
+  const data = {};
+  for(let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if(k && k.indexOf(SLUG+':')===0) data[k]=localStorage.getItem(k);
+  }
+  const payload = {app:'zhishu', skillVersion:ZS_VERSION, kind:'companion', exportedAt:new Date().toISOString(), prefix:SLUG+':', data};
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (SLUG||'book')+'-progress-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+}
+function importProgress(file){
+  const fr = new FileReader();
+  fr.onload = () => {
+    try{
+      const p = JSON.parse(fr.result);
+      if(!p || p.app!=='zhishu' || !p.data || typeof p.data!=='object') throw new Error('不是知枢进度文件');
+      let n = 0;
+      Object.keys(p.data).forEach(k=>{ if(k.indexOf(SLUG+':')===0){ localStorage.setItem(k, p.data[k]); n++; } });
+      if(!n){ alert('这个文件里没有属于本书的进度（slug 不一致）'); return; }
+      alert('已导入 '+n+' 条进度，页面将刷新'); location.reload();
+    }catch(e){ alert('导入失败：'+e.message); }
+  };
+  fr.readAsText(file);
+}
+let state = { visited: store.get('visited')||[], quiz: store.get('quiz')||{}, cards: store.get('cards')||{}, mastery: store.get('mastery')||{} };
+
+/* ---------- 导航 ---------- */
+function renderNav(){
+  const nav = $('#nav'); nav.innerHTML='';
+  const build = items => items.forEach(it=>{
+    if(it.children){
+      const sec=document.createElement('div'); sec.className='nav-sec'; sec.textContent=it.label; nav.appendChild(sec);
+      it.children.forEach(c=>{
+        const a=document.createElement('a'); a.className='nav-item'; a.href=c.href; a.textContent=c.label;
+        const id=routeId(c.href);
+        if(state.visited.includes(id)) a.innerHTML = esc(c.label)+' <span class="done">✓</span>';
+        nav.appendChild(a);
+      });
+    }else{
+      const a=document.createElement('a'); a.className='nav-item'; a.href=it.href; a.textContent=it.label;
+      const id=routeId(it.href);
+      if(state.visited.includes(id)) a.innerHTML = esc(it.label)+' <span class="done">✓</span>';
+      nav.appendChild(a);
+    }
+  });
+  build(DATA.nav);
+  updateProgress();
+}
+function routeId(href){ return href.replace('#/',''); }
+
+/* ---------- 路由 ---------- */
+function routeIdFromHash(){
+  let h = location.hash.replace(/^#\//,'');
+  if(!h) return 'path';
+  if(h==='path') return 'path';
+  if(h==='diagnosis') return 'diagnosis';
+  const m = h.match(/^(chapter|concept)\/(.+)$/);
+  if(m) return m[1]+'/'+m[2];
+  return h;
+}
+function showPage(rid){
+  let id;
+  if(rid==='path') id='__path__';
+  else if(rid==='diagnosis') id='__diagnosis__';
+  else if(rid==='graph') id='__graph__';
+  else if(rid.startsWith('quiz/')) id='__quiz_'+rid.split('/')[1]+'__';
+  else if(rid==='cards') id='__cards__';
+  else if(rid==='glossary') id='__glossary__';
+  else if(rid==='patterns') id='__patterns__';
+  else if(rid==='cheatsheet') id='__cheatsheet__';
+  else if(rid.startsWith('chapter/')) id=rid.split('/')[1];
+  else if(rid.startsWith('concept/')) id=rid.split('/')[1];
+  else id=rid;
+  const html = pages[id] || '<div class="empty">页面不存在</div>';
+  $('#view').innerHTML = html;
+  $$('.nav-item').forEach(a=>a.classList.toggle('active', routeId(a.getAttribute('href'))===rid));
+  if(!state.visited.includes(rid) && (rid.startsWith('chapter/')||rid.startsWith('concept/'))){
+    state.visited.push(rid); store.set('visited', state.visited); renderNav();
+  }
+  window.scrollTo(0,0);
+  if(rid==='cards') initCards();
+  if(rid==='glossary') initGlossary();
+  if(rid.startsWith('quiz')) initQuizzes(rid);
+  if(rid==='diagnosis') initDiagnosis();
+  if(rid==='graph') initGraph();
+  if(id==='__path__') updatePath();
+  renderMath();
+  renderMermaid();
+  applyPendingHighlight();
+}
+
+/* ---------- KaTeX 渲染（多源回退） ---------- */
+let katexLoading = false, katexReady = false;
+function renderMath(){
+  const hasMath = document.querySelector('.katex-inline, .katex-block');
+  if(!hasMath) return;
+  if(katexReady){ doRenderMath(); return; }
+  if(katexLoading) return;
+  katexLoading = true;
+  const cssUrls = [
+    'https://registry.npmmirror.com/katex/0.16.9/files/dist/katex.min.css',
+    'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css',
+    'https://unpkg.com/katex@0.16.9/dist/katex.min.css'
+  ];
+  const jsUrls = [
+    'https://registry.npmmirror.com/katex/0.16.9/files/dist/katex.min.js',
+    'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js',
+    'https://unpkg.com/katex@0.16.9/dist/katex.min.js'
+  ];
+  let ci = 0, ji = 0;
+  const tryCss = () => {
+    if(ci >= cssUrls.length){ tryJs(); return; }
+    const link = document.createElement('link');
+    link.rel = 'stylesheet'; link.href = cssUrls[ci++];
+    let settled = false, timer = null;
+    const next = () => {
+      if(settled) return;
+      settled = true; clearTimeout(timer); link.remove(); tryCss();
+    };
+    timer = setTimeout(next, 4000);
+    link.onload = () => {
+      if(settled) return;
+      settled = true; clearTimeout(timer); tryJs();
+    };
+    link.onerror = next;
+    document.head.appendChild(link);
+  };
+  const tryJs = () => {
+    if(ji >= jsUrls.length){ katexLoading = false; return; }
+    const s = document.createElement('script');
+    s.src = jsUrls[ji++];
+    let settled = false, timer = null;
+    const next = () => {
+      if(settled) return;
+      settled = true; clearTimeout(timer); s.onload = null; s.onerror = null; s.remove(); tryJs();
+    };
+    timer = setTimeout(next, 5000);
+    s.onload = () => {
+      if(settled) return;
+      settled = true; clearTimeout(timer); katexReady = true; katexLoading = false; doRenderMath();
+    };
+    s.onerror = next;
+    document.head.appendChild(s);
+  };
+  tryCss();
+}
+function doRenderMath(){
+  if(typeof katex === 'undefined') return;
+  // 行内公式：.katex-inline 里的内容
+  $$('.katex-inline').forEach(el=>{
+    try{ katex.render(el.textContent, el, {throwOnError:false}); }catch(e){}
+  });
+  // 块级公式：.katex-block 里的内容
+  $$('.katex-block').forEach(el=>{
+    try{ katex.render(el.textContent, el, {displayMode:true, throwOnError:false}); }catch(e){}
+  });
+}
+// 公式内容预处理：把 < 后跟字母的位置转成 &lt;，避免被 HTML 解析器当标签吃掉
+// （这是 first-principles-derivation 踩过的坑：$m<n$ 会变成残留 $m）
+function sanitizeMathHTML(){
+  $$('.katex-inline, .katex-block').forEach(el=>{
+    el.innerHTML = el.innerHTML.replace(/<([a-zA-Z])/g, '&lt;$1');
+  });
+}
+
+/* ---------- 进度 ---------- */
+function updateProgress(){
+  const chs = (manifest.chapters||[]).length;
+  const done = (manifest.chapters||[]).filter(c=>state.visited.includes('chapter/'+c.id)).length;
+  const pct = chs? Math.round(done/chs*100) : 0;
+  $('#progress-fill').style.width = pct+'%';
+  $('#progress-label').textContent = `进度 ${pct}% · 已学 ${done}/${chs} 章`;
+}
+function updatePath(){
+  $$('.path-step').forEach(el=>{
+    const step = el.id.replace('path-','');
+    const s = (manifest.learningPath||[]).find(x=>x.step===step);
+    if(s && (s.chapterIds||[]).every(c=>state.visited.includes('chapter/'+c))){
+      el.classList.add('passed');
+      const lbl = el.querySelector('.checkpoint-ok'); if(!lbl){ const sp=document.createElement('span'); sp.className='done'; sp.textContent=' ✓ 已完成'; el.appendChild(sp); }
+    }
+  });
+}
+
+/* ---------- 概念/章节依赖查找（用于诊断倒推） ---------- */
+function findConcept(id){ return (manifest.concepts||[]).find(c=>c.id===id); }
+function findChapter(id){ return (manifest.chapters||[]).find(c=>c.id===id); }
+function getPrereqs(node){
+  if(!node) return [];
+  return node.prerequisites || node.prereqs || [];
+}
+/**
+ * 答错倒推：从错题关联的概念/章节出发，沿 prerequisites 回溯，
+ * 返回一串"你可能需要先补的"节点，带跳转链接。
+ */
+function traceBack(startConceptId, startChapterId){
+  const visited = new Set();
+  const chain = [];
+  const queue = [];
+  if(startConceptId){ const c = findConcept(startConceptId); if(c) queue.push({node:c, kind:'concept'}); }
+  if(startChapterId){ const c = findChapter(startChapterId); if(c) queue.push({node:c, kind:'chapter'}); }
+  while(queue.length && chain.length < 6){
+    const {node, kind} = queue.shift();
+    if(visited.has(node.id)) continue;
+    visited.add(node.id);
+    chain.push({node, kind});
+    (getPrereqs(node)||[]).forEach(pid=>{
+      const cn = findConcept(pid); if(cn){ queue.push({node:cn, kind:'concept'}); return; }
+      const ch = findChapter(pid); if(ch) queue.push({node:ch, kind:'chapter'});
+    });
+  }
+  return chain;
+}
+
+/* ---------- 测验（带倒推） ---------- */
+function initQuizzes(rid){
+  $$('.quiz-item').forEach(item=>{
+    const btn = item.querySelector('.quiz-check');
+    if(!btn || item.dataset.inited){ return }
+    item.dataset.inited='1';
+    btn.addEventListener('click', ()=>{
+      const qid = item.dataset.qid; const type = item.dataset.type;
+      const q = (manifest.quizzes||[]).find(x=>x.id===qid); if(!q) return;
+      let user, correct=false, fb;
+      if(type==='single'){
+        const sel = item.querySelector('input:checked');
+        user = sel? parseInt(sel.value) : null;
+        correct = user===q.answer;
+        fb = correct?'✓ 正确':'✗ 错误'+(user==null?'（未作答）':'');
+      } else if(type==='multi'){
+        user = Array.from(item.querySelectorAll('input:checked')).map(i=>parseInt(i.value)).sort();
+        const ans = Array.isArray(q.answer)? q.answer.slice().sort(): [q.answer];
+        correct = user.length>0 && JSON.stringify(user)===JSON.stringify(ans);
+        fb = correct?'✓ 正确':'✗ 错误';
+      } else if(type==='blank'){
+        const v = (item.querySelector('.quiz-blank').value||'').trim().toLowerCase();
+        const a = String(q.answer).trim().toLowerCase();
+        correct = v===a;
+        fb = correct?'✓ 正确':'✗ 错误'+(v?'':'（未作答）');
+      }
+      item.querySelectorAll('input:checked').forEach(i=>{
+        const val=parseInt(i.value);
+        i.parentElement.style.color = (Array.isArray(q.answer)? q.answer.includes(val) : val===q.answer) ? 'var(--ok)' : 'var(--bad)';
+      });
+      const feed = item.querySelector('.quiz-feedback');
+      feed.className = 'quiz-feedback '+(correct?'fb-ok':'fb-bad');
+      feed.textContent = fb;
+      let ex = item.querySelector('.quiz-explain');
+      if(!ex){ ex=document.createElement('div'); ex.className='quiz-explain'; item.appendChild(ex); }
+      ex.innerHTML = '解析：' + esc(q.explain||'');
+      // 答错时：倒推前置 + 误解卡片 + 掌握度更新
+      if(!correct){
+        let remedy = item.querySelector('.quiz-remedy');
+        if(!remedy){ remedy = document.createElement('div'); remedy.className='quiz-remedy'; item.appendChild(remedy); }
+        const chain = traceBack(item.dataset.concept, item.dataset.chapter);
+        if(chain.length > 1){
+          const links = chain.slice(1).map(({node,kind})=>{
+            const href = kind==='concept' ? `#/concept/${node.id}` : `#/chapter/${node.id}`;
+            return `<a href="${href}">${esc(node.title||node.id)}</a>`;
+          }).join(' → ');
+          remedy.innerHTML = '🔍 可能的根因（沿依赖链回溯）：' + links;
+        }
+        // 误解卡片：如果选错的选项标注了 misconceptionId
+        const checked = item.querySelector('input:checked');
+        const misId = checked ? checked.dataset.misconception : '';
+        if(misId){
+          const mis = (manifest.misconceptions||[]).find(m=>m.id===misId);
+          if(mis){
+            let misCard = item.querySelector('.misconception-card');
+            if(!misCard){ misCard = document.createElement('div'); misCard.className='misconception-card'; item.appendChild(misCard); }
+            misCard.innerHTML = `<b>⚠ 常见误解</b><br>你选了「${esc(mis.wrong)}」——${esc(mis.correction)}`;
+          }
+        }
+        // 掌握度下降
+        updateMastery(item.dataset.concept, -0.15);
+      } else {
+        updateMastery(item.dataset.concept, +0.15);
+      }
+      const ch = q.chapterId||'__all__';
+      if(!state.quiz[ch]) state.quiz[ch]={done:0,total:0};
+      state.quiz[ch].done = Math.min(state.quiz[ch].total+1, state.quiz[ch].done+1);
+      state.quiz[ch].total += 1;
+      store.set('quiz', state.quiz);
+    });
+  });
+}
+
+/* ---------- 知识图谱（vis-network） ---------- */
+let networkLoaded = false;
+function loadVisNetwork(cb){
+  if(networkLoaded){ cb(); return; }
+  const urls = [
+    'https://cdn.jsdelivr.net/npm/vis-network@9.1.9/dist/vis-network.min.js',
+    'https://unpkg.com/vis-network@9.1.9/dist/vis-network.min.js',
+    'https://registry.npmmirror.com/vis-network/9.1.9/dist/vis-network.min.js'
+  ];
+  let i = 0;
+  const tryNext = () => {
+    if(i >= urls.length) return;
+    const s = document.createElement('script');
+    s.src = urls[i++];
+    const timer = setTimeout(() => { s.onload = null; s.onerror = null; s.remove(); tryNext(); }, 4000);
+    s.onload = () => { clearTimeout(timer); networkLoaded = true; cb(); };
+    s.onerror = () => { clearTimeout(timer); s.remove(); tryNext(); };
+    document.head.appendChild(s);
+  };
+  tryNext();
+}
+function initGraph(){
+  const container = document.getElementById('graph-container');
+  if(!container) return;
+  loadVisNetwork(() => {
+    if(typeof vis === 'undefined'){ container.innerHTML = '<p class="empty">图谱库加载失败，请联网后刷新</p>'; return; }
+    const concepts = manifest.concepts || [];
+    const chapters = manifest.chapters || [];
+    const nodes = [];
+    const edges = [];
+    concepts.forEach(c => {
+      const mastery = Math.round(getMastery(c.id)*100);
+      nodes.push({
+        id: 'c_' + c.id,
+        label: c.title || c.id,
+        title: (c.title||c.id) + '（掌握度 ' + mastery + '%）',
+        color: mastery > 70 ? '#86efac' : mastery > 40 ? '#fde68a' : '#fca5a5',
+        shape: 'dot',
+        size: mastery > 70 ? 20 : 14,
+        font: { size: 13 }
+      });
+    });
+    chapters.forEach(ch => {
+      nodes.push({
+        id: 'ch_' + ch.id,
+        label: ch.title || ch.id,
+        shape: 'box',
+        color: '#93c5fd',
+        font: { size: 12 }
+      });
+    });
+    // 前置边
+    concepts.forEach(c => {
+      (c.prerequisites || []).forEach(p => {
+        const pid = typeof p === 'string' ? p : p.id;
+        const ptype = typeof p === 'string' ? 'hard' : (p.type || 'hard');
+        const from = (pid.startsWith('ch') ? 'ch_' : 'c_') + pid;
+        const to = 'c_' + c.id;
+        if(nodes.find(n => n.id === from)){
+          edges.push({
+            from: from, to: to,
+            color: { color: ptype === 'hard' ? '#dc2626' : ptype === 'soft' ? '#9ca3af' : '#3b82f6' },
+            arrows: 'to',
+            width: ptype === 'hard' ? 2 : 1,
+            dashes: ptype !== 'hard'
+          });
+        }
+      });
+    });
+    const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+    const options = {
+      physics: { stabilization: true, barnesHut: { gravitationalConstant: -3000 } },
+      interaction: { hover: true, tooltipDelay: 200 }
+    };
+    const net = new vis.Network(container, data, options);
+    net.on('click', params => {
+      if(params.nodes.length > 0){
+        const nid = params.nodes[0];
+        if(nid.startsWith('c_')) location.hash = '#/concept/' + nid.slice(2);
+        else if(nid.startsWith('ch_')) location.hash = '#/chapter/' + nid.slice(3);
+      }
+    });
+  });
+}
+
+/* ---------- 诊断模式 ---------- */
+let diagQueue = [], diagIdx = 0, diagWrong = [];
+function initDiagnosis(){
+  const startBtn = $('#diag-start');
+  if(!startBtn || startBtn.dataset.inited) return;
+  startBtn.dataset.inited='1';
+  startBtn.addEventListener('click', ()=>{
+    const all = (manifest.quizzes||[]).slice();
+    // 随机抽 5 题（不够就全抽）
+    for(let i = all.length-1; i>0; i--){ const j = Math.floor(Math.random()*(i+1)); [all[i],all[j]]=[all[j],all[i]]; }
+    diagQueue = all.slice(0, Math.min(5, all.length));
+    diagIdx = 0; diagWrong = [];
+    showDiagQuestion();
+  });
+}
+function showDiagQuestion(){
+  const stage = $('#diag-stage');
+  const result = $('#diag-result');
+  result.innerHTML = '';
+  if(diagIdx >= diagQueue.length){ finishDiagnosis(); return; }
+  const q = diagQueue[diagIdx];
+  $('#diag-progress').textContent = `第 ${diagIdx+1} / ${diagQueue.length} 题`;
+  const fakeItem = document.createElement('div');
+  fakeItem.innerHTML = _renderQuizHTML(q, diagIdx+1);
+  stage.innerHTML = fakeItem.innerHTML;
+  // 绑定检查按钮
+  const item = stage.querySelector('.quiz-item');
+  const btn = item.querySelector('.quiz-check');
+  btn.addEventListener('click', ()=>{
+    const type = item.dataset.type;
+    let user, correct=false;
+    if(type==='single'){
+      const sel = item.querySelector('input:checked');
+      user = sel? parseInt(sel.value) : null;
+      correct = user===q.answer;
+    } else if(type==='multi'){
+      user = Array.from(item.querySelectorAll('input:checked')).map(i=>parseInt(i.value)).sort();
+      const ans = Array.isArray(q.answer)? q.answer.slice().sort(): [q.answer];
+      correct = user.length>0 && JSON.stringify(user)===JSON.stringify(ans);
+    } else if(type==='blank'){
+      const v = (item.querySelector('.quiz-blank').value||'').trim().toLowerCase();
+      correct = v===String(q.answer).trim().toLowerCase();
+    }
+    if(!correct){
+      diagWrong.push(q);
+      const chain = traceBack(q.relatedConceptId, q.chapterId);
+      if(chain.length > 1){
+        const links = chain.slice(1).map(({node,kind})=>{
+          const href = kind==='concept' ? `#/concept/${node.id}` : `#/chapter/${node.id}`;
+          return `<div class="diag-remedy-item">建议先学：<a href="${href}">${esc(node.title||node.id)}</a></div>`;
+        }).join('');
+        $('#diag-result').innerHTML = '<h3>这道题答错了，可能的根因：</h3>' + links +
+          '<p><button id="diag-next" class="quiz-check">下一题 →</button></p>';
+      } else {
+        $('#diag-result').innerHTML = '<p><button id="diag-next" class="quiz-check">下一题 →</button></p>';
+      }
+    } else {
+      $('#diag-result').innerHTML = '<p>✓ 正确。<button id="diag-next" class="quiz-check">下一题 →</button></p>';
+    }
+    $('#diag-next').addEventListener('click', ()=>{ diagIdx++; showDiagQuestion(); });
+  });
+}
+function _renderQuizHTML(q, idx){
+  // 复用服务端渲染的 quiz HTML 结构
+  const qtype = q.type||'single';
+  const qid = q.id||('diag'+idx);
+  let html = `<div class='quiz-item' data-qid='${qid}' data-type='${qtype}' data-concept='${esc(q.relatedConceptId||"")}' data-chapter='${esc(q.chapterId||"")}'>`;
+  html += `<p class='quiz-q'><b>Q${idx}.</b> ${esc(q.question||"")}</p>`;
+  if(qtype==='single'||qtype==='multi'){
+    const it = qtype==='single'?'radio':'checkbox';
+    html += "<div class='quiz-opts'>";
+    (q.options||[]).forEach((o,i)=>{ html += `<label class='quiz-opt'><input type='${it}' name='${qid}' value='${i}'> ${esc(String(o))}</label>`; });
+    html += '</div>';
+  } else {
+    html += `<input class='quiz-blank' type='text' placeholder='填写答案'>`;
+  }
+  html += `<div class='quiz-actions'><button class='quiz-check'>检查答案</button><span class='quiz-feedback'></span></div></div>`;
+  return html;
+}
+function finishDiagnosis(){
+  const total = diagQueue.length;
+  const wrong = diagWrong.length;
+  const right = total - wrong;
+  let html = `<h2>诊断完成：${right}/${total} 正确</h2>`;
+  if(wrong === 0){
+    html += '<p>🎉 这组题全对，可以继续往下学。</p>';
+  } else {
+    html += `<p>有 ${wrong} 道题答错。下面是按依赖链回溯的补强建议：</p>`;
+    const seen = new Set();
+    diagWrong.forEach(q=>{
+      const chain = traceBack(q.relatedConceptId, q.chapterId);
+      chain.slice(1).forEach(({node,kind})=>{
+        if(seen.has(node.id)) return;
+        seen.add(node.id);
+        const href = kind==='concept' ? `#/concept/${node.id}` : `#/chapter/${node.id}`;
+        html += `<div class="diag-remedy-item">📚 <a href="${href}">${esc(node.title||node.id)}</a></div>`;
+      });
+    });
+  }
+  html += '<p><button id="diag-restart" class="quiz-check">重新诊断</button></p>';
+  $('#diag-stage').innerHTML = '';
+  $('#diag-progress').textContent = '';
+  $('#diag-result').innerHTML = html;
+  $('#diag-restart').addEventListener('click', ()=>{
+    $('#diag-start').click();
+  });
+}
+
+/* ---------- 掌握度（简化 BKT） ---------- */
+function getMastery(cid){
+  if(!cid) return 0.5;
+  const m = (state.mastery||{})[cid];
+  return m !== undefined ? m : 0.3;
+}
+function updateMastery(cid, delta){
+  if(!cid) return;
+  if(!state.mastery) state.mastery = {};
+  const cur = state.mastery[cid] !== undefined ? state.mastery[cid] : 0.3;
+  state.mastery[cid] = Math.max(0, Math.min(1, cur + delta));
+  store.set('mastery', state.mastery);
+}
+function masteryBar(cid){
+  const v = Math.round(getMastery(cid)*100);
+  return `<div class="mastery-bar"><div style="width:${v}%"></div></div><span class="mastery-label">掌握度 ${v}%</span>`;
+}
+
+/* ---------- 抽认卡 ---------- */
+let cardIdx = 0, cardList = [];
+function initCards(){
+  const cards = manifest.flashcards||[];
+  cardList = cards.slice();
+  cardIdx = 0;
+  const sel = $('#card-filter');
+  sel.innerHTML = '<option value="">全部</option>';
+  [...new Set(cards.map(c=>c.chapterId).filter(Boolean))].forEach(c=>{
+    const o=document.createElement('option'); o.value=c; o.textContent=manifestChTitle(c); sel.appendChild(o);
+  });
+  sel.onchange = ()=>{ const v=sel.value; cardList = v? cards.filter(c=>c.chapterId===v): cards.slice(); cardIdx=0; showCard(); };
+  $('#flashcard').onclick = ()=>$('#flashcard').classList.toggle('flip');
+  $('#card-known-btn').onclick = ()=>{ markCard(true); };
+  $('#card-again-btn').onclick = ()=>{ markCard(false); };
+  showCard();
+}
+function showCard(){
+  updateCardCounts();
+  if(cardIdx>=cardList.length){ $('#card-stage').innerHTML='<div class="empty">本组卡片已全部复习完 🎉</div>'; return; }
+  const c = cardList[cardIdx];
+  document.querySelector('.fc-front').textContent = c.front;
+  document.querySelector('.fc-back').textContent = c.back;
+  $('#flashcard').classList.remove('flip');
+}
+function markCard(known){
+  const c = cardList[cardIdx]; if(!c) return;
+  state.cards[c.id] = known?'known':'again';
+  store.set('cards', state.cards);
+  cardIdx++; showCard();
+}
+function updateCardCounts(){
+  const known = Object.values(state.cards).filter(v=>v==='known').length;
+  const again = Object.values(state.cards).filter(v=>v==='again').length;
+  $('#card-known').textContent = known;
+  $('#card-again').textContent = again;
+  $('#card-left').textContent = Math.max(0, cardList.length-cardIdx);
+}
+function manifestChTitle(id){
+  const c=(manifest.chapters||[]).find(x=>x.id===id); return c? c.title : id;
+}
+
+/* ---------- 术语表 ---------- */
+function initGlossary(){
+  const input = $('#glossary-filter');
+  if(!input || input.dataset.inited) return;
+  input.dataset.inited='1';
+  input.oninput = ()=>{
+    const v = input.value.trim().toLowerCase();
+    $$('#glossary-list li').forEach(li=>{
+      li.style.display = (!v || li.dataset.term.includes(v)) ? '' : 'none';
+    });
+  };
+}
+
+/* ---------- 搜索 v2：分词 + 多词 + 命中定位 ---------- */
+let searchIndex = null;
+let pendingHl = [];
+function hlEscRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function tokenizeQuery(q){
+  q = String(q||'').trim().toLowerCase();
+  if(!q) return [];
+  const STOP = new Set(['的','了','是','在','和','与','我','你','他','它','这','那','有','就','都','而','及','或',
+                        '吗','呢','吧','把','被','对','从','到','为','上','下','里','中','个','一',
+                        '什么','怎么','为什么','如何','哪些','这个','那个']);
+  const raw = q.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  const out = [];
+  for(const w of raw){
+    if(STOP.has(w)) continue;
+    if(/^\p{Script=Han}+$/u.test(w) && w.length > 2){
+      out.push(w);
+      for(let i=0;i+2<=w.length;i++) out.push(w.slice(i,i+2));
+    } else out.push(w);
+  }
+  return [...new Set(out)].slice(0,12);
+}
+function hlSnippet(text, terms){
+  const low = text.toLowerCase();
+  let pos = -1, hit = '';
+  for(const t of terms){ const i = low.indexOf(t); if(i>=0 && (pos<0 || i<pos)){ pos=i; hit=t; } }
+  const start = Math.max(0, (pos<0?0:pos) - 60);
+  const end = Math.min(text.length, (pos<0?0:pos) + 140);
+  let s = esc(text.slice(start,end));
+  let budget = 6;                                 // 每段最多标 6 处，避免常见词把片段糊满
+  terms.forEach(t=>{
+    if(t.length < 1 || budget <= 0) return;
+    s = s.replace(new RegExp(hlEscRe(t),'gi'), m=>{
+      if(budget <= 0) return m;
+      budget--;
+      return '<mark class="hl">' + m + '</mark>';
+    });
+  });
+  return '…' + s + '…';
+}
+function applyPendingHighlight(){
+  const terms = pendingHl.slice(); pendingHl = [];
+  if(!terms.length) return;
+  const root = $('#view'); if(!root) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  let node, first = null, idx = -1, term = '';
+  while((node = walker.nextNode())){
+    if(!node.nodeValue || !node.nodeValue.trim()) continue;
+    const low = node.nodeValue.toLowerCase();
+    for(const t of terms){
+      const i = low.indexOf(t);
+      if(i>=0 && (first===null || i<idx || (i===idx && t.length>term.length))){
+        first = node; idx = i; term = t;
+      }
+    }
+  }
+  if(!first) return;
+  try{
+    const i = first.nodeValue.toLowerCase().indexOf(term);
+    if(i<0) return;
+    const range = document.createRange();
+    range.setStart(first, i); range.setEnd(first, i+term.length);
+    const mark = document.createElement('mark');
+    mark.className = 'hit-hl';
+    range.surroundContents(mark);
+    mark.scrollIntoView({block:'center'});
+    mark.classList.add('hit-flash');
+    setTimeout(()=>mark.classList.remove('hit-flash'), 1800);
+  }catch(e){}
+}
+document.addEventListener('click', (e)=>{
+  const a = (e.target && e.target.closest) ? e.target.closest('.search-hit a') : null;
+  if(a && a.dataset.hl) pendingHl = tokenizeQuery(a.dataset.hl);
+});
+function searchHref(id){
+  const map = {'__path__':'#/path','__diagnosis__':'#/diagnosis','__graph__':'#/graph',
+               '__cards__':'#/cards','__glossary__':'#/glossary','__patterns__':'#/patterns',
+               '__cheatsheet__':'#/cheatsheet'};
+  if(map[id]) return map[id];
+  if(id.startsWith('__quiz_')) return '#/quiz/'+id.replace('__quiz_','').replace(/__$/,'');
+  if(id.startsWith('__')) return '';
+  return '#/'+id;
+}
+function searchLabel(id){
+  if((manifest.chapters||[]).some(c=>c.id===id)) return '章节：'+id;
+  if((manifest.concepts||[]).some(c=>c.id===id)) return '概念：'+id;
+  const map = {'__path__':'学习路径','__diagnosis__':'诊断测试','__graph__':'知识图谱','__cards__':'抽认卡',
+               '__glossary__':'术语表','__patterns__':'模式库','__cheatsheet__':'速查表'};
+  if(map[id]) return map[id];
+  if(id.startsWith('__quiz_')) return '测验';
+  return id;
+}
+function pageTitle(id){
+  const ch = (manifest.chapters||[]).find(c=>c.id===id);
+  if(ch) return ch.title || id;
+  const cp = (manifest.concepts||[]).find(c=>c.id===id);
+  if(cp) return cp.title || id;
+  const map = {'__path__':'学习路径','__diagnosis__':'诊断测试','__graph__':'知识图谱','__cards__':'抽认卡',
+               '__glossary__':'术语表','__patterns__':'模式库','__cheatsheet__':'速查表'};
+  if(map[id]) return map[id];
+  if(id.startsWith('__quiz_')){
+    const q = (manifest.quizzes||[]).find(x=>'__quiz_'+x.id===id);
+    return q ? '测验 · '+String(q.question||'').slice(0,14) : '测验';
+  }
+  return id;
+}
+function chapOf(id){
+  const chs = manifest.chapters || [];
+  const ci = chs.findIndex(c=>c.id===id);
+  if(ci >= 0) return {key:'ch:'+id, label:chs[ci].title||id, order:ci};
+  const cp = (manifest.concepts||[]).find(c=>c.id===id);
+  if(cp){
+    const chId = (cp.chapterIds||[])[0];
+    const i = chs.findIndex(c=>c.id===chId);
+    if(i >= 0) return {key:'ch:'+chId, label:chs[i].title||chId, order:i};
+    return {key:'zz', label:'未归入章节', order:900};
+  }
+  return {key:'tools', label:'术语与工具页', order:950, ref:true};
+}
+function buildSearchIndex(){
+  if(searchIndex) return searchIndex;
+  searchIndex = [];
+  Object.entries(pages).forEach(([id, htmlText])=>{
+    const href = searchHref(id);
+    if(!href) return;
+    const text = htmlText.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ');
+    searchIndex.push({id, href, text, label:pageTitle(id), chap:chapOf(id)});
+  });
+  return searchIndex;
+}
+function synOf(t){
+  const out = [];
+  for(const g of SYN_GROUPS){ if(g.indexOf(t) >= 0){ for(const x of g){ if(x !== t) out.push(x); } } }
+  return out.slice(0,6);
+}
+$('#q').addEventListener('input', e=>{
+  const v = e.target.value.trim();
+  if(!v){ showPage(routeIdFromHash()); return; }
+  const terms = tokenizeQuery(v);
+  if(!terms.length){ showPage(routeIdFromHash()); return; }
+  const grams = [];
+  terms.forEach(t=>{ if(t.length >= 2){ for(let i=0;i+2<=t.length;i++) grams.push(t.slice(i,i+2)); } });
+  const qGrams = [...new Set(grams)].slice(0,16);
+  const snippetTerms = terms.concat(...terms.map(synOf)).slice(0,24);
+  const hits = [];
+  buildSearchIndex().forEach(p=>{
+    const low = p.text.toLowerCase();
+    let tHit = 0, sHit = 0, gHit = 0, first = '', viaSyn = '';
+    for(const t of terms){
+      if(low.includes(t)){ tHit++; if(!first) first = t; continue; }
+      for(const s of synOf(t)){
+        if(low.includes(s)){ sHit++; if(!viaSyn) viaSyn = s; if(!first) first = s; break; }
+      }
+    }
+    for(const gm of qGrams){ if(low.includes(gm)) gHit++; }
+    if(tHit > 0 || sHit > 0 || gHit >= 4){
+      hits.push({p, score: tHit*100 + sHit*30 + Math.min(gHit,20), first, viaSyn});
+    }
+  });
+  hits.sort((a,b)=> b.score-a.score || a.p.text.length-b.p.text.length);
+  const top = hits.slice(0,20);
+  let body;
+  if(top.length){
+    const gs = {};
+    top.forEach(h=>{
+      const k = h.p.chap.key;
+      (gs[k] = gs[k] || {label:h.p.chap.label, order:h.p.chap.order, ref:!!h.p.chap.ref, hits:[]}).hits.push(h);
+    });
+    const eff = g => Math.max(...g.hits.map(x=>x.score)) * (g.ref ? 0.55 : 1);
+    const order = Object.values(gs).sort((a,b)=> eff(b)-eff(a));
+    body = order.map(g=>{
+      const inner = g.hits.sort((a,b)=> b.score-a.score).map(h=>
+        `<div class="search-hit"><a href="${h.p.href}" data-hl="${esc(h.first)}">${esc(h.p.label)}</a>${h.viaSyn?`<span class="syn-note">同义命中：${esc(h.viaSyn)}</span>`:''}<br><span class="sub">${hlSnippet(h.p.text, snippetTerms)}</span></div>`).join('');
+      return `<div class="search-group"><div class="grp-head">${esc(g.label)}<span class="grp-count">${g.hits.length}</span></div>${inner}</div>`;
+    }).join('');
+  } else {
+    body = '<div class="empty">未找到相关内容，试试章节名 / 概念名 / 术语，或减少关键词。</div>';
+  }
+  $('#view').innerHTML = '<h1>搜索结果：'+esc(v)+'</h1>' + body;
+});
+
+/* ---------- Mermaid 懒加载 ---------- */
+function renderMermaid(){
+  if(!document.querySelector('.mermaid')) return;
+  const boot=()=>{ try{
+    mermaid.initialize({startOnLoad:false, theme: matchMedia('(prefers-color-scheme: dark)').matches?'dark':'default'});
+    document.querySelectorAll('.mermaid').forEach(el=>{
+      const code=el.textContent;
+      mermaid.render('mm'+Math.random().toString(36).slice(2), code)
+        .then(({svg})=>{ el.innerHTML=svg; })
+        .catch(()=>{ el.textContent=code; });
+    });
+  }catch(e){} };
+  const urls=['https://registry.npmmirror.com/mermaid/10.9.1/files/dist/mermaid.min.js',
+              'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js',
+              'https://unpkg.com/mermaid@10.9.1/dist/mermaid.min.js'];
+  let ui=0, done=false;
+  const tryNext=()=>{
+    if(done || ui>=urls.length) return;
+    const s=document.createElement('script');
+    s.src=urls[ui++];
+    const timer=setTimeout(()=>{ if(done) return; s.onload=null; s.onerror=null; s.remove(); tryNext(); }, 4000);
+    s.onload=()=>{ done=true; clearTimeout(timer); boot(); };
+    s.onerror=()=>{ clearTimeout(timer); s.remove(); tryNext(); };
+    document.head.appendChild(s);
+  };
+  tryNext();
+}
+
+/* ---------- 深色模式 ---------- */
+const themeBtn=$('#theme-btn');
+themeBtn.onclick=()=>{
+  const d = document.body.dataset.theme==='dark';
+  document.body.dataset.theme = d? '' : 'dark';
+  themeBtn.textContent = d? '🌙 深色' : '☀️ 浅色';
+};
+/* ---------- 进度按钮绑定 ---------- */
+(function(){
+  const ex=$('#progress-export'), im=$('#progress-import'), fi=$('#progress-file');
+  if(ex) ex.onclick = exportProgress;
+  if(im) im.onclick = ()=> fi && fi.click();
+  if(fi) fi.onchange = ()=>{ if(fi.files && fi.files[0]) importProgress(fi.files[0]); fi.value=''; };
+})();
+
+/* ---------- 启动 ---------- */
+renderNav();
+window.addEventListener('hashchange', ()=>showPage(routeIdFromHash()));
+(function(){
+  const sb=document.querySelector('.sidebar'); if(!sb) return;
+  const btn=document.createElement('button'); btn.id='nav-toggle'; btn.textContent='目录（点开选择章节）';
+  btn.onclick=()=>sb.classList.toggle('open');
+  sb.insertBefore(btn, sb.querySelector('#nav'));
+  window.addEventListener('hashchange',()=>{ if(window.innerWidth<=760) sb.classList.remove('open'); });
+})();
+showPage(routeIdFromHash());
+</script>
+</body>
+</html>

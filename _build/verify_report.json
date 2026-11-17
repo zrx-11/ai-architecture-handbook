@@ -1,0 +1,222 @@
+[
+ {
+  "check": "首页渲染",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "书卡数量",
+  "pass": true,
+  "extra": "3/3"
+ },
+ {
+  "check": "总览页：跨书总览：DeepSeek 架构学习路线",
+  "pass": true,
+  "extra": "1021 字符"
+ },
+ {
+  "check": "总览页：跨书概念映射表",
+  "pass": true,
+  "extra": "890 字符"
+ },
+ {
+  "check": "总览页：综合检验建议",
+  "pass": true,
+  "extra": "867 字符"
+ },
+ {
+  "check": "deepseek-foundations 首章渲染",
+  "pass": true,
+  "extra": "3497 字符"
+ },
+ {
+  "check": "deepseek-foundations 末章渲染",
+  "pass": true,
+  "extra": "4018 字符"
+ },
+ {
+  "check": "deepseek-papers 首章渲染",
+  "pass": true,
+  "extra": "4063 字符"
+ },
+ {
+  "check": "deepseek-papers 末章渲染",
+  "pass": true,
+  "extra": "5633 字符"
+ },
+ {
+  "check": "deepseek-architecture 首章渲染",
+  "pass": true,
+  "extra": "3737 字符"
+ },
+ {
+  "check": "deepseek-architecture 末章渲染",
+  "pass": true,
+  "extra": "3072 字符"
+ },
+ {
+  "check": "deepseek-foundations 测验题数",
+  "pass": true,
+  "extra": "15 题"
+ },
+ {
+  "check": "deepseek-foundations 测验正确反馈",
+  "pass": true,
+  "extra": "✓ 正确"
+ },
+ {
+  "check": "deepseek-foundations 测验解析",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "deepseek-papers 测验题数",
+  "pass": true,
+  "extra": "12 题"
+ },
+ {
+  "check": "deepseek-papers 测验正确反馈",
+  "pass": true,
+  "extra": "✓ 正确"
+ },
+ {
+  "check": "deepseek-papers 测验解析",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "deepseek-architecture 测验题数",
+  "pass": true,
+  "extra": "12 题"
+ },
+ {
+  "check": "deepseek-architecture 测验正确反馈",
+  "pass": true,
+  "extra": "✓ 正确"
+ },
+ {
+  "check": "deepseek-architecture 测验解析",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "抽认卡正面有内容",
+  "pass": true,
+  "extra": "向量在模型里是什么？"
+ },
+ {
+  "check": "抽认卡翻转",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "认识计数增加",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "术语表过滤",
+  "pass": true,
+  "extra": "共23 过滤后1（向量）"
+ },
+ {
+  "check": "全局搜索命中",
+  "pass": true,
+  "extra": "28 条"
+ },
+ {
+  "check": "分词搜索（含停用词）",
+  "pass": true,
+  "extra": "40 条"
+ },
+ {
+  "check": "多词搜索命中",
+  "pass": true,
+  "extra": "28 条"
+ },
+ {
+  "check": "结果片段高亮",
+  "pass": true,
+  "extra": "51 处"
+ },
+ {
+  "check": "点击结果定位高亮",
+  "pass": true,
+  "extra": "1 处"
+ },
+ {
+  "check": "结果按章节分组",
+  "pass": true,
+  "extra": "11 组：基础篇：从零到 Transformer · 测验3 / 总览 · 跨书总览1 / 基础篇：从零到 Transformer · 第 1 章：数字怎么变成“意思”：向量、矩阵与 softmax4"
+ },
+ {
+  "check": "结果标题可读",
+  "pass": true,
+  "extra": "例：测验"
+ },
+ {
+  "check": "同义词表已注入",
+  "pass": true,
+  "extra": "16 组"
+ },
+ {
+  "check": "同义召回生效",
+  "pass": false,
+  "extra": "搜「定义」→ 40 条（书中只有「概念」）"
+ },
+ {
+  "check": "进度跨刷新持久",
+  "pass": true,
+  "extra": "《基础篇：从零到 Transformer》 进度 60% · 已学 3/5 章 → 《基础篇：从零到 Transformer》 进度 60% · 已学 3/5 章"
+ },
+ {
+  "check": "学习路径完成标记",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "诊断页可打开",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "深度片段（本书无，跳过）",
+  "pass": true,
+  "extra": "本书无深度片段"
+ },
+ {
+  "check": "出处脚注存在",
+  "pass": true,
+  "extra": "1 处"
+ },
+ {
+  "check": "总入口有导出/导入按钮",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "进度导出函数可用",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "版本常量写入",
+  "pass": true,
+  "extra": "1.5.0"
+ },
+ {
+  "check": "误解卡（无数据，跳过）",
+  "pass": true,
+  "extra": "manifest 未配 optionMisconceptions"
+ },
+ {
+  "check": "深色模式",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "控制台无错误",
+  "pass": true,
+  "extra": ""
+ }
+]
