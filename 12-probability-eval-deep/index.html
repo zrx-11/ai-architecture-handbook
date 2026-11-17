@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>概率、损失与评估 · 深潜课</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%237c5bff'/><text x='50' y='68' font-size='44' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>DS</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161922;--bg3:#1e2230;--panel:#1a1e2a;
+  --text:#e4e6ed;--muted:#9ba1b3;--dim:#6b7184;
+  --accent:#7c5bff;--accent2:#5b9dff;--green:#38d39f;--warn:#f5a623;
+  --border:#2a3040;--soft:rgba(124,91,255,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden;max-width:100vw}
+body{font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.78;font-size:15.5px;overflow-x:hidden;
+  overflow-wrap:break-word;word-break:break-word}
+a{color:var(--accent2);text-decoration:none}
+a:hover{text-decoration:underline}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:999;width:0}
+.topbar{position:fixed;top:3px;left:0;right:0;height:54px;background:rgba(15,17,23,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:900;
+  display:flex;align-items:center;gap:12px;padding:0 18px}
+.topbar button{display:none;background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:7px 10px;font-size:17px;cursor:pointer}
+.brand{font-weight:700;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand span{color:var(--muted);font-weight:400;margin-left:8px}
+.topbar .back{margin-left:auto;font-size:12.5px;color:var(--muted);border:1px solid var(--border);
+  padding:5px 9px;border-radius:999px;white-space:nowrap}
+.sidebar{position:fixed;top:57px;left:0;bottom:0;width:250px;background:var(--bg2);
+  border-right:1px solid var(--border);overflow-y:auto;padding:18px 0;z-index:800;
+  transition:transform .25s}
+.sidebar h2{font-size:12px;color:var(--dim);font-weight:600;letter-spacing:.08em;
+  padding:0 20px 10px;text-transform:uppercase}
+.nav-item{display:block;padding:9px 20px;font-size:13px;color:var(--muted);
+  border-left:3px solid transparent;cursor:pointer;line-height:1.45}
+.nav-item:hover{background:var(--bg3);color:var(--text);text-decoration:none}
+.nav-item.active{border-left-color:var(--accent);color:var(--text);background:var(--bg3)}
+.nav-item small{display:block;color:var(--dim);font-size:11px;margin-top:1px}
+.main{margin-left:250px;padding:80px 28px 60px;max-width:1180px}
+.wrap{max-width:860px;margin:0 auto}
+section{padding:4px 0 30px;border-bottom:1px solid rgba(42,48,64,.55);margin-bottom:26px;scroll-margin-top:70px}
+section:last-of-type{border-bottom:0}
+h2{font-size:clamp(1.35rem,3vw,1.85rem);line-height:1.28;margin:8px 0 14px;letter-spacing:-.01em}
+h2 .num{color:var(--accent);font-size:.78em;margin-right:9px;font-variant-numeric:tabular-nums}
+h3{font-size:1.05rem;margin:18px 0 7px;color:var(--text)}
+h4{font-size:.96rem;margin:14px 0 5px;color:var(--muted)}
+p{margin:9px 0}
+ul,ol{margin:8px 0 10px 1.35em}
+li{margin:4px 0}
+strong{color:#fff;font-weight:650}
+code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--bg3);
+  padding:1px 5px;border-radius:4px;font-size:.9em;color:#c9d5ff}
+pre{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;
+  overflow-x:auto;font-size:13px;line-height:1.55;margin:12px 0}
+pre code{background:none;padding:0;color:#d8def0}
+.formula{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);
+  border-radius:8px;padding:10px 14px;margin:12px 0;overflow-x:auto;font-size:1.02em}
+.formula .katex-display{margin:0}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg3);color:#fff;font-weight:600;white-space:nowrap}
+td{color:var(--text)}
+.note{background:rgba(91,157,255,.07);border:1px solid rgba(91,157,255,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#c9d8f5}
+.warn{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#f3d19a}
+.good{background:rgba(56,211,159,.07);border:1px solid rgba(56,211,159,.35);border-radius:8px;
+  padding:10px 13px;margin:12px 0;font-size:14px;color:#b5f0d9}
+details{border:1px solid var(--border);border-radius:9px;margin:12px 0;background:var(--bg2)}
+details summary{cursor:pointer;padding:10px 13px;font-size:13.5px;color:var(--accent2);font-weight:600}
+details .inner{padding:2px 14px 14px;border-top:1px solid var(--border)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0}
+.flow .box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 11px;
+  font-size:13px;text-align:center;min-width:74px}
+.flow .arrow{color:var(--dim);font-size:18px}
+.quiz{border:1px solid var(--border);border-radius:11px;padding:14px;margin:14px 0;background:var(--bg2)}
+.quiz .q{font-weight:600;color:#fff;margin:0 0 9px;font-size:14.5px}
+.quiz .opt{display:block;width:100%;text-align:left;background:var(--bg);color:var(--text);
+  border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin:6px 0;font:inherit;
+  font-size:13.5px;cursor:pointer;line-height:1.5}
+.quiz .opt:hover{border-color:var(--accent)}
+.quiz .opt.ok{border-color:var(--green);background:rgba(56,211,159,.1)}
+.quiz .opt.bad{border-color:#ff6b6b;background:rgba(255,107,107,.1)}
+.quiz .fb{display:none;margin-top:9px;font-size:13.5px;line-height:1.65;color:var(--muted);border-top:1px dashed var(--border);padding-top:9px}
+.quiz .fb.show{display:block}
+.quiz .fb b{color:var(--text)}
+.pager{display:flex;justify-content:space-between;gap:10px;margin:18px 0 8px}
+.pager button{background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:9px 14px;font:inherit;font-size:13px;cursor:pointer}
+.pager button:hover{border-color:var(--accent)}
+.foot{color:var(--dim);font-size:12.5px;margin-top:24px;line-height:1.7}
+.katex-fallback{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.35);
+  border-radius:8px;padding:9px 12px;margin:10px 0;color:#f3d19a;font-size:13px;display:none}
+@media(max-width:900px){
+  .topbar button{display:block}
+  .brand span{display:none}
+  .sidebar{transform:translateX(-100%);top:57px;width:82vw;max-width:310px;box-shadow:20px 0 40px rgba(0,0,0,.35)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:76px 16px 48px}
+  h2{font-size:1.3rem}
+  .formula{padding:8px 10px}
+  .formula .katex{font-size:.86em}
+  table{font-size:12px}
+  .flow{gap:5px}.flow .box{font-size:12px;padding:6px 8px;min-width:60px}.flow .arrow{font-size:14px}
+}
+@media(max-width:420px){
+  body{font-size:15px}
+  .main{padding-left:13px;padding-right:13px}
+  .quiz .opt{font-size:13px}
+}
+</style>
+</head>
+<body>
+<div class="progress"></div>
+<header class="topbar">
+  <button id="menu" aria-label="目录">☰</button>
+  <div class="brand">概率、损失与评估<span>模型到底在优化什么</span></div>
+  <a class="back" href="../index.html">返回主手册</a>
+</header>
+<aside class="sidebar">
+  <h2>课程目录</h2>
+  <a class="nav-item" data-target="intro">课程概览<small>00</small></a>
+<a class="nav-item" data-target="bayes">1. 条件概率与贝叶斯<small>01</small></a>
+<a class="nav-item" data-target="mle">2. 最大似然与交叉熵<small>02</small></a>
+<a class="nav-item" data-target="mse">3. 平方损失与高斯噪声<small>03</small></a>
+<a class="nav-item" data-target="bias">4. 偏差与方差<small>04</small></a>
+<a class="nav-item" data-target="reg">5. 过拟合与正则化<small>05</small></a>
+<a class="nav-item" data-target="metrics">6. 混淆矩阵与 P/R/F1<small>06</small></a>
+<a class="nav-item" data-target="roc">7. ROC、AUC 与 PR 曲线<small>07</small></a>
+<a class="nav-item" data-target="leak">8. 数据泄漏与交叉验证<small>08</small></a>
+<a class="nav-item" data-target="mistakes">9. 常见误解与自测<small>09</small></a>
+</aside>
+<main class="main"><div class="wrap">
+<div class="katex-fallback">公式需要联网加载 KaTeX。当前显示的是 LaTeX 源码，文字、表格、测验仍可用。</div>
+<section id="intro" data-title="课程概览">
+<h2><span class="num">00</span>课程概览：从概率到“模型好不好”</h2>
+<p>这门课不背算法，只回答三个问题：模型输出的概率是什么意思？训练时最小化的损失从哪来？评估时 precision、recall、AUC 分别在说什么？</p>
+<h3>学完你能做到</h3>
+<ul>
+<li>用贝叶斯公式算一个简单的后验概率。</li>
+<li>从最大似然推出交叉熵，并手算一个三分类的损失。</li>
+<li>解释平方损失为什么对应高斯噪声假设。</li>
+<li>用混淆矩阵算 precision、recall、F1。</li>
+<li>识别数据泄漏和错误的交叉验证。</li>
+</ul>
+<div class="note">前置：会分数、对数、求和符号。看到 $\sum$ 会愣住的话，先把它读成“把每一项加起来”。</div>
+</section>
+
+<section id="bayes" data-title="1. 条件概率与贝叶斯">
+<h2><span class="num">01</span>条件概率与贝叶斯</h2>
+<p>条件概率 $P(A\mid B)$ 读作“在 B 发生的条件下，A 发生的概率”。定义是：</p>
+<div class="formula">$$P(A\mid B)=\frac{P(A\cap B)}{P(B)}$$</div>
+<p>贝叶斯公式把“因果”翻过来：</p>
+<div class="formula">$$P(A\mid B)=\frac{P(B\mid A)P(A)}{P(B)}$$</div>
+<p>例子：某种病患病率 1%，检测阳性时真患病的概率不是 99%。设检测灵敏度 $P(+\mid 病)=0.99$，假阳性 $P(+\mid 无病)=0.05$。先算总阳性率：</p>
+<div class="formula">$$P(+)=0.99\cdot0.01+0.05\cdot0.99=0.0099+0.0495=0.0594$$</div>
+<p>后验：</p>
+<div class="formula">$$P(病\mid +)=\frac{0.99\cdot0.01}{0.0594}\approx0.167$$</div>
+<p>阳性只有 16.7% 真患病。原因是健康人基数大，假阳性把阳性池子撑大了。这就是“基率”的作用。</p>
+<div class="warn">不要只看灵敏度。评估一个模型时，正负样本比例会直接改变 precision，哪怕 recall 没变。</div>
+</section>
+
+<section id="mle" data-title="2. 最大似然与交叉熵">
+<h2><span class="num">02</span>最大似然与交叉熵</h2>
+<p>分类模型输出一个概率分布 $p_1,\dots,p_K$。训练集里真实类别是 $y$，我们想让模型给真实类别的概率尽量大。最大似然就是：</p>
+<div class="formula">$$\max_\theta \sum_{(x,y)}\log p_\theta(y\mid x)$$</div>
+<p>加负号变成最小化，就是交叉熵：</p>
+<div class="formula">$$\mathcal L_{\mathrm{CE}}=-\sum_{(x,y)}\log p_\theta(y\mid x)$$</div>
+<p>如果标签是 one-hot，只有真实类别那一项非零：$\mathcal L=-\log p_{\text{true}}$。</p>
+<p>手算：三分类输出 $[0.7,0.2,0.1]$，真实类别是第 1 类，损失 $-\log0.7\approx0.357$。如果输出 $[0.1,0.2,0.7]$，真实仍是第 1 类，损失 $-\log0.1\approx2.303$。错得越自信，罚得越重。</p>
+<table>
+<tr><th>真实类别</th><th>模型给真实类的概率</th><th>交叉熵</th></tr>
+<tr><td>第 1 类</td><td>0.7</td><td>0.357</td></tr>
+<tr><td>第 1 类</td><td>0.1</td><td>2.303</td></tr>
+<tr><td>第 1 类</td><td>0.01</td><td>4.605</td></tr>
+</table>
+<div class="good">交叉熵不是“错误率”，它是负对数似然。预测概率越接近 0，损失越快趋向无穷；所以模型会对“非常自信但错了”的样本给大梯度。</div>
+</section>
+
+<section id="mse" data-title="3. 平方损失与高斯噪声">
+<h2><span class="num">03</span>平方损失与高斯噪声</h2>
+<p>回归模型输出 $\hat y$，真实值 $y$。平方损失：</p>
+<div class="formula">$$\mathcal L=(\hat y-y)^2$$</div>
+<p>对 $\hat y$ 求导：</p>
+<div class="formula">$$\frac{\partial \mathcal L}{\partial \hat y}=2(\hat y-y)$$</div>
+<p>为什么老是平方？如果假设 $y=\hat y+\epsilon$，$\epsilon\sim\mathcal N(0,\sigma^2)$，那么给定 $\hat y$ 时 $y$ 的似然是高斯。取负对数，常数项之外就是 $\frac{(y-\hat y)^2}{2\sigma^2}$。最小化平方损失等价于在高斯噪声假设下做最大似然。</p>
+<div class="warn">平方损失对异常值敏感：误差 10 会被平方成 100。数据有长尾异常值时，绝对值损失（L1）或 Huber 损失更稳。</div>
+<p>分类用交叉熵，回归用平方损失，不是随意搭配。它们对应不同的概率假设：分类是伯努利/类别分布，回归是高斯的。</p>
+</section>
+
+<section id="bias" data-title="4. 偏差与方差">
+<h2><span class="num">04</span>偏差与方差</h2>
+<p>模型的期望误差可以拆成三块：</p>
+<div class="formula">$$\mathbb E[(y-\hat f(x))^2]=\text{偏差}^2+\text{方差}+\text{噪声}$$</div>
+<p>偏差：模型平均预测偏离真实函数多远。方差：换一批训练数据，模型预测波动多大。</p>
+<table>
+<tr><th>状态</th><th>训练误差</th><th>验证误差</th><th>典型原因</th></tr>
+<tr><td>欠拟合</td><td>高</td><td>高</td><td>模型太简单、特征太少、训练不足</td></tr>
+<tr><td>过拟合</td><td>低</td><td>高</td><td>模型太复杂、数据太少、训练太久</td></tr>
+<tr><td>合适</td><td>低</td><td>低</td><td>容量与数据匹配</td></tr>
+</table>
+<p>不要只看训练 loss。训练 loss 降到 0 不代表模型学会了规律，可能只是记住了样本。</p>
+<div class="note">“偏差-方差权衡”不是玄学：增加模型容量通常降偏差、升方差；增加数据通常降方差；正则化通常升偏差、降方差。</div>
+</section>
+
+<section id="reg" data-title="5. 过拟合与正则化">
+<h2><span class="num">05</span>过拟合与正则化</h2>
+<p>正则化是给模型加约束，让它不要为了拟合噪声而疯狂摆动。</p>
+<h3>L2 正则</h3>
+<div class="formula">$$\mathcal L_{\mathrm{total}}=\mathcal L_{\mathrm{data}}+\lambda\sum_i w_i^2$$</div>
+<p>把权重往 0 拉，惩罚大权重。梯度多一项 $2\lambda w_i$。</p>
+<h3>L1 正则</h3>
+<div class="formula">$$\mathcal L_{\mathrm{total}}=\mathcal L_{\mathrm{data}}+\lambda\sum_i|w_i|$$</div>
+<p>L1 更容易把不重要的权重压到正好 0，产生稀疏解。</p>
+<h3>Dropout</h3>
+<p>训练时随机把一部分神经元输出置 0，逼网络不要依赖某一条路径。推理时关闭，并按保留概率缩放，保持期望不变。</p>
+<h3>早停</h3>
+<p>验证 loss 连续几轮不降就停。它是最便宜的正则化，不用改模型结构。</p>
+<div class="warn">正则化不是越多越好。$\lambda$ 太大，模型被压得只会输出常数，变成欠拟合。</div>
+</section>
+
+<section id="metrics" data-title="6. 混淆矩阵与 P/R/F1">
+<h2><span class="num">06</span>混淆矩阵与 P/R/F1</h2>
+<p>二分类的四个格子：</p>
+<table>
+<tr><th></th><th>预测正</th><th>预测负</th></tr>
+<tr><td>真实正</td><td>TP</td><td>FN</td></tr>
+<tr><td>真实负</td><td>FP</td><td>TN</td></tr>
+</table>
+<p>三个最常用的指标：</p>
+<div class="formula">$$\text{Precision}=\frac{TP}{TP+FP},\qquad \text{Recall}=\frac{TP}{TP+FN}$$</div>
+<div class="formula">$$F_1=\frac{2\,\text{Precision}\cdot\text{Recall}}{\text{Precision}+\text{Recall}}$$</div>
+<p>手算：100 个样本，TP=30，FP=10，FN=20，TN=40。</p>
+<ul>
+<li>Precision = 30/40 = 0.75：预测为正的里面，75% 真为正。</li>
+<li>Recall = 30/50 = 0.60：真实为正的里面，抓到了 60%。</li>
+<li>F1 = 2×0.75×0.60/1.35 ≈ 0.667。</li>
+<li>Accuracy = (30+40)/100 = 0.70，但在正负不平衡时会骗人。</li>
+</ul>
+<div class="good">Precision 关心“别误报”，Recall 关心“别漏报”。医疗筛查通常偏 Recall，垃圾邮件拦截通常偏 Precision。没有统一答案，看漏报和误报哪个代价大。</div>
+</section>
+
+<section id="roc" data-title="7. ROC、AUC 与 PR 曲线">
+<h2><span class="num">07</span>ROC、AUC 与 PR 曲线</h2>
+<p>分类器输出的是分数，不是硬标签。换一个阈值，TPR 和 FPR 都会变：</p>
+<div class="formula">$$\text{TPR}=\frac{TP}{TP+FN},\qquad \text{FPR}=\frac{FP}{FP+TN}$$</div>
+<p>把阈值从高到低扫一遍，得到 ROC 曲线。AUC 是曲线下面积，意思是“随机抽一个正样本和一个负样本，模型给正样本更高分的概率”。</p>
+<p>AUC=0.5 等于瞎猜，AUC=1 是完美排序。AUC 只看排序，不看具体阈值，所以它对类别不平衡不敏感；也正因为如此，极度不平衡时它可能看起来很好，实际 precision 很差。</p>
+<div class="warn">正样本只有 1% 时，看 PR 曲线通常比 ROC 更有意义。ROC 的 FPR 分母是负样本，负样本很多时，少量 FP 在 FPR 上不明显，但在 precision 上会很痛。</div>
+</section>
+
+<section id="leak" data-title="8. 数据泄漏与交叉验证">
+<h2><span class="num">08</span>数据泄漏与交叉验证</h2>
+<p>数据泄漏是评估里最隐蔽的错：训练时不小心看到了测试信息，分数虚高，上线就崩。</p>
+<table>
+<tr><th>泄漏类型</th><th>例子</th><th>正确做法</th></tr>
+<tr><td>预处理泄漏</td><td>在全量数据上算均值/方差再标准化</td><td>只用训练折算，再应用到验证折</td></tr>
+<tr><td>时间泄漏</td><td>用未来数据预测过去</td><td>按时间切分，训练集早于验证集</td></tr>
+<tr><td>分组泄漏</td><td>同一用户的不同记录同时进训练和测试</td><td>按用户/设备分组切分</td></tr>
+<tr><td>目标泄漏</td><td>特征里包含标签的直接后代</td><td>检查特征生成时间与可用性</td></tr>
+</table>
+<p>k 折交叉验证：把数据切成 k 份，每次拿 1 份做验证，其余训练，最后平均。它降低单次切分的偶然性，但不能修复泄漏。</p>
+<div class="formula">$$\text{CV}=\frac1k\sum_{i=1}^k \text{score}_i$$</div>
+<p>时间序列不能随机打乱做 k 折，要用滚动窗口或按时间切分。</p>
+</section>
+
+<section id="mistakes" data-title="9. 常见误解与自测">
+<h2><span class="num">09</span>常见误解与自测</h2>
+<h3>先排掉五个误解</h3>
+<ul>
+<li><strong>“准确率高就是模型好”</strong>：正负 99:1 时，全预测负也有 99% 准确率。</li>
+<li><strong>“AUC 高，precision 一定高”</strong>：不一定。AUC 看排序，precision 看阈值上的误报。</li>
+<li><strong>“交叉验证可以防止过拟合”</strong>：它只是更稳地估计泛化误差，不改变模型容量。</li>
+<li><strong>“正则化越强越好”</strong>：太强会欠拟合。</li>
+<li><strong>“训练 loss 低，测试也不会差”</strong>：可能已经记住了训练集，测试集才是检验。</li>
+</ul>
+<div class="quiz" data-answer="2" data-explain="贝叶斯：$P(A|B)=P(B|A)P(A)/P(B)$。">
+<p class="q">1. 贝叶斯公式是？</p>
+<button class="opt">A. $P(A\mid B)=P(A)P(B)$</button>
+<button class="opt">B. $P(A\mid B)=P(B\mid A)P(B)/P(A)$</button>
+<button class="opt">C. $P(A\mid B)=P(B\mid A)P(A)/P(B)$</button>
+<button class="opt">D. $P(A\mid B)=P(A)+P(B)$</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="1" data-explain="三分类真实类概率 0.7，交叉熵 $-\\log0.7\\approx0.357$。">
+<p class="q">2. 三分类输出 [0.7,0.2,0.1]，真实是第 1 类，交叉熵约是？</p>
+<button class="opt">A. 0.7</button>
+<button class="opt">B. 0.357</button>
+<button class="opt">C. 2.303</button>
+<button class="opt">D. 1.0</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="3" data-explain="TP=30，FP=10，FN=20，precision=30/40=0.75，recall=30/50=0.60。">
+<p class="q">3. TP=30，FP=10，FN=20，TN=40。Recall 是多少？</p>
+<button class="opt">A. 0.75</button>
+<button class="opt">B. 0.70</button>
+<button class="opt">C. 0.667</button>
+<button class="opt">D. 0.60</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="0" data-explain="AUC 是排序指标，不看具体阈值；类别极度不平衡时 PR 曲线更能暴露误报。">
+<p class="q">4. AUC 高但 precision 差，最可能的原因是？</p>
+<button class="opt">A. 类别极度不平衡，负样本太多</button>
+<button class="opt">B. 模型没有训练</button>
+<button class="opt">C. 学习率太大</button>
+<button class="opt">D. 特征太少</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="1" data-explain="标准化参数只能用训练折估计，否则验证折信息泄漏进训练。">
+<p class="q">5. 哪种做法会造成数据泄漏？</p>
+<button class="opt">A. 只用训练折算均值和方差</button>
+<button class="opt">B. 在全量数据上算均值和方差再标准化</button>
+<button class="opt">C. 按时间切分训练/测试</button>
+<button class="opt">D. 按用户分组切分</button>
+<div class="fb"></div>
+</div>
+<div class="good">下一步：回主手册 04 分册，把第 2 章评估、第 6 章 SVM、第 11 章聚类各做一遍自测；再用 09 第 11 章选型表练一次“指标和业务代价”的取舍。</div>
+</section>
+
+<div class="pager"><button id="prev">← 上一节</button><button id="next">下一节 →</button></div>
+<div class="foot">这套深潜课是独立单文件页，进度存在本机浏览器。公式用 KaTeX 渲染；离线时显示源码，不影响阅读正文。<br>
+相关分册：<a href="../index.html">主学习手册</a> · <a href="../00-跨书总览/深潜专题.md">深潜专题</a></div>
+</div></main>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+const sections=[...document.querySelectorAll('section')];
+const nav=[...document.querySelectorAll('.nav-item')];
+const bar=document.querySelector('.progress');
+const key='deep:'+location.pathname.split('/').filter(Boolean).slice(-2,-1)[0];
+let cur=0;
+function show(i,push){
+  i=Math.max(0,Math.min(sections.length-1,i));
+  sections.forEach((s,k)=>s.style.display=(k===i?'block':'none'));
+  nav.forEach((n,k)=>n.classList.toggle('active',k===i));
+  cur=i;
+  bar.style.width=((i+1)/sections.length*100)+'%';
+  try{localStorage.setItem(key,String(i))}catch(e){}
+  if(push) history.replaceState(null,'','#'+sections[i].id);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+nav.forEach((n,i)=>n.addEventListener('click',()=>{show(i,true);document.querySelector('.sidebar').classList.remove('open')}));
+document.querySelector('#menu').addEventListener('click',()=>document.querySelector('.sidebar').classList.toggle('open'));
+document.addEventListener('click',e=>{if(e.target.closest('.sidebar')||e.target.closest('#menu'))return;document.querySelector('.sidebar').classList.remove('open')});
+document.querySelector('#prev').addEventListener('click',()=>show(cur-1,true));
+document.querySelector('#next').addEventListener('click',()=>show(cur+1,true));
+try{const saved=localStorage.getItem(key);if(saved!==null)cur=+saved||0}catch(e){}
+const hash=location.hash.slice(1);const hi=sections.findIndex(s=>s.id===hash);if(hi>=0)cur=hi;
+show(cur,false);
+setTimeout(()=>window.scrollTo({top:0,behavior:"auto"}),0);
+
+document.querySelectorAll('.quiz').forEach(q=>{
+  const opts=[...q.querySelectorAll('.opt')], ans=+q.dataset.answer, fb=q.querySelector('.fb');
+  opts.forEach((o,i)=>o.addEventListener('click',()=>{
+    opts.forEach(x=>x.classList.remove('ok','bad'));
+    if(i===ans){o.classList.add('ok')}else{o.classList.add('bad');opts[ans].classList.add('ok')}
+    fb.innerHTML=(i===ans?'<b>正确。</b> ':'<b>不对。</b> ')+(q.dataset.explain||'');
+    fb.classList.add('show');
+    if(window.renderMathInElement){
+      try{renderMathInElement(fb,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});}catch(e){}
+    }
+  }));
+});
+
+function render(){
+  if(!window.renderMathInElement){
+    const el=document.querySelector('.katex-fallback'); if(el) el.style.display='block'; return;
+  }
+  try{
+    renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});
+  }catch(e){const el=document.querySelector('.katex-fallback'); if(el) el.style.display='block';}
+}
+window.addEventListener('load',render);
+</script>
+</body>
+</html>

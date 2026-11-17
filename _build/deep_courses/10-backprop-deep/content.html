@@ -1,0 +1,209 @@
+<section id="intro" data-title="课程概览">
+<h2><span class="num">00</span>课程概览：梯度到底怎么传回去</h2>
+<p>这门课只解决一件事：给你一个网络、一个损失，怎么把每个参数的梯度算出来，再用它更新参数。全程不依赖框架，数字都能手算。</p>
+<h3>学完你能做到</h3>
+<ul>
+<li>把 <code>loss = (wx+b-y)^2</code> 拆成计算图，逐节点写局部梯度。</li>
+<li>手算一个 2-2-1 网络的前向与反向，核对每个梯度的符号和大小。</li>
+<li>解释梯度消失、梯度爆炸、梯度裁剪分别在哪一步起作用。</li>
+<li>区分 SGD、Momentum、RMSProp、Adam 各自改了哪个量。</li>
+</ul>
+<div class="note">前置：会加减乘除、会看 $y=wx+b$ 这样的直线。不会矩阵也能学，第 5 节才出现矩阵形状。</div>
+<h3>路线</h3>
+<div class="flow">
+<div class="box">计算图</div><div class="arrow">→</div><div class="box">链式法则</div><div class="arrow">→</div><div class="box">手算 2-2-1</div><div class="arrow">→</div><div class="box">形状</div><div class="arrow">→</div><div class="box">消失/爆炸</div><div class="arrow">→</div><div class="box">优化器</div>
+</div>
+<p>如果只想先跑起来，读第 1、2、4、7 节；想把数学补齐，九节都读。</p>
+</section>
+
+<section id="graph" data-title="1. 计算图：把公式拆成节点">
+<h2><span class="num">01</span>计算图：把公式拆成节点</h2>
+<p>反向传播不是一条神秘公式，它只是把复合函数拆开，对每条边求导，再把路径上的导数乘起来。</p>
+<p>拿一个最简单的例子：</p>
+<div class="formula">$$z=wx+b,\qquad a=z,\qquad L=(a-y)^2$$</div>
+<p>把它画成一条链：</p>
+<div class="flow">
+<div class="box">w, x, b</div><div class="arrow">→</div><div class="box">z = wx+b</div><div class="arrow">→</div><div class="box">a = z</div><div class="arrow">→</div><div class="box">L = (a-y)²</div>
+</div>
+<p>每个节点只负责一件事：知道自己输出对输入的局部导数。乘法的局部导数是另一个乘数，加法的局部导数是 1，平方的局部导数是 $2(a-y)$。</p>
+<div class="good">反向传播的顺序是从右往左：先算 $\frac{\partial L}{\partial L}=1$，再算 $\frac{\partial L}{\partial a}$，再算 $\frac{\partial L}{\partial z}$，最后算 $\frac{\partial L}{\partial w}$ 和 $\frac{\partial L}{\partial b}$。前向是“算值”，反向是“算斜率”。</div>
+</section>
+
+<section id="chain" data-title="2. 链式法则：一条路径">
+<h2><span class="num">02</span>链式法则：一条路径</h2>
+<p>链式法则一句话：<strong>输出对远端变量的导数，等于路径上每一段局部导数连乘。</strong></p>
+<div class="formula">$$\frac{\partial L}{\partial w}=\frac{\partial L}{\partial a}\cdot\frac{\partial a}{\partial z}\cdot\frac{\partial z}{\partial w}$$</div>
+<p>代入具体数字：$w=2$，$x=3$，$b=-1$，$y=1$。</p>
+<p>前向：$z=2\cdot3-1=5$，$a=5$，$L=(5-1)^2=16$。</p>
+<table>
+<tr><th>步骤</th><th>局部导数</th><th>数值</th></tr>
+<tr><td>$\partial L/\partial a$</td><td>$2(a-y)$</td><td>$2(5-1)=8$</td></tr>
+<tr><td>$\partial a/\partial z$</td><td>$1$（这里 $a=z$）</td><td>$1$</td></tr>
+<tr><td>$\partial z/\partial w$</td><td>$x$</td><td>$3$</td></tr>
+<tr><td>$\partial z/\partial b$</td><td>$1$</td><td>$1$</td></tr>
+</table>
+<p>连乘：$\partial L/\partial w=8\cdot1\cdot3=24$，$\partial L/\partial b=8\cdot1=8$。</p>
+<div class="warn">常见错误：只乘了最后一段。链式法则要求从损失一路乘到目标参数，中间每一段都不能漏。</div>
+<p>为什么梯度是 24 这么大？因为 $w$ 从 2 增加一点点，$z$ 会放大 3 倍，$L$ 又对 $a$ 敏感 8 倍，两个放大叠在一起。</p>
+</section>
+
+<section id="multipath" data-title="3. 多路径：梯度相加">
+<h2><span class="num">03</span>多路径：梯度相加</h2>
+<p>真实网络里，一个变量常常喂给多个分支。比如 $a$ 同时进入两个损失项：</p>
+<div class="formula">$$L=(a-1)^2+(2a+3)^2$$</div>
+<p>对 $a$ 求导，要分别算两条路径，再把结果相加：</p>
+<div class="formula">$$\frac{dL}{da}=2(a-1)+2(2a+3)\cdot2=2(a-1)+4(2a+3)$$</div>
+<p>取 $a=0$：第一条路径给 $-2$，第二条给 $12$，合计 $10$。如果只算第一条，会得到 $-2$，更新方向完全反了。</p>
+<div class="good">记忆方式：前向时一个值可以分叉给多个节点；反向时，所有从它出发的路径把梯度<strong>累加</strong>回来。这就是“梯度累加”这个词的来源。</div>
+<p>残差连接就是典型的多路径：$y=x+F(x)$，梯度一条走 $F$，一条直接走 $x$，反向时两条路径相加，所以深层网络不容易断梯度。</p>
+</section>
+
+<section id="hand" data-title="4. 手算一个 2-2-1 网络">
+<h2><span class="num">04</span>手算一个 2-2-1 网络</h2>
+<p>网络结构：2 个输入，2 个隐藏神经元（ReLU），1 个输出（线性），损失用平方误差。</p>
+<div class="formula">$$h_1=\mathrm{ReLU}(0.5x_1-0.2x_2+0.1)$$</div>
+<div class="formula">$$h_2=\mathrm{ReLU}(-0.3x_1+0.4x_2-0.2)$$</div>
+<div class="formula">$$\hat y=0.8h_1+0.1h_2,\qquad L=(\hat y-y)^2$$</div>
+<p>取 $x_1=1$，$x_2=0$，$y=1$。前向：</p>
+<table>
+<tr><th>量</th><th>计算</th><th>值</th></tr>
+<tr><td>$z_1$</td><td>$0.5\cdot1-0.2\cdot0+0.1$</td><td>$0.6$</td></tr>
+<tr><td>$h_1$</td><td>$\mathrm{ReLU}(0.6)$</td><td>$0.6$</td></tr>
+<tr><td>$z_2$</td><td>$-0.3\cdot1+0.4\cdot0-0.2$</td><td>$-0.5$</td></tr>
+<tr><td>$h_2$</td><td>$\mathrm{ReLU}(-0.5)$</td><td>$0$</td></tr>
+<tr><td>$\hat y$</td><td>$0.8\cdot0.6+0.1\cdot0$</td><td>$0.48$</td></tr>
+<tr><td>$L$</td><td>$(0.48-1)^2$</td><td>$0.2704$</td></tr>
+</table>
+<p>反向，从损失开始：</p>
+<div class="formula">$$\frac{\partial L}{\partial \hat y}=2(\hat y-y)=2(0.48-1)=-1.04$$</div>
+<p>输出层权重：$\partial L/\partial w_{o1}=-1.04\cdot h_1=-0.624$，$\partial L/\partial w_{o2}=-1.04\cdot h_2=0$。</p>
+<p>隐藏层：$h_2=0$ 落在 ReLU 的负半轴，局部导数 0，所以 $z_2$ 的梯度是 0。$h_1$ 的局部导数是 1，得到：</p>
+<div class="formula">$$\frac{\partial L}{\partial z_1}=-1.04\cdot0.8\cdot1=-0.832$$</div>
+<p>继续传到第一层权重：$\partial L/\partial w_{11}=-0.832\cdot x_1=-0.832$，$\partial L/\partial w_{12}=-0.832\cdot x_2=0$。</p>
+<div class="note">这个例子说明两件事：输出层梯度由误差决定；隐藏层梯度还要乘上输出权重和激活函数的局部导数。某个隐藏单元一旦落在 ReLU 负区，这条路径就暂时不通。</div>
+</section>
+
+<section id="shapes" data-title="5. 矩阵形状：批量之后怎么对齐">
+<h2><span class="num">05</span>矩阵形状：批量之后怎么对齐</h2>
+<p>单个样本的公式会变成矩阵。假设批量 $B$ 个样本，每个样本 $d$ 维，隐藏层 $h$ 维：</p>
+<table>
+<tr><th>量</th><th>形状</th><th>说明</th></tr>
+<tr><td>$X$</td><td>$B\times d$</td><td>一行一个样本</td></tr>
+<tr><td>$W_1$</td><td>$d\times h$</td><td>输入到隐藏</td></tr>
+<tr><td>$Z_1=XW_1+b_1$</td><td>$B\times h$</td><td>广播加偏置</td></tr>
+<tr><td>$H=\mathrm{ReLU}(Z_1)$</td><td>$B\times h$</td><td>逐元素</td></tr>
+<tr><td>$W_2$</td><td>$h\times 1$</td><td>隐藏到输出</td></tr>
+<tr><td>$\hat Y=HW_2+b_2$</td><td>$B\times 1$</td><td>每个样本一个预测</td></tr>
+</table>
+<p>反向时形状必须和正向对得上。最常用的两条：</p>
+<div class="formula">$$\frac{\partial L}{\partial W_1}=X^T\frac{\partial L}{\partial Z_1},\qquad \frac{\partial L}{\partial X}=\frac{\partial L}{\partial Z_1}W_1^T$$</div>
+<p>第一条把 $B$ 这个维度“压掉”，得到 $d\times h$，和 $W_1$ 同形；第二条把梯度传回输入，得到 $B\times d$，和 $X$ 同形。</p>
+<div class="warn">形状对不上，先检查转置，不要先怀疑公式。矩阵乘法里 $X^T G$ 的 $X^T$ 是 $d\times B$，$G$ 是 $B\times h$，乘出来才是 $d\times h$。</div>
+</section>
+
+<section id="vanish" data-title="6. 梯度消失与爆炸">
+<h2><span class="num">06</span>梯度消失与爆炸</h2>
+<p>深层网络的梯度是很多局部导数连乘。连乘有个残酷性质：小于 1 的数越乘越小，大于 1 的数越乘越大。</p>
+<p>Sigmoid 的导数最大只有 0.25。假设每层都取 0.25，传 10 层：</p>
+<div class="formula">$$0.25^{10}\approx 9.5\times10^{-7}$$</div>
+<p>梯度到第 1 层只剩百万分之一，参数几乎不动。这就是梯度消失。反过来，如果每层局部导数平均是 1.5，10 层后是 $1.5^{10}\approx57.7$，梯度爆炸。</p>
+<table>
+<tr><th>现象</th><th>症状</th><th>常见处理</th></tr>
+<tr><td>梯度消失</td><td>前几层几乎不更新，loss 降得很慢</td><td>ReLU、残差连接、LayerNorm、合适初始化</td></tr>
+<tr><td>梯度爆炸</td><td>loss 变 NaN，参数飞掉</td><td>梯度裁剪、降低学习率、归一化</td></tr>
+</table>
+<p>梯度裁剪不是改变方向，而是给梯度范数设上限：</p>
+<div class="formula">$$g\leftarrow g\cdot\min\left(1,\frac{c}{\|g\|}\right)$$</div>
+<p>如果 $\|g\|$ 没超过 $c$，梯度不变；超过了就整体缩小，方向不变。它救的是数值稳定性，不负责让模型变聪明。</p>
+</section>
+
+<section id="optim" data-title="7. SGD、Momentum、RMSProp、Adam">
+<h2><span class="num">07</span>SGD、Momentum、RMSProp、Adam</h2>
+<p>拿到梯度 $g_t$ 后，怎么走下一步？不同优化器改的是“用哪个梯度、走多大步”。</p>
+<h3>SGD</h3>
+<div class="formula">$$\theta_{t+1}=\theta_t-\eta g_t$$</div>
+<p>最朴素：梯度指哪走哪，步长固定。缺点是对病态方向来回震荡。</p>
+<h3>Momentum</h3>
+<div class="formula">$$v_t=\mu v_{t-1}+g_t,\qquad \theta_{t+1}=\theta_t-\eta v_t$$</div>
+<p>把历史梯度攒起来。方向一致的维度越走越快，来回摆的维度被平均掉。$\mu$ 常取 0.9。</p>
+<h3>RMSProp</h3>
+<div class="formula">$$s_t=\beta s_{t-1}+(1-\beta)g_t^2,\qquad \theta_{t+1}=\theta_t-\frac{\eta}{\sqrt{s_t}+\epsilon}g_t$$</div>
+<p>按每个维度的历史平方梯度缩放步长。梯度大的维度步子小，梯度小的维度步子大。</p>
+<h3>Adam</h3>
+<div class="formula">$$m_t=\beta_1m_{t-1}+(1-\beta_1)g_t,\qquad v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2$$</div>
+<div class="formula">$$\hat m_t=\frac{m_t}{1-\beta_1^t},\qquad \hat v_t=\frac{v_t}{1-\beta_2^t},\qquad \theta_{t+1}=\theta_t-\eta\frac{\hat m_t}{\sqrt{\hat v_t}+\epsilon}$$</div>
+<p>Adam = Momentum + RMSProp，再加偏差修正。$\hat m_t$ 和 $\hat v_t$ 的修正项是因为 $m_0=v_0=0$，早期估计偏小；$t$ 是第几步。</p>
+<table>
+<tr><th>优化器</th><th>用了什么</th><th>主要超参</th></tr>
+<tr><td>SGD</td><td>当前梯度</td><td>学习率</td></tr>
+<tr><td>Momentum</td><td>梯度一阶动量</td><td>学习率、$\mu$</td></tr>
+<tr><td>RMSProp</td><td>梯度二阶动量</td><td>学习率、$\beta$</td></tr>
+<tr><td>Adam</td><td>一阶 + 二阶 + 偏差修正</td><td>$\eta,\beta_1,\beta_2,\epsilon$</td></tr>
+</table>
+<div class="warn">Adam 不是永远更好。它有时在泛化上不如调好的 SGD+Momentum；大模型训练里 AdamW 把权重衰减和梯度更新解耦，减少对自适应步长的干扰。</div>
+</section>
+
+<section id="lr" data-title="8. 学习率、初始化与 batch">
+<h2><span class="num">08</span>学习率、初始化与 batch</h2>
+<p>学习率是最敏感的超参。太大：loss 震荡甚至发散；太小：走得像蜗牛，还在局部平台打转。</p>
+<p>常见调度：warmup + cosine decay。</p>
+<div class="formula">$$\eta_t=\eta_{\min}+\frac{1}{2}(\eta_{\max}-\eta_{\min})\left(1+\cos\frac{t\pi}{T}\right)$$</div>
+<p>前几百步从很小的学习率线性升到 $\eta_{\max}$，避免早期梯度爆炸；之后按余弦曲线降到 $\eta_{\min}$。</p>
+<p>初始化控制的是“前向方差”。Xavier 让每层输出方差尽量不变，适合 tanh；He 初始化针对 ReLU，把权重方差设为 $2/n_{in}$：</p>
+<div class="formula">$$W\sim\mathcal N\left(0,\frac{2}{n_{in}}\right)$$</div>
+<p>batch 大小同时影响梯度噪声和显存。小 batch 噪声大，有时泛化更好；大 batch 梯度稳，但学习率通常要相应调大。线性缩放规则是个起点，不是铁律：</p>
+<div class="formula">$$\eta_{new}=\eta_{base}\cdot\frac{B_{new}}{B_{base}}$$</div>
+</section>
+
+<section id="mistakes" data-title="9. 常见误解与自测">
+<h2><span class="num">09</span>常见误解与自测</h2>
+<h3>先排掉五个误解</h3>
+<ul>
+<li><strong>“反向传播是一种优化器”</strong>：不是。反向传播只算梯度，SGD/Adam 才负责更新参数。</li>
+<li><strong>“梯度是损失对参数的平均”</strong>：不是。梯度是局部斜率，batch 里是把每个样本的梯度相加或平均，不是先平均损失再求导就自动等价。</li>
+<li><strong>“ReLU 不会梯度消失”</strong>：负半轴梯度直接是 0，这叫死亡 ReLU；正半轴才是 1。</li>
+<li><strong>“Adam 步长就是学习率”</strong>：Adam 的每维步长被 $\sqrt{\hat v_t}$ 缩放，实际步长和 $\eta$ 不是一回事。</li>
+<li><strong>“梯度裁剪能解决所有 NaN”</strong>：它只防梯度爆炸。学习率过大、数据有 NaN、混合精度溢出，裁剪救不了。</li>
+</ul>
+<div class="quiz" data-answer="2" data-explain="$L=(a-y)^2$，对 $a$ 的导数是 $2(a-y)$。">
+<p class="q">1. $L=(a-y)^2$，$\partial L/\partial a$ 等于？</p>
+<button class="opt">A. $a-y$</button>
+<button class="opt">B. $2a-y$</button>
+<button class="opt">C. $2(a-y)$</button>
+<button class="opt">D. $1$</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="1" data-explain="两条路径都要算，然后相加：$2(a-1)+4(2a+3)$。">
+<p class="q">2. $L=(a-1)^2+(2a+3)^2$，$dL/da$ 是？</p>
+<button class="opt">A. $2(a-1)$</button>
+<button class="opt">B. $2(a-1)+4(2a+3)$</button>
+<button class="opt">C. $2(a-1)+2(2a+3)$</button>
+<button class="opt">D. $4(2a+3)$</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="0" data-explain="反向传播负责算梯度，参数更新由优化器完成。">
+<p class="q">3. 反向传播的作用是？</p>
+<button class="opt">A. 算每个参数的梯度</button>
+<button class="opt">B. 直接更新参数</button>
+<button class="opt">C. 降低损失</button>
+<button class="opt">D. 选择学习率</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="3" data-explain="Adam 同时用一阶动量和二阶动量，并做偏差修正。">
+<p class="q">4. Adam 相比 SGD，多了什么？</p>
+<button class="opt">A. 只多一个 momentum</button>
+<button class="opt">B. 只多一个学习率衰减</button>
+<button class="opt">C. 只多一个梯度裁剪</button>
+<button class="opt">D. 一阶动量、二阶动量和偏差修正</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="1" data-explain="ReLU 在负半轴导数为 0，正半轴为 1；死亡 ReLU 是负区梯度不通。">
+<p class="q">5. 关于 ReLU 的梯度，正确的是？</p>
+<button class="opt">A. 所有位置都是 1</button>
+<button class="opt">B. 正半轴为 1，负半轴为 0</button>
+<button class="opt">C. 所有位置都是 0.25</button>
+<button class="opt">D. 负半轴为 1，正半轴为 0</button>
+<div class="fb"></div>
+</div>
+<div class="good">如果这五题能全对，并且能手算第 4 节那张表，反向传播这条线就算通了。下一步去主手册的 05、06 分册做对应章节测验。</div>
+</section>

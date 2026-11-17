@@ -1,0 +1,170 @@
+<section id="intro" data-title="课程概览">
+<h2><span class="num">00</span>课程概览：把“大模型”算成数字</h2>
+<p>这门课不讨论模型聪不聪明，只算账：训练要多少 FLOPs、推理要多少显存、并发能开多少、什么模型在什么负载下划算。所有例子都能用纸笔复算。</p>
+<h3>学完你能做到</h3>
+<ul>
+<li>用 $6ND$ 估算训练 FLOPs，并换算成 GPU 天数。</li>
+<li>用公式算 KV cache，判断一张卡能放多长的上下文。</li>
+<li>区分 prefill 和 decode 的瓶颈：一个吃算力，一个吃带宽。</li>
+<li>说清 DP、TP、PP、EP 各自切什么、通信什么。</li>
+<li>在延迟、吞吐、上下文、许可证之间做选型。</li>
+</ul>
+<div class="note">前置：会科学计数法、会乘除。公式里的 $10^{12}$ 读作“万亿”，$10^9$ 读作“十亿”。</div>
+</section>
+
+<section id="memory" data-title="1. 参数量与显存">
+<h2><span class="num">01</span>参数量与显存</h2>
+<p>先分清三个数：总参数、激活参数、训练状态。推理时显存主要装权重和 KV cache；训练时还要装梯度、优化器状态和激活值。</p>
+<table>
+<tr><th>精度</th><th>每参数字节</th><th>7B 模型权重</th></tr>
+<tr><td>FP32</td><td>4</td><td>28 GB</td></tr>
+<tr><td>BF16 / FP16</td><td>2</td><td>14 GB</td></tr>
+<tr><td>FP8</td><td>1</td><td>7 GB</td></tr>
+<tr><td>FP4</td><td>0.5</td><td>3.5 GB</td></tr>
+</table>
+<p>训练用 Adam，每个参数通常要存：权重、梯度、一阶动量、二阶动量。FP32 下是 16 字节/参数：</p>
+<div class="formula">$$\text{训练状态}\approx16P\ \text{字节}$$</div>
+<p>7B 参数就是 112 GB，还没算激活值和临时缓冲。单卡放不下，所以要并行、要 ZeRO、要混合精度。</p>
+<div class="warn">“模型 7B，所以 14 GB 显存就够”只在纯推理、BF16、没有 KV cache 的理想情况下成立。实际还要留出 KV cache、框架开销和碎片。</div>
+</section>
+
+<section id="flops" data-title="2. 训练 FLOPs：6ND">
+<h2><span class="num">02</span>训练 FLOPs：6ND</h2>
+<p>训练一个 transformer，粗略估算：每个参数、每个 token 前向约 2 次浮点运算，反向约 4 次，合计 6 次。</p>
+<div class="formula">$$\text{FLOPs}\approx6ND$$</div>
+<p>$N$ 是参数量，$D$ 是训练 token 数。这个公式忽略注意力随上下文增长的二次项，短上下文够用。</p>
+<p>例子：7B 参数，训练 1B token。</p>
+<div class="formula">$$6\cdot7\times10^9\cdot1\times10^9=4.2\times10^{19}\ \text{FLOPs}$$</div>
+<p>一张 300 TFLOPS 的卡，实际利用率 50%，有效算力 $1.5\times10^{14}$ FLOP/s：</p>
+<div class="formula">$$\frac{4.2\times10^{19}}{1.5\times10^{14}}\approx2.8\times10^5\ \text{s}\approx3.2\ \text{天}$$</div>
+<p>这是“一张卡”的时间。实际用几百张卡，还要扣通信、故障、数据加载，不是线性缩放。</p>
+<div class="note">$6ND$ 是量级估算，不是账单。MoE 只用激活参数算前向，但总参数影响显存；上下文很长时，注意力的 $T^2$ 项会变成大头。</div>
+</section>
+
+<section id="kv" data-title="3. KV cache 公式">
+<h2><span class="num">03</span>KV cache 公式</h2>
+<p>推理时缓存历史 K/V，每个 token、每层、每个 KV 头存两个向量：</p>
+<div class="formula">$$\text{KV bytes}=2\cdot L\cdot n_{kv}\cdot d_h\cdot b\cdot T\cdot B$$</div>
+<p>$L$ 层，$n_{kv}$ 个 KV 头，$d_h$ 每头维度，$b$ 字节数，$T$ 序列长度，$B$ 并发数。</p>
+<p>例子：32 层、32 个 KV 头、每头 128 维、BF16、4096 上下文、单序列：</p>
+<div class="formula">$$2\cdot32\cdot32\cdot128\cdot2\cdot4096$$</div>
+<div class="formula">$$\approx2.15\times10^9\ \text{B}\approx2\ \text{GB}$$</div>
+<p>10 个并发就是 20 GB。上下文翻倍，KV 翻倍；并发翻倍，也翻倍。</p>
+<table>
+<tr><th>模型</th><th>每 token 全局 KV</th><th>128K 单序列</th><th>1M 单序列</th></tr>
+<tr><td>V3（MLA）</td><td>约 70,272 B</td><td>约 9.21 GB</td><td>约 73.7 GB</td></tr>
+<tr><td>V3.2（DSA 全注意力等价）</td><td>约 367 KB</td><td>约 48.1 GB</td><td>约 385 GB</td></tr>
+<tr><td>V4.1（CED/CSA2）</td><td>约 890 B</td><td>约 114 MB</td><td>约 890 MB</td></tr>
+</table>
+<div class="warn">不同模型的“每 token KV”口径不同：MLA 只算潜向量，DSA 还要算索引器，V4.1 的 890 B 是论文口径的全局 KV。比较时先确认口径，不要拿不同东西相除。</div>
+</section>
+
+<section id="prefill" data-title="4. prefill 与 decode">
+<h2><span class="num">04</span>prefill 与 decode</h2>
+<p>推理分两段。prefill 把整段输入一次性读进去，建立 KV cache；decode 一个 token 一个 token 生成。</p>
+<table>
+<tr><th>阶段</th><th>并行度</th><th>主要瓶颈</th><th>优化方向</th></tr>
+<tr><td>prefill</td><td>高，整段并行</td><td>算力（FLOPs）</td><td>更好的矩阵乘、FlashAttention、FP8</td></tr>
+<tr><td>decode</td><td>低，逐 token</td><td>显存带宽（KV 读取）</td><td>KV 压缩、批处理、投机解码</td></tr>
+</table>
+<p>decode 每生成一个 token，都要把历史 KV 从显存读一遍。算术强度低：算的 FLOPs 少，搬的字节多。GPU 的算力经常闲置，等显存。</p>
+<div class="formula">$$\text{算术强度}=\frac{\text{FLOPs}}{\text{Bytes}}$$</div>
+<p>算术强度低于机器的 ridge point，就是 memory-bound；高于它，才是 compute-bound。decode 通常远低于 ridge point，所以“FLOPs 没用满”不代表代码写得差。</p>
+</section>
+
+<section id="parallel" data-title="5. 并行：DP、TP、PP、EP">
+<h2><span class="num">05</span>并行：DP、TP、PP、EP</h2>
+<table>
+<tr><th>方式</th><th>切什么</th><th>通信什么</th><th>适合</th></tr>
+<tr><td>DP（数据并行）</td><td>切 batch，每卡一份完整模型</td><td>梯度 all-reduce</td><td>模型能单卡放下</td></tr>
+<tr><td>TP（张量并行）</td><td>切矩阵的列/行</td><td>每层 all-reduce</td><td>单层太大，节点内高带宽</td></tr>
+<tr><td>PP（流水并行）</td><td>切层，不同卡放不同层</td><td>激活值点对点传输</td><td>层数多，跨节点</td></tr>
+<tr><td>EP（专家并行）</td><td>不同专家放不同卡</td><td>token 路由 all-to-all</td><td>MoE 专家多</td></tr>
+</table>
+<p>实际训练是组合：TP 放在节点内（NVLink），PP 和 DP 跨节点，EP 按专家分布。并行的难点不是切，是切完之后通信别把算力吃光。</p>
+<div class="note">TP 的 all-reduce 很频繁，适合高带宽互联；PP 有空泡（bubble），需要 micro-batch 填；EP 的 all-to-all 对网络压力大。没有一种并行适合所有集群。</div>
+</section>
+
+<section id="quant" data-title="6. 量化：FP16、FP8、FP4">
+<h2><span class="num">06</span>量化：FP16、FP8、FP4</h2>
+<p>量化就是把权重/激活用更少的位表示。显存和带宽下降，算力也可能提升，代价是数值误差。</p>
+<table>
+<tr><th>格式</th><th>位宽</th><th>特点</th><th>常见用途</th></tr>
+<tr><td>FP32</td><td>32</td><td>精度高，显存大</td><td>训练主权重、优化器状态</td></tr>
+<tr><td>BF16</td><td>16</td><td>动态范围大，训练稳定</td><td>训练/推理常用</td></tr>
+<tr><td>FP16</td><td>16</td><td>精度高，范围小，易溢出</td><td>推理、混合精度</td></tr>
+<tr><td>FP8</td><td>8</td><td>需要缩放因子</td><td>H100 等新硬件训练/推理</td></tr>
+<tr><td>FP4</td><td>4</td><td>压缩率高，误差大</td><td>权重-only 推理、特定硬件</td></tr>
+</table>
+<p>量化不是“把数字四舍五入”这么简单。FP8 要 per-tensor 或 per-channel 的 scale，FP4 通常要分组缩放和校准。校准数据选错，精度会掉得很厉害。</p>
+<div class="warn">量化收益要先看瓶颈。decode 是 memory-bound，权重量化能直接提速；prefill 是 compute-bound，FP8 的算力收益更关键。不要以为量化一定快。</div>
+</section>
+
+<section id="select" data-title="7. 选型：延迟、吞吐、上下文、成本">
+<h2><span class="num">07</span>选型：延迟、吞吐、上下文、成本</h2>
+<p>选型不是“哪个参数大哪个好”。先列约束，再排优先级。</p>
+<table>
+<tr><th>场景</th><th>第一指标</th><th>建议</th></tr>
+<tr><td>单用户长文档问答</td><td>首 token 延迟、上下文</td><td>V4.1/V4，1M 上下文，KV 压缩</td></tr>
+<tr><td>高并发 API</td><td>吞吐、每 token 成本</td><td>V4-Flash 或 V3.2，批处理</td></tr>
+<tr><td>代码补全</td><td>低延迟、短上下文</td><td>小激活模型，投机解码</td></tr>
+<tr><td>离线批量推理</td><td>总成本</td><td>大 batch、FP8/FP4、老一代</td></tr>
+</table>
+<p>一个简化的成本式：</p>
+<div class="formula">$$\text{每 token 成本}\approx\frac{\text{GPU 小时价}\times\text{占用卡数}}{\text{每小时生成 token 数}}$$</div>
+<p>上下文越长，KV 越大，能并发的序列越少，单位成本越高。长上下文不是免费的。</p>
+<div class="good">先问四个问题：要多长上下文？多少并发？首 token 延迟卡不卡？许可证能不能用？四个答案定完，再谈参数和排名。</div>
+</section>
+
+<section id="mistakes" data-title="8. 常见误解与自测">
+<h2><span class="num">08</span>常见误解与自测</h2>
+<h3>先排掉五个误解</h3>
+<ul>
+<li><strong>“参数量翻倍，推理速度减半”</strong>：不一定。看激活参数、带宽和批处理。</li>
+<li><strong>“KV cache 只和上下文有关”</strong>：还和层数、KV 头数、每头维度、精度、并发有关。</li>
+<li><strong>“decode 慢是因为 GPU 算力不够”</strong>：多数时候是显存带宽不够。</li>
+<li><strong>“量化一定更快”</strong>：compute-bound 场景不一定，校准不好还会掉精度。</li>
+<li><strong>“并行度越高越快”</strong>：通信和空泡会把收益吃掉。</li>
+</ul>
+<div class="quiz" data-answer="1" data-explain="$6ND=6\\cdot7e9\\cdot1e9=4.2e19$ FLOPs。">
+<p class="q">1. 7B 参数、1B token，训练 FLOPs 约是多少？</p>
+<button class="opt">A. $4.2\times10^{18}$</button>
+<button class="opt">B. $4.2\times10^{19}$</button>
+<button class="opt">C. $4.2\times10^{20}$</button>
+<button class="opt">D. $7\times10^{19}$</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="2" data-explain="KV 公式里 2 表示 K 和 V 两份，层数、KV 头数、每头维度、字节数、长度都要乘。">
+<p class="q">2. KV cache 公式里，哪个因子表示 K 和 V 两份？</p>
+<button class="opt">A. $L$</button>
+<button class="opt">B. $T$</button>
+<button class="opt">C. 最前面的 2</button>
+<button class="opt">D. $b$</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="0" data-explain="decode 逐 token，算术强度低，主要等显存带宽。">
+<p class="q">3. decode 阶段的主要瓶颈通常是？</p>
+<button class="opt">A. 显存带宽</button>
+<button class="opt">B. 纯算力</button>
+<button class="opt">C. 磁盘 IO</button>
+<button class="opt">D. 网络 DNS</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="3" data-explain="EP 切专家，token 路由需要 all-to-all。">
+<p class="q">4. 专家并行（EP）主要切什么？</p>
+<button class="opt">A. batch</button>
+<button class="opt">B. 层</button>
+<button class="opt">C. 矩阵列</button>
+<button class="opt">D. 专家</button>
+<div class="fb"></div>
+</div>
+<div class="quiz" data-answer="1" data-explain="长上下文主要抬高 KV cache 和单序列显存，降低可并发数，单位成本上升。">
+<p class="q">5. 上下文从 128K 拉到 1M，成本通常怎么变？</p>
+<button class="opt">A. 不变</button>
+<button class="opt">B. 上升，因为 KV 和单序列显存变大</button>
+<button class="opt">C. 下降，因为批处理更大</button>
+<button class="opt">D. 只和参数量有关</button>
+<div class="fb"></div>
+</div>
+<div class="good">下一步：打开主手册 09 第 13 章，把 V3 128K、V4.1 1M 的 KV 账自己按一遍；再用 03 第 14 章写一份三约束选型报告。</div>
+</section>

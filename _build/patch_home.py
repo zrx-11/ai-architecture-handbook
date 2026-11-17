@@ -39,6 +39,10 @@ NEW = """  let pre='';
       + META.map(m=>`<a class="lib-item" href="#/book/${m.key}/path"><b>${esc(m.title)}</b><span>${m.chapters} 章 · ${m.quizzes} 测验</span></a>`).join('')
       + `<a class="lib-item" href="${encodeURI('07-transformer-deep/index.html')}" target="_blank"><b>Transformer 深潜</b><span>15 节 · 179 个推导步骤</span></a>`
       + `<a class="lib-item" href="${encodeURI('08-svm-deep/index.html')}" target="_blank"><b>SVM 深潜</b><span>16 节 · 1355 个公式</span></a>`
+      + `<a class="lib-item" href="${encodeURI('10-backprop-deep/index.html')}" target="_blank"><b>反向传播与优化器</b><span>10 节 · 手算梯度到 Adam</span></a>`
+      + `<a class="lib-item" href="${encodeURI('11-moe-mla-deep/index.html')}" target="_blank"><b>MoE 与 MLA</b><span>10 节 · 路由与 KV 账</span></a>`
+      + `<a class="lib-item" href="${encodeURI('12-probability-eval-deep/index.html')}" target="_blank"><b>概率、损失与评估</b><span>10 节 · 交叉熵 / PR / AUC</span></a>`
+      + `<a class="lib-item" href="${encodeURI('13-train-infer-deep/index.html')}" target="_blank"><b>训练与推理账本</b><span>9 节 · FLOPs / KV / 并行</span></a>`
       +'</div></div>';
   }"""
 

@@ -1,0 +1,272 @@
+[
+ {
+  "check": "07-transformer-deep 打开",
+  "pass": true,
+  "extra": "Transformer · 从零推导交互式学习"
+ },
+ {
+  "check": "07-transformer-deep 节数",
+  "pass": true,
+  "extra": "15"
+ },
+ {
+  "check": "07-transformer-deep 目录",
+  "pass": true,
+  "extra": "15"
+ },
+ {
+  "check": "07-transformer-deep 公式",
+  "pass": true,
+  "extra": "391"
+ },
+ {
+  "check": "07-transformer-deep 目录切换",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "07-transformer-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "07-transformer-deep 控制台",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "08-svm-deep 打开",
+  "pass": true,
+  "extra": "支持向量机 · 从零推导交互式学习"
+ },
+ {
+  "check": "08-svm-deep 节数",
+  "pass": true,
+  "extra": "16"
+ },
+ {
+  "check": "08-svm-deep 目录",
+  "pass": true,
+  "extra": "16"
+ },
+ {
+  "check": "08-svm-deep 公式",
+  "pass": true,
+  "extra": "1355"
+ },
+ {
+  "check": "08-svm-deep 目录切换",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "08-svm-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "08-svm-deep 控制台",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "10-backprop-deep 打开",
+  "pass": true,
+  "extra": "反向传播与优化器 · 深潜课"
+ },
+ {
+  "check": "10-backprop-deep 节数",
+  "pass": true,
+  "extra": "10"
+ },
+ {
+  "check": "10-backprop-deep 目录",
+  "pass": true,
+  "extra": "10"
+ },
+ {
+  "check": "10-backprop-deep 公式",
+  "pass": true,
+  "extra": "146"
+ },
+ {
+  "check": "10-backprop-deep 测验",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "10-backprop-deep 正确反馈",
+  "pass": true,
+  "extra": "正确。 L=(a−y)2L=(a-y)^2L=(a−y)2，对 aaa 的导数是"
+ },
+ {
+  "check": "10-backprop-deep 错误反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "10-backprop-deep 下一节",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "10-backprop-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "10-backprop-deep 控制台",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "11-moe-mla-deep 打开",
+  "pass": true,
+  "extra": "MoE 与 MLA · 深潜课"
+ },
+ {
+  "check": "11-moe-mla-deep 节数",
+  "pass": true,
+  "extra": "10"
+ },
+ {
+  "check": "11-moe-mla-deep 目录",
+  "pass": true,
+  "extra": "10"
+ },
+ {
+  "check": "11-moe-mla-deep 公式",
+  "pass": true,
+  "extra": "67"
+ },
+ {
+  "check": "11-moe-mla-deep 测验",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "11-moe-mla-deep 正确反馈",
+  "pass": true,
+  "extra": "正确。 只激活 top-k 个专家，总参数可以远大于激活参数。"
+ },
+ {
+  "check": "11-moe-mla-deep 错误反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "11-moe-mla-deep 下一节",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "11-moe-mla-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "11-moe-mla-deep 控制台",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "12-probability-eval-deep 打开",
+  "pass": true,
+  "extra": "概率、损失与评估 · 深潜课"
+ },
+ {
+  "check": "12-probability-eval-deep 节数",
+  "pass": true,
+  "extra": "10"
+ },
+ {
+  "check": "12-probability-eval-deep 目录",
+  "pass": true,
+  "extra": "10"
+ },
+ {
+  "check": "12-probability-eval-deep 公式",
+  "pass": true,
+  "extra": "40"
+ },
+ {
+  "check": "12-probability-eval-deep 测验",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "12-probability-eval-deep 正确反馈",
+  "pass": true,
+  "extra": "正确。 贝叶斯：P(A∣B)=P(B∣A)P(A)/P(B)P(A|B)=P(B"
+ },
+ {
+  "check": "12-probability-eval-deep 错误反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "12-probability-eval-deep 下一节",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "12-probability-eval-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "12-probability-eval-deep 控制台",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "13-train-infer-deep 打开",
+  "pass": true,
+  "extra": "训练与推理账本 · 深潜课"
+ },
+ {
+  "check": "13-train-infer-deep 节数",
+  "pass": true,
+  "extra": "9"
+ },
+ {
+  "check": "13-train-infer-deep 目录",
+  "pass": true,
+  "extra": "9"
+ },
+ {
+  "check": "13-train-infer-deep 公式",
+  "pass": true,
+  "extra": "30"
+ },
+ {
+  "check": "13-train-infer-deep 测验",
+  "pass": true,
+  "extra": "5"
+ },
+ {
+  "check": "13-train-infer-deep 正确反馈",
+  "pass": true,
+  "extra": "正确。 6ND=6cdot7e9cdot1e9=4.2e196ND=6\\\\cdo"
+ },
+ {
+  "check": "13-train-infer-deep 错误反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "13-train-infer-deep 下一节",
+  "pass": true,
+  "extra": "1"
+ },
+ {
+  "check": "13-train-infer-deep 移动端",
+  "pass": true,
+  "extra": "390"
+ },
+ {
+  "check": "13-train-infer-deep 控制台",
+  "pass": true,
+  "extra": ""
+ }
+]
