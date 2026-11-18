@@ -1,0 +1,148 @@
+# 第 16 章 附录：全球开放权重模型索引
+
+> 难度：工具页 · 随时查阅 · 前置：第 14、15 章
+> 用法：先按“地区/家族”定位，再看“代表 checkpoint、总参/激活、上下文、结构、许可证”。这不是每一个 checkpoint 的清单，而是**家族级索引**；同一家族的量化版、微调版、合并版不单列。
+
+## 16.1 收录口径
+
+- 只收官方公开发布、权重可从 Hugging Face 等渠道下载的模型；
+- 同一家族合并尺寸，选 1–6 个代表；
+- `总/激活` 用模型卡/命名口径；`—` 表示公开材料没有给出可靠数字；
+- 上下文是模型卡标称最大值，不等于训练长度或实际可用长度；
+- 许可证是模型卡标签，商用前读全文；
+- 截止 2026-11；新模型会继续出现，索引是“当前截面”，不是终局。
+
+## 16.2 主线：美洲、欧洲与开源研究模型
+
+| 家族 | 代表 checkpoint | 总参/激活 | 上下文 | 结构 | 许可证 | 地区 |
+|---|---|---|---|---|---|---|
+| Llama | Llama 2 7B/13B/70B | 7/13/70B dense | 4K | decoder-only, GQA(70B) | Llama 2 Community | US |
+| Llama | Llama 3 8B/70B | 8/70B dense | 8K | decoder-only, GQA | Llama 3 Community | US |
+| Llama | Llama 3.1 8B/70B/405B | 8/70/405B dense | 128K | decoder-only, GQA | Llama 3.1 Community | US |
+| Llama | Llama 3.2 1B/3B | 1/3B dense | 128K | decoder-only, GQA | Llama 3.2 Community | US |
+| Llama | Llama 3.3 70B | 70B dense | 128K | decoder-only, GQA | Llama 3.3 Community | US |
+| Llama | Llama 4 Scout | 109B / 17B active | 10M | MoE 16 experts + early fusion | Llama 4 Community | US |
+| Llama | Llama 4 Maverick | 400B / 17B active | 1M | MoE 128 experts + early fusion | Llama 4 Community | US |
+| Mistral | Mistral 7B | 7B dense | 32K (SWA 4K) | GQA 8 KV, sliding window | Apache 2.0 | EU |
+| Mistral | Mixtral 8x7B | 46.7B / 12.9B | 32K | MoE 8 experts, top-2 | Apache 2.0 | EU |
+| Mistral | Mixtral 8x22B | 141B / 39B | 64K | MoE 8 experts, top-2 | Apache 2.0 | EU |
+| Mistral | Mistral Small 3.1 24B | 24B dense | 128K | dense + Pixtral vision | Apache 2.0 | EU |
+| Mistral | Mistral Small 4 119B | 119B MoE | 1M | 36 layers, 128 experts top-4, 32/32 KV | 自定义 | EU |
+| Mistral | Mistral Medium 3.5 128B | 128B dense | 262K | 88 layers, 96/8 KV | 自定义 | EU |
+| Mistral | Mistral Large 4 1T-A52B | 1T / 52B active | 1M | 72 layers, 128+1 experts top-4, 64/64 KV | 自定义 | EU |
+| Mistral | Pixtral 12B | 12B | 128K | ViT + Mistral 12B | Apache 2.0 | EU |
+| Gemma | Gemma 2 9B/27B | 9/27B dense | 8K | local/global 1:1, soft-capping | Gemma Terms | US |
+| Gemma | Gemma 3 4B/12B/27B | 4/12/27B dense | 128K | 5:1 local/global, QK-Norm, vision | Gemma Terms | US |
+| Gemma | Gemma 4 E4B | 4B-class | 131K | text+vision+audio any-to-any | Gemma 4 terms | US |
+| Gemma | Gemma 4 12B | 12B dense | 262K | unified any-to-any, 48 layers | Apache 2.0 | US |
+| Gemma | RecurrentGemma 2B/9B | 2/9B | 8K | Griffin recurrent + local attention | Gemma Terms | US |
+| Gemma | PaliGemma 2 | 3B/10B | 8K | SigLIP + Gemma | Gemma Terms | US |
+| Phi | Phi-3 mini 3.8B | 3.8B dense | 4K/128K | 32 layers, 3072, 32/32 MHA | MIT | US |
+| Phi | Phi-4 14B | 14B dense | 16K | 40 layers, 5120, 40/10 GQA | MIT | US |
+| Phi | Phi-4-mini 3.8B | 3.8B dense | 128K | 32 layers, 3072, 24/8 GQA | MIT | US |
+| Falcon | Falcon 7B/40B/180B | 7/40/180B | 4K/8K | MQA, multilingual | TII Falcon License | UAE |
+| Falcon | Falcon3 1B-40B | 1B-40B | 32K-128K | GQA, RoPE | TII Falcon License | UAE |
+| Falcon | Falcon-H1 7B/34B | 7/34B | 262K | Mamba/Transformer hybrid, 12/2 KV | TII Falcon License | UAE |
+| MPT | MPT-7B/30B | 7/30B dense | 2K/8K | ALiBi, no positional embedding | Apache 2.0 | US |
+| BLOOM | BLOOM 176B | 176B dense | 2048 | 70 layers, 14336, 112 heads, ALiBi | BigScience RAIL | EU |
+| GPT-NeoX | GPT-NeoX-20B | 20B dense | 2048 | 44 layers, 6144, 64 heads, RoPE | Apache 2.0 | US |
+| Pythia | Pythia 6.9B/12B | 6.9/12B dense | 2048 | 32/36 layers, public training order | Apache 2.0 | US |
+| OLMo | OLMo 2 7B | 7B dense | 4K | 32 layers, 4096, 32/32 | Apache 2.0 | US |
+| OLMo | OLMo 3 32B | 32B dense | 64K | 64 layers, 5120, 40/8, YaRN | Apache 2.0 | US |
+| OLMo | OLMoE 1B-7B-A1B | 7B / 1B active | 4K | MoE 64 experts, top-8? | Apache 2.0 | US |
+| DCLM | DCLM 7B | 7B dense | 2K/8K | 32 layers, 4096, open data pipeline | 自定义开放 | US |
+| Nemotron | Nemotron 4 15B / Nemotron-H | 15B / 8B-47B | 4K-8K | dense / hybrid Mamba | NVIDIA License | US |
+| Granite | Granite 3.3/4.2 8B | 8B dense | 131K | 40 layers, 4096, 32/8 | Apache 2.0 | US |
+| DBRX | DBRX 132B | 132B / 36B active | 32K | 40 layers, 16 experts, top-4 | Databricks License | US |
+| Arctic | Snowflake Arctic 480B | 480B / 17B active | 32K | 128 experts, top-2 | Apache 2.0 | US |
+| Cohere | Command R 35B / R+ 104B | 35/104B dense | 128K | dense, tool use | CC-BY-NC 4.0 | Canada |
+| xAI | Grok-1 314B | 314B MoE | 8K | 64 layers, 8 experts, top-2 | Apache 2.0 | US |
+| AI21 | Jamba 52B | 52B / 12B active | 256K | Transformer + Mamba hybrid | Jamba Open Model License | Israel |
+| RWKV | RWKV-7 3B/7B | 3/7B | 长上下文 | linear attention / RNN-style | Apache 2.0 | US/CN |
+| Mamba | Mamba-2 / Codestral Mamba 7B | 0.13B-2.8B / 7B | 2K-32K | selective SSM | Apache 2.0 | US/EU |
+| xLSTM | xLSTM 7B | 7B | 4K-32K | exponential gating + matrix memory | Apache 2.0 | EU |
+| Qwen | Qwen2.5 7B/72B | 7/72B dense | 128K | decoder-only, GQA, RoPE | Apache 2.0 | CN |
+
+## 16.3 中国开放权重：全尺寸、MoE 与多模态
+
+| 家族 | 代表 checkpoint | 总参/激活 | 上下文 | 结构 | 许可证 | 地区 |
+|---|---|---|---|---|---|---|
+| Qwen | Qwen3 8B/235B-A22B | 8B dense / 235B-22B | 40K-262K | dense + MoE 128 experts top-8 | Apache 2.0 | CN |
+| Qwen | Qwen3-Next 80B-A3B | 80B / 3B active | 262K | Gated DeltaNet + Gated Attention, 512 experts top-10 | Apache 2.0 | CN |
+| Qwen | Qwen3.5 397B-A17B | 397B / 17B | 262K | 60 layers, 512 experts top-10, 32/2 KV | Apache 2.0 | CN |
+| Qwen | Qwen3.5 122B-A10B | 122B / 10B | 262K | 48 layers, 256 experts top-8, 32/2 KV | Apache 2.0 | CN |
+| Qwen | Qwen3.5 35B-A3B | 35B / 3B | 262K | 40 layers, 256 experts top-8, 16/2 KV | Apache 2.0 | CN |
+| Qwen | Qwen3.5 27B | 27B dense | 262K | 64 layers, 5120, 24/4 KV | Apache 2.0 | CN |
+| Qwen | Qwen3.5 9B | 9B dense | 262K | 32 layers, 4096, 16/4 KV | Apache 2.0 | CN |
+| Qwen | Qwen3.6 35B-A3B | 35B / 3B | 262K | 40 layers, 256 experts top-8, 16/2 KV | Apache 2.0 | CN |
+| Qwen | Qwen3.8 2.4T-A95B | 2.4T / 95B | 262K | 92 layers, 512 experts top-10, 64/4 KV | 自定义 | CN |
+| Qwen | Qwen3.8 27B | 27B dense | 262K | 64 layers, 5120, 24/4 KV, vision | Apache 2.0 | CN |
+| Qwen | Qwen3.8 Flash-Next | — | 262K | 48 layers, 512 experts top-10, qwen4_exp | 自定义 | CN |
+| Qwen | Qwen2.5-VL 7B/72B | 7/72B | 128K | ViT + dynamic resolution + LLM | Apache 2.0 | CN |
+| Qwen | Qwen3-VL | — | 256K | ViT + connector + Qwen3 | Apache 2.0 | CN |
+| Qwen | Qwen2.5-Omni 7B | 7B | 128K | text/image/audio/video any-to-any | Apache 2.0 | CN |
+| DeepSeek | DeepSeek V3 | 671B / 37B | 128K | MLA + MoE 256+1 top-8 + MTP | 自定义 | CN |
+| DeepSeek | DeepSeek R1 | 671B / 37B | 128K | V3 架构 + RL 后训练 | 自定义 | CN |
+| DeepSeek | DeepSeek V4 / V4.1 | 见 09 分册 | 1M | CSA/HCA + MoE + mHC/Muon | 自定义 | CN |
+| GLM | GLM-5.3 | — | 1M | 78 layers, 6144, 256 experts top-8 +1, DSA | 自定义 | CN |
+| GLM | GLM-5.3-Flash | — | 1M | 45 layers, 4096, 288 experts top-8 +1 | 自定义 | CN |
+| Kimi | Kimi K2 | 1T / 32B | 256K | MoE 384 experts (K2) | 自定义 | CN |
+| Kimi | Kimi K3 | — | 1M | 93 layers, 7168, 96/96, 896 experts, linear | 自定义 | CN |
+| MiniMax | MiniMax M2 | 456B / 45.9B | 1M | sparse MoE | 自定义 | CN |
+| MiniMax | MiniMax M3 | — | 1M | 60 layers, 6144, 64/4, top-4 +1, vision | 自定义 | CN |
+| InternLM | InternLM 2.5 7B/20B | 7/20B dense | 200K | decoder-only, GQA | Apache 2.0 | CN |
+| InternLM | Intern-S2 397B | 397B | 262K | Qwen3.5 MoE 60/4096/32/2/512 top-10 | Apache 2.0 | CN |
+| MiniCPM | MiniCPM5 2B | 2B dense | 128K | 42 layers, 2048, 16/2 | Apache 2.0 | CN |
+| MiniCPM | MiniCPM-V 4.7 | 35B / 3B active | 128K | vision + MoE | Apache 2.0 | CN |
+| Baichuan | Baichuan 2 7B/13B | 7/13B dense | 4K | decoder-only | 自定义 | CN |
+| Baichuan | Baichuan M2 32B | 32B | 32K | dense, medical | 自定义 | CN |
+| Yi | Yi 6B/9B/34B / 200K | 6/9/34B dense | 200K | decoder-only, RoPE | Apache 2.0 | CN |
+| Step | Step-5-Preview | — | 1M | 92 layers, 4096, 64 heads, top-8, perception encoder | 自定义 | CN |
+| ERNIE | ERNIE 4.5 300B-A47B | 300B / 47B | 128K | 54 layers, 8192, 64/8, MoE | Apache 2.0 | CN |
+| Ling | Ling 3.1 flash | — | 262K | 72 layers, 4096, 64/64, 512 experts top-8 | MIT | CN |
+| MiMo | MiMo-V2.6 Pro | — | 1M | 70 layers, 6144, 128/8, 384 experts top-8 | MIT | CN |
+| dots | dots.llm1 | — | 32K | 62 layers, 4096, 32/32, 128+2 experts top-6 | 自定义 | CN |
+| LLaVA | LLaVA 1.5 7B | 7B | 4K | CLIP ViT-L/14 + MLP + Vicuna | Apache 2.0 | US |
+
+## 16.4 多模态、非 Transformer、小模型与编码器
+
+| 家族 | 代表 checkpoint | 总参/激活 | 上下文 | 结构 | 许可证 | 地区 |
+|---|---|---|---|---|---|---|
+| InternVL | InternVL3 8B/14B/78B | 8/14/78B | 32K | InternViT + MLP + LLM, dynamic tiling | Apache 2.0 | CN |
+| Molmo | Molmo 7B/72B | 7/72B | 4K | CLIP-style vision + LLM | Apache 2.0 | US |
+| Chameleon | Chameleon 7B/34B | 7/34B | 4K | early fusion, discrete image tokens | 自定义 | US |
+| Janus | Janus-Pro 7B | 7B | 4K | dual head: understanding + generation | Apache 2.0 | CN |
+| Idefics | Idefics2 8B | 8B | 8K | vision + LLM | Apache 2.0 | EU |
+| T5 | T5/Flan-T5 11B | 11B | 512-2048 | encoder-decoder | Apache 2.0 | US |
+| BART | BART 400M | 400M | 1024 | encoder-decoder | Apache 2.0 | US |
+| mT5 | mT5 13B | 13B | 1024 | encoder-decoder, multilingual | Apache 2.0 | US |
+| UL2 | UL2 20B | 20B | 512 | encoder-decoder, mixture of denoisers | Apache 2.0 | US |
+| LLaDA | LLaDA 8B | 8B | 2K | diffusion language model | Apache 2.0 | CN |
+| Dream | Dream 7B | 7B | 2K | diffusion language model | Apache 2.0 | HK |
+| SmolLM | SmolLM3 3B | 3B | 32K | dense, small | Apache 2.0 | US |
+| TinyLlama | TinyLlama 1.1B | 1.1B | 2K | dense, small | Apache 2.0 | CN |
+| MobileLLM | MobileLLM 1.3B | 1.3B | 2K | dense, mobile | Apache 2.0 | US |
+| OpenELM | OpenELM 1.1B/2.7B | 1.1/2.7B | 2K | dense, efficient | Apache 2.0 | US |
+| BGE | BGE-M3 | — | 8192 | embedding / reranker | MIT | CN |
+| E5 | E5-Mistral 7B | 7B | 4K | embedding | MIT | US |
+| GTE | GTE-Qwen2 7B | 7B | 32K | embedding | Apache 2.0 | CN |
+| EmbeddingGemma | EmbeddingGemma 300M | 300M | 2K | embedding | Gemma Terms | US |
+
+## 16.5 读表后的三个动作
+
+1. **先排除许可证不合适的**：商用优先 Apache/MIT；Llama/Gemma 读条款；CC-BY-NC 直接排除商用。
+2. **再排除显存不合适的**：MoE 按总参数算权重，按激活参数算算力；别把 `A95B` 当总参数。
+3. **最后排除上下文不合适的**：看 `max_position_embeddings` 与 `rope_scaling`，再算 KV；标称 1M 不等于单卡能跑 1M。
+
+## 16.6 已知缺口
+
+- 视频生成、语音合成、图像生成模型只列了少量代表，没有逐家族展开；
+- 嵌入/检索模型只列 BGE/E5/GTE/EmbeddingGemma，未覆盖所有 reranker；
+- 部分 2026 新模型（Qwen3.8-Flash-Next、Kimi K3、MiniMax M3、Step-5）技术报告未完整公开，表中只写 config 能确认的字段；
+- 同一家族不同尺寸的配置差异，回到第 15 章读具体 `config.json`。
+
+## 16.7 复习锚点
+
+- 索引是家族级，不是 checkpoint 级。
+- 选型顺序：许可证 → 显存 → 上下文 → 任务。
+- 不确定的数字写 `—`，不编造。

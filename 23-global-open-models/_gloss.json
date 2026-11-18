@@ -1,0 +1,352 @@
+[
+ {
+  "term": "Transformer",
+  "def": "由自注意力、FFN、残差和归一化堆叠成的序列模型骨架",
+  "chapterId": "ch02"
+ },
+ {
+  "term": "decoder-only",
+  "def": "只用因果解码器、按下一个 token 预测训练的架构",
+  "chapterId": "ch02"
+ },
+ {
+  "term": "encoder-decoder",
+  "def": "编码器双向读输入、解码器自回归生成的架构",
+  "chapterId": "ch02"
+ },
+ {
+  "term": "注意力",
+  "def": "让每个 token 根据相关性聚合其他 token 信息的机制",
+  "chapterId": "ch02"
+ },
+ {
+  "term": "自注意力",
+  "def": "Q/K/V 都来自同一序列的注意力",
+  "chapterId": "ch02"
+ },
+ {
+  "term": "因果掩码",
+  "def": "禁止 token 看到未来位置的掩码",
+  "chapterId": "ch02"
+ },
+ {
+  "term": "MHA",
+  "def": "每个 Q 头有独立 K/V 的多头注意力",
+  "chapterId": "ch13"
+ },
+ {
+  "term": "MQA",
+  "def": "所有 Q 头共享 1 组 K/V 的多查询注意力",
+  "chapterId": "ch13"
+ },
+ {
+  "term": "GQA",
+  "def": "Q 头分组共享 K/V 的分组查询注意力",
+  "chapterId": "ch13"
+ },
+ {
+  "term": "MLA",
+  "def": "把 K/V 压成低秩潜向量再投影的多头潜在注意力",
+  "chapterId": "ch13"
+ },
+ {
+  "term": "KV cache",
+  "def": "推理时缓存的 Key/Value，避免每步重算历史",
+  "chapterId": "ch13"
+ },
+ {
+  "term": "RoPE",
+  "def": "用旋转位置编码让注意力只看相对位置的方案",
+  "chapterId": "ch13"
+ },
+ {
+  "term": "YaRN",
+  "def": "通过改旋转频率/温度把上下文外推的方法",
+  "chapterId": "ch13"
+ },
+ {
+  "term": "ALiBi",
+  "def": "用距离线性偏置代替位置编码的方案",
+  "chapterId": "ch08"
+ },
+ {
+  "term": "sliding window",
+  "def": "每个 token 只看最近 W 个 token 的注意力",
+  "chapterId": "ch05"
+ },
+ {
+  "term": "局部/全局注意力",
+  "def": "多数层看局部窗口、少数层看全序列的交替设计",
+  "chapterId": "ch06"
+ },
+ {
+  "term": "RMSNorm",
+  "def": "只按均方根归一化、不减均值的归一化",
+  "chapterId": "ch03"
+ },
+ {
+  "term": "LayerNorm",
+  "def": "减均值、除标准差再仿射的归一化",
+  "chapterId": "ch03"
+ },
+ {
+  "term": "QK-Norm",
+  "def": "注意力前对 Q/K 做归一化，稳定大 head_dim 训练",
+  "chapterId": "ch06"
+ },
+ {
+  "term": "SwiGLU",
+  "def": "用 Swish 门控的两个线性投影组成的 FFN",
+  "chapterId": "ch03"
+ },
+ {
+  "term": "FFN",
+  "def": "Transformer 层里的前馈网络",
+  "chapterId": "ch02"
+ },
+ {
+  "term": "MoE",
+  "def": "把 FFN 拆成多个专家、每 token 只激活 top-k 的架构",
+  "chapterId": "ch11"
+ },
+ {
+  "term": "router",
+  "def": "给每个 token 选择专家并输出权重的门控网络",
+  "chapterId": "ch11"
+ },
+ {
+  "term": "top-k",
+  "def": "每个 token 只激活的专家数量",
+  "chapterId": "ch11"
+ },
+ {
+  "term": "expert",
+  "def": "MoE 中独立的一套 FFN 参数",
+  "chapterId": "ch11"
+ },
+ {
+  "term": "shared expert",
+  "def": "所有 token 都经过的通用专家",
+  "chapterId": "ch11"
+ },
+ {
+  "term": "total params",
+  "def": "模型全部权重，决定显存",
+  "chapterId": "ch11"
+ },
+ {
+  "term": "active params",
+  "def": "每 token 实际参与计算的权重，决定算力",
+  "chapterId": "ch11"
+ },
+ {
+  "term": "expert parallelism",
+  "def": "把不同专家放到不同设备上的并行方式",
+  "chapterId": "ch11"
+ },
+ {
+  "term": "load balancing",
+  "def": "让 token 均匀分配到专家的训练约束",
+  "chapterId": "ch11"
+ },
+ {
+  "term": "dense",
+  "def": "每个 token 都走同一套 FFN 的模型",
+  "chapterId": "ch11"
+ },
+ {
+  "term": "sparse attention",
+  "def": "每 token 只和部分历史做注意力的机制",
+  "chapterId": "ch13"
+ },
+ {
+  "term": "DSA",
+  "def": "用索引器选 top-k 历史 token 的稀疏注意力",
+  "chapterId": "ch13"
+ },
+ {
+  "term": "linear attention",
+  "def": "用核函数/递归把注意力降到 O(n) 的方案",
+  "chapterId": "ch10"
+ },
+ {
+  "term": "SSM",
+  "def": "用固定状态递推建模序列的状态空间模型",
+  "chapterId": "ch10"
+ },
+ {
+  "term": "Mamba",
+  "def": "带选择性状态的空间状态模型",
+  "chapterId": "ch10"
+ },
+ {
+  "term": "RWKV",
+  "def": "RNN 化 Transformer，time-mix + channel-mix",
+  "chapterId": "ch10"
+ },
+ {
+  "term": "hybrid architecture",
+  "def": "线性/SSM 层与全注意力层混合的架构",
+  "chapterId": "ch10"
+ },
+ {
+  "term": "Jamba",
+  "def": "Transformer + Mamba 的混合模型",
+  "chapterId": "ch10"
+ },
+ {
+  "term": "Griffin",
+  "def": "RG-LRU + 局部注意力的混合模型",
+  "chapterId": "ch10"
+ },
+ {
+  "term": "xLSTM",
+  "def": "指数门控 + 矩阵记忆的 LSTM 变体",
+  "chapterId": "ch10"
+ },
+ {
+  "term": "multimodal",
+  "def": "同时处理文本、图像、音频等模态的模型",
+  "chapterId": "ch12"
+ },
+ {
+  "term": "ViT",
+  "def": "把图像切 patch 后用 Transformer 编码的视觉模型",
+  "chapterId": "ch12"
+ },
+ {
+  "term": "patch",
+  "def": "图像切分后的固定大小块",
+  "chapterId": "ch12"
+ },
+ {
+  "term": "connector",
+  "def": "把视觉/音频特征投到语言模型维度的模块",
+  "chapterId": "ch12"
+ },
+ {
+  "term": "resampler",
+  "def": "用固定查询把变长视觉特征压成固定 token 的模块",
+  "chapterId": "ch12"
+ },
+ {
+  "term": "early fusion",
+  "def": "在较早层把多模态 token 拼在一起的融合",
+  "chapterId": "ch12"
+ },
+ {
+  "term": "late fusion",
+  "def": "只把视觉特征当外挂、在输入端拼接的融合",
+  "chapterId": "ch12"
+ },
+ {
+  "term": "any-to-any",
+  "def": "文本/图像/音频等任意模态到任意模态的模型",
+  "chapterId": "ch12"
+ },
+ {
+  "term": "image token",
+  "def": "图像 patch 经编码器/连接器后得到的 token",
+  "chapterId": "ch12"
+ },
+ {
+  "term": "tokenizer",
+  "def": "把文本切成 token 的组件",
+  "chapterId": "ch15"
+ },
+ {
+  "term": "vocab",
+  "def": "tokenizer 的词表大小",
+  "chapterId": "ch15"
+ },
+ {
+  "term": "embedding",
+  "def": "把 token id 映射成向量的矩阵",
+  "chapterId": "ch15"
+ },
+ {
+  "term": "logits",
+  "def": "模型输出头得到的未归一化分数",
+  "chapterId": "ch15"
+ },
+ {
+  "term": "softmax",
+  "def": "把 logits 变成概率分布的归一化",
+  "chapterId": "ch15"
+ },
+ {
+  "term": "context length",
+  "def": "模型能处理的最大 token 数",
+  "chapterId": "ch13"
+ },
+ {
+  "term": "prefill",
+  "def": "推理时一次性处理输入前缀的阶段",
+  "chapterId": "ch13"
+ },
+ {
+  "term": "decode",
+  "def": "推理时逐 token 生成的阶段",
+  "chapterId": "ch13"
+ },
+ {
+  "term": "quantization",
+  "def": "把权重/激活降到低精度以省显存",
+  "chapterId": "ch14"
+ },
+ {
+  "term": "FP8",
+  "def": "8 位浮点量化格式",
+  "chapterId": "ch14"
+ },
+ {
+  "term": "INT4",
+  "def": "4 位整数量化格式",
+  "chapterId": "ch14"
+ },
+ {
+  "term": "license",
+  "def": "决定能否商用/修改/再分发的法律条款",
+  "chapterId": "ch14"
+ },
+ {
+  "term": "Apache 2.0",
+  "def": "允许商用、修改、再分发的宽松许可证",
+  "chapterId": "ch14"
+ },
+ {
+  "term": "MIT",
+  "def": "比 Apache 更短更宽松的许可证",
+  "chapterId": "ch14"
+ },
+ {
+  "term": "Llama Community",
+  "def": "Llama 系列的自定义社区许可证",
+  "chapterId": "ch14"
+ },
+ {
+  "term": "Gemma Terms",
+  "def": "Gemma 系列的自定义使用条款",
+  "chapterId": "ch14"
+ },
+ {
+  "term": "CC-BY-NC",
+  "def": "禁止商用的 Creative Commons 许可证",
+  "chapterId": "ch14"
+ },
+ {
+  "term": "open weights",
+  "def": "权重可下载，但不等于代码/数据/商用权利全开放",
+  "chapterId": "ch01"
+ },
+ {
+  "term": "benchmark contamination",
+  "def": "评测题出现在训练数据里导致分数虚高",
+  "chapterId": "ch14"
+ },
+ {
+  "term": "model card",
+  "def": "模型卡：许可证、数据、评测、限制的说明页",
+  "chapterId": "ch14"
+ }
+]

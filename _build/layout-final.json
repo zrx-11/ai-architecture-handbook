@@ -1,0 +1,41 @@
+{
+ "bad": [],
+ "books": [
+  [
+   "index.html",
+   390
+  ],
+  [
+   "01-foundations/deepseek-foundations学习伴侣.html",
+   390
+  ],
+  [
+   "02-paper-teardown/deepseek-papers学习伴侣.html",
+   390
+  ],
+  [
+   "03-architecture/deepseek-architecture学习伴侣.html",
+   390
+  ],
+  [
+   "04-machine-learning/machine-learning学习伴侣.html",
+   390
+  ],
+  [
+   "05-neural-networks/neural-networks学习伴侣.html",
+   390
+  ],
+  [
+   "06-deep-learning/deep-learning学习伴侣.html",
+   390
+  ],
+  [
+   "09-deepseek-family/deepseek-family学习伴侣.html",
+   390
+  ],
+  [
+   "23-global-open-models/global-open-models学习伴侣.html",
+   390
+  ]
+ ]
+}

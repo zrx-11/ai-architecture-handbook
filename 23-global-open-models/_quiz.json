@@ -1,0 +1,797 @@
+[
+ {
+  "id": "q01",
+  "chapterId": "ch01",
+  "type": "single",
+  "question": "“开放权重”最准确的含义是？",
+  "options": [
+   "模型参数可下载",
+   "训练数据公开",
+   "训练代码公开",
+   "许可证允许商用"
+  ],
+  "answer": 0,
+  "explain": "开放权重只承诺参数可获取；代码、数据、商用权利要另看。",
+  "relatedConceptId": "c01"
+ },
+ {
+  "id": "q02",
+  "chapterId": "ch01",
+  "type": "single",
+  "question": "Apache 2.0 与 CC-BY-NC 最关键的区别是？",
+  "options": [
+   "前者允许商用，后者禁止商用",
+   "前者禁止修改，后者允许",
+   "两者都禁止商用",
+   "前者只允许研究"
+  ],
+  "answer": 0,
+  "explain": "Apache 2.0 允许商用；CC-BY-NC 的 NC 就是非商用。",
+  "relatedConceptId": "c11"
+ },
+ {
+  "id": "q03",
+  "chapterId": "ch01",
+  "type": "single",
+  "question": "本册为什么按“家族”而不是按每个 checkpoint 组织？",
+  "options": [
+   "checkpoint 数量无穷且架构重复",
+   "家族名字更好听",
+   "每个 checkpoint 都有独立架构",
+   "Hugging Face 不支持 checkpoint"
+  ],
+  "answer": 0,
+  "explain": "量化/微调/合并版大量重复，家族级才能建立结构感。",
+  "relatedConceptId": "c01"
+ },
+ {
+  "id": "q04",
+  "chapterId": "ch02",
+  "type": "single",
+  "question": "下列哪一项不是本章说的“结构旋钮”？",
+  "options": [
+   "学习率",
+   "注意力类型",
+   "FFN 类型",
+   "位置编码"
+  ],
+  "answer": 0,
+  "explain": "学习率是训练超参，不是模型结构。",
+  "relatedConceptId": "c02"
+ },
+ {
+  "id": "q05",
+  "chapterId": "ch02",
+  "type": "single",
+  "question": "MoE 的“总参数”和“激活参数”分别决定什么？",
+  "options": [
+   "显存 / 每 token 算力",
+   "算力 / 显存",
+   "都决定显存",
+   "都决定算力"
+  ],
+  "answer": 0,
+  "explain": "总参数要全装，决定显存；激活参数决定每 token 计算量。",
+  "relatedConceptId": "c10"
+ },
+ {
+  "id": "q06",
+  "chapterId": "ch02",
+  "type": "single",
+  "question": "线性注意力主要解决什么问题？",
+  "options": [
+   "长序列的二次复杂度",
+   "词表太小",
+   "多模态编码",
+   "许可证问题"
+  ],
+  "answer": 0,
+  "explain": "它把注意力复杂度从 O(n^2) 降到 O(n)，代价是状态容量有限。",
+  "relatedConceptId": "c07"
+ },
+ {
+  "id": "q07",
+  "chapterId": "ch03",
+  "type": "single",
+  "question": "Llama 1 定下的四个结构默认值不包括？",
+  "options": [
+   "MoE 路由",
+   "RoPE",
+   "SwiGLU",
+   "RMSNorm"
+  ],
+  "answer": 0,
+  "explain": "Llama 1 是 dense，没有 MoE。",
+  "relatedConceptId": "c02"
+ },
+ {
+  "id": "q08",
+  "chapterId": "ch03",
+  "type": "single",
+  "question": "Llama 2 70B 用 GQA 主要省哪部分显存？",
+  "options": [
+   "KV cache",
+   "词表 embedding",
+   "FFN 权重",
+   "输出头"
+  ],
+  "answer": 0,
+  "explain": "64 个 Q 头共享 8 组 K/V，KV cache 降到 MHA 的 1/8。",
+  "relatedConceptId": "c04"
+ },
+ {
+  "id": "q09",
+  "chapterId": "ch03",
+  "type": "single",
+  "question": "Llama 4 Scout 的“17B”指什么？",
+  "options": [
+   "每 token 激活参数",
+   "总参数",
+   "专家数",
+   "上下文长度"
+  ],
+  "answer": 0,
+  "explain": "Scout 总参数约 109B，17B 是激活参数。",
+  "relatedConceptId": "c10"
+ },
+ {
+  "id": "q10",
+  "chapterId": "ch03",
+  "type": "single",
+  "question": "Llama 3.3 70B 在 128K 下单序列 KV 约多少？",
+  "options": [
+   "40 GiB",
+   "4 GiB",
+   "140 GiB",
+   "400 GiB"
+  ],
+  "answer": 0,
+  "explain": "0.3125 MiB/token × 131072 ≈ 40 GiB。",
+  "relatedConceptId": "c04"
+ },
+ {
+  "id": "q11",
+  "chapterId": "ch04",
+  "type": "single",
+  "question": "Qwen3.8-2.4T-A95B 的 95B 指什么？",
+  "options": [
+   "每 token 激活参数",
+   "总参数",
+   "专家数",
+   "KV 头数"
+  ],
+  "answer": 0,
+  "explain": "A95B 的 A 是 active；2.4T 是总参数。",
+  "relatedConceptId": "c10"
+ },
+ {
+  "id": "q12",
+  "chapterId": "ch04",
+  "type": "single",
+  "question": "Qwen3.5-397B-A17B 的专家数和 top-k 是？",
+  "options": [
+   "512 / 10",
+   "256 / 8",
+   "128 / 8",
+   "896 / 8"
+  ],
+  "answer": 0,
+  "explain": "config：512 专家，top-10，专家宽度 1024。",
+  "relatedConceptId": "c03"
+ },
+ {
+  "id": "q13",
+  "chapterId": "ch04",
+  "type": "single",
+  "question": "Qwen3.8-27B 的 KV 头数和 head_dim 是？",
+  "options": [
+   "4 / 256",
+   "8 / 128",
+   "16 / 128",
+   "32 / 256"
+  ],
+  "answer": 0,
+  "explain": "text_config：4 个 KV 头，head_dim 256。",
+  "relatedConceptId": "c04"
+ },
+ {
+  "id": "q14",
+  "chapterId": "ch04",
+  "type": "single",
+  "question": "Qwen 的三条子路线不包括？",
+  "options": [
+   "encoder-decoder",
+   "小尺寸 dense",
+   "大尺寸 MoE",
+   "混合线性注意力"
+  ],
+  "answer": 0,
+  "explain": "Qwen 主线是 decoder-only；encoder-decoder 不是它的子路线。",
+  "relatedConceptId": "c02"
+ },
+ {
+  "id": "q15",
+  "chapterId": "ch05",
+  "type": "single",
+  "question": "Mistral 7B 的滑窗大小是？",
+  "options": [
+   "4096",
+   "1024",
+   "32768",
+   "128"
+  ],
+  "answer": 0,
+  "explain": "Mistral 7B 用 4096 滑动窗口，最大位置 32K。",
+  "relatedConceptId": "c06"
+ },
+ {
+  "id": "q16",
+  "chapterId": "ch05",
+  "type": "single",
+  "question": "Mixtral 8x7B 的总参数 / 激活参数约是？",
+  "options": [
+   "46.7B / 12.9B",
+   "56B / 56B",
+   "12.9B / 46.7B",
+   "141B / 39B"
+  ],
+  "answer": 0,
+  "explain": "8 个专家都装，top-2 只算 2 个。",
+  "relatedConceptId": "c03"
+ },
+ {
+  "id": "q17",
+  "chapterId": "ch05",
+  "type": "single",
+  "question": "Mistral Small 4 119B 的 KV 头数是？",
+  "options": [
+   "32",
+   "4",
+   "8",
+   "64"
+  ],
+  "answer": 0,
+  "explain": "config：32 Q/32 KV，是 MHA，不是 GQA。",
+  "relatedConceptId": "c04"
+ },
+ {
+  "id": "q18",
+  "chapterId": "ch06",
+  "type": "single",
+  "question": "Gemma 3 的局部/全局比例是？",
+  "options": [
+   "5:1",
+   "1:1",
+   "1:5",
+   "全局部"
+  ],
+  "answer": 0,
+  "explain": "每 6 层 5 层局部、1 层全局；Gemma 2 约 1:1。",
+  "relatedConceptId": "c06"
+ },
+ {
+  "id": "q19",
+  "chapterId": "ch06",
+  "type": "single",
+  "question": "QK-Norm 主要解决什么问题？",
+  "options": [
+   "大 head_dim 下 attention logits 爆炸",
+   "词表太大",
+   "专家不均衡",
+   "KV 头太少"
+  ],
+  "answer": 0,
+  "explain": "对 Q/K 归一化，稳定长上下文训练。",
+  "relatedConceptId": "c04"
+ },
+ {
+  "id": "q20",
+  "chapterId": "ch06",
+  "type": "single",
+  "question": "Gemma 4 12B 的架构特点是？",
+  "options": [
+   "统一 any-to-any",
+   "纯文本 dense",
+   "8 专家 MoE",
+   "纯 SSM"
+  ],
+  "answer": 0,
+  "explain": "Gemma4Unified 处理文/图/音，262K。",
+  "relatedConceptId": "c08"
+ },
+ {
+  "id": "q21",
+  "chapterId": "ch07",
+  "type": "single",
+  "question": "Phi-4 14B 的层数、hidden、Q/KV 是？",
+  "options": [
+   "40 / 5120 / 40 / 10",
+   "32 / 3072 / 32 / 32",
+   "48 / 4096 / 32 / 8",
+   "62 / 5376 / 32 / 16"
+  ],
+  "answer": 0,
+  "explain": "Phi-4：40 层、5120、40 Q/10 KV、16K。",
+  "relatedConceptId": "c04"
+ },
+ {
+  "id": "q22",
+  "chapterId": "ch07",
+  "type": "single",
+  "question": "Phi-4-mini 在 128K 下单序列 KV 约多少？",
+  "options": [
+   "16 GiB",
+   "4 GiB",
+   "64 GiB",
+   "1 GiB"
+  ],
+  "answer": 0,
+  "explain": "32 层×8 KV×128 维×2 字节×2=0.125 MiB/token，128K≈16 GiB。",
+  "relatedConceptId": "c04"
+ },
+ {
+  "id": "q23",
+  "chapterId": "ch07",
+  "type": "single",
+  "question": "Phi 系列最核心的竞争力是？",
+  "options": [
+   "数据课程与小模型训练",
+   "MoE 路由",
+   "线性注意力",
+   "多模态生成"
+  ],
+  "answer": 0,
+  "explain": "结构基本是 Llama 式；数据和训练配方是差异。",
+  "relatedConceptId": "c02"
+ },
+ {
+  "id": "q24",
+  "chapterId": "ch08",
+  "type": "single",
+  "question": "BLOOM 176B 的层数、hidden、头数是？",
+  "options": [
+   "70 / 14336 / 112",
+   "80 / 8192 / 64",
+   "32 / 4096 / 32",
+   "60 / 6144 / 48"
+  ],
+  "answer": 0,
+  "explain": "BLOOM 176B：70 层、14336、112 头、2048 上下文。",
+  "relatedConceptId": "c04"
+ },
+ {
+  "id": "q25",
+  "chapterId": "ch08",
+  "type": "single",
+  "question": "OLMo 与 Llama 最大的差别是？",
+  "options": [
+   "OLMo 开放数据/代码/训练日志",
+   "OLMo 没有注意力",
+   "OLMo 是 MoE",
+   "OLMo 不能商用"
+  ],
+  "answer": 0,
+  "explain": "OLMo 是全开放研究线；Llama 主要开放权重。",
+  "relatedConceptId": "c01"
+ },
+ {
+  "id": "q26",
+  "chapterId": "ch08",
+  "type": "single",
+  "question": "Command R+ 的许可证是？",
+  "options": [
+   "CC-BY-NC 4.0",
+   "Apache 2.0",
+   "MIT",
+   "Llama Community"
+  ],
+  "answer": 0,
+  "explain": "CC-BY-NC 禁止商用，商用需另获授权。",
+  "relatedConceptId": "c11"
+ },
+ {
+  "id": "q27",
+  "chapterId": "ch09",
+  "type": "single",
+  "question": "GLM-5.3 的 model_type 是？",
+  "options": [
+   "glm_moe_dsa",
+   "llama",
+   "mixtral",
+   "kimi_linear"
+  ],
+  "answer": 0,
+  "explain": "MoE + DSA 稀疏注意力；78 层、6144、64/64、256 专家 top-8。",
+  "relatedConceptId": "c03"
+ },
+ {
+  "id": "q28",
+  "chapterId": "ch09",
+  "type": "single",
+  "question": "Kimi K3 的专家数是？",
+  "options": [
+   "896",
+   "128",
+   "256",
+   "512"
+  ],
+  "answer": 0,
+  "explain": "config：896 专家，93 层、7168、96/96、1M。",
+  "relatedConceptId": "c03"
+ },
+ {
+  "id": "q29",
+  "chapterId": "ch09",
+  "type": "single",
+  "question": "MiniMax M3 的 4 个 KV 头 + 1M 上下文说明什么？",
+  "options": [
+   "朴素 KV 约 240 GiB，必须稀疏/压缩",
+   "它不需要 KV",
+   "它是 dense",
+   "它只有 4 层"
+  ],
+  "answer": 0,
+  "explain": "2×60×4×128×2=0.234 MiB/token，1M≈240 GiB。",
+  "relatedConceptId": "c04"
+ },
+ {
+  "id": "q30",
+  "chapterId": "ch09",
+  "type": "single",
+  "question": "Intern-S2 的 text model_type 是？",
+  "options": [
+   "qwen3_5_moe_text",
+   "llama",
+   "glm_moe_dsa",
+   "step5"
+  ],
+  "answer": 0,
+  "explain": "它复用 Qwen3.5 MoE 骨架，做多模态/数据创新。",
+  "relatedConceptId": "c02"
+ },
+ {
+  "id": "q31",
+  "chapterId": "ch10",
+  "type": "single",
+  "question": "SSM 的递推式是？",
+  "options": [
+   "h_t = A h_{t-1} + B x_t",
+   "h_t = QK^T V",
+   "h_t = softmax(x)",
+   "h_t = W x + b"
+  ],
+  "answer": 0,
+  "explain": "状态递推，输出 y_t=C h_t；状态维度固定。",
+  "relatedConceptId": "c07"
+ },
+ {
+  "id": "q32",
+  "chapterId": "ch10",
+  "type": "single",
+  "question": "Jamba 的架构是？",
+  "options": [
+   "Transformer + Mamba 混合",
+   "纯 SSM",
+   "纯 RNN",
+   "纯 CNN"
+  ],
+  "answer": 0,
+  "explain": "混合架构，保留部分注意力。",
+  "relatedConceptId": "c07"
+ },
+ {
+  "id": "q33",
+  "chapterId": "ch10",
+  "type": "single",
+  "question": "Kimi K3 与 Qwen3-Next 的共同点是？",
+  "options": [
+   "线性/混合注意力 + MoE",
+   "都是 dense",
+   "都是 encoder-decoder",
+   "都没有专家"
+  ],
+  "answer": 0,
+  "explain": "大部分层线性、少量全注意力，外加 MoE。",
+  "relatedConceptId": "c07"
+ },
+ {
+  "id": "q34",
+  "chapterId": "ch11",
+  "type": "single",
+  "question": "“2.4T-A95B”最准确读法是？",
+  "options": [
+   "总参数 2.4T，每 token 激活 95B",
+   "总参数 95B，激活 2.4T",
+   "两者都是总参数",
+   "两者都是激活参数"
+  ],
+  "answer": 0,
+  "explain": "A 是 active，总参数和激活参数分开。",
+  "relatedConceptId": "c10"
+ },
+ {
+  "id": "q35",
+  "chapterId": "ch11",
+  "type": "single",
+  "question": "Qwen3.8-2.4T 的专家数、top-k、专家宽度是？",
+  "options": [
+   "512 / 10 / 2048",
+   "256 / 8 / 1024",
+   "128 / 8 / 1536",
+   "896 / 8 / 3072"
+  ],
+  "answer": 0,
+  "explain": "config：512 专家、top-10、moe_intermediate 2048。",
+  "relatedConceptId": "c03"
+ },
+ {
+  "id": "q36",
+  "chapterId": "ch11",
+  "type": "single",
+  "question": "共享专家的主要作用是？",
+  "options": [
+   "承担通用能力，缓解路由碎片化",
+   "增加路由层数",
+   "替代 KV cache",
+   "减少词表"
+  ],
+  "answer": 0,
+  "explain": "所有 token 都走共享专家，学通用知识。",
+  "relatedConceptId": "c03"
+ },
+ {
+  "id": "q37",
+  "chapterId": "ch11",
+  "type": "single",
+  "question": "Mixtral 8x7B 每 token 激活约多少？",
+  "options": [
+   "12.9B",
+   "46.7B",
+   "7B",
+   "56B"
+  ],
+  "answer": 0,
+  "explain": "top-2 专家 + 注意力/embedding，约 12.9B。",
+  "relatedConceptId": "c03"
+ },
+ {
+  "id": "q38",
+  "chapterId": "ch12",
+  "type": "single",
+  "question": "448×448 图像、patch 14，token 数是多少？",
+  "options": [
+   "1024",
+   "256",
+   "512",
+   "4096"
+  ],
+  "answer": 0,
+  "explain": "(448/14)^2=32^2=1024；2×2 合并后 256。",
+  "relatedConceptId": "c08"
+ },
+ {
+  "id": "q39",
+  "chapterId": "ch12",
+  "type": "single",
+  "question": "图像 token 对 KV cache 的影响是？",
+  "options": [
+   "和文本 token 一样占 KV",
+   "完全不占",
+   "只占权重",
+   "只占词表"
+  ],
+  "answer": 0,
+  "explain": "图像 token 进同一序列、同一 KV。",
+  "relatedConceptId": "c08"
+ },
+ {
+  "id": "q40",
+  "chapterId": "ch12",
+  "type": "single",
+  "question": "Janus 的双系统是指？",
+  "options": [
+   "理解头 + 生成头",
+   "文本头 + 音频头",
+   "编码器 + 解码器",
+   "MoE + dense"
+  ],
+  "answer": 0,
+  "explain": "理解与生成解耦，避免目标冲突。",
+  "relatedConceptId": "c08"
+ },
+ {
+  "id": "q41",
+  "chapterId": "ch13",
+  "type": "single",
+  "question": "GQA 的 KV/token/layer 公式是？",
+  "options": [
+   "2 × H_kv × d_head × b",
+   "2 × H × d_head × b",
+   "H × d_head × b",
+   "2 × L × H × b"
+  ],
+  "answer": 0,
+  "explain": "只有 KV 头数参与；H_kv 是组数。",
+  "relatedConceptId": "c04"
+ },
+ {
+  "id": "q42",
+  "chapterId": "ch13",
+  "type": "single",
+  "question": "Llama 3.3 70B 在 32K 下单序列 KV 约多少？",
+  "options": [
+   "10 GiB",
+   "40 GiB",
+   "4 GiB",
+   "100 GiB"
+  ],
+  "answer": 0,
+  "explain": "0.3125 MiB × 32768 ≈ 10 GiB。",
+  "relatedConceptId": "c04"
+ },
+ {
+  "id": "q43",
+  "chapterId": "ch13",
+  "type": "single",
+  "question": "1M 上下文模型为什么必须稀疏/压缩？",
+  "options": [
+   "朴素 KV 可达数百 GiB",
+   "因为词表太大",
+   "因为层数太少",
+   "因为不能用 GPU"
+  ],
+  "answer": 0,
+  "explain": "例如 MiniMax M3 朴素 KV 约 240 GiB。",
+  "relatedConceptId": "c04"
+ },
+ {
+  "id": "q44",
+  "chapterId": "ch13",
+  "type": "single",
+  "question": "YaRN 的 factor 表示什么？",
+  "options": [
+   "长度外推倍数",
+   "KV 头数",
+   "专家数",
+   "学习率"
+  ],
+  "answer": 0,
+  "explain": "factor=8 把 8K 训练长度外推到 64K 量级。",
+  "relatedConceptId": "c05"
+ },
+ {
+  "id": "q45",
+  "chapterId": "ch14",
+  "type": "single",
+  "question": "CC-BY-NC 的核心限制是？",
+  "options": [
+   "禁止商用",
+   "禁止修改",
+   "禁止再分发",
+   "禁止研究"
+  ],
+  "answer": 0,
+  "explain": "NC = NonCommercial；研究可以，商用要授权。",
+  "relatedConceptId": "c11"
+ },
+ {
+  "id": "q46",
+  "chapterId": "ch14",
+  "type": "single",
+  "question": "OLMo 比 Llama 更适合训练复现，因为？",
+  "options": [
+   "开放数据/代码/日志",
+   "参数更大",
+   "没有注意力",
+   "许可证更严"
+  ],
+  "answer": 0,
+  "explain": "OLMo 是全开放研究线。",
+  "relatedConceptId": "c01"
+ },
+ {
+  "id": "q47",
+  "chapterId": "ch14",
+  "type": "single",
+  "question": "检测 benchmark 污染的可行方法是？",
+  "options": [
+   "改写题目/换数字重测",
+   "只看排行榜",
+   "只看模型大小",
+   "只跑一个样本"
+  ],
+  "answer": 0,
+  "explain": "改写后分数大跌说明可能靠记忆。",
+  "relatedConceptId": "c12"
+ },
+ {
+  "id": "q48",
+  "chapterId": "ch15",
+  "type": "single",
+  "question": "`architectures` 和 `model_type` 的区别是？",
+  "options": [
+   "前者是类名，后者是配置族",
+   "两者完全一样",
+   "前者是许可证",
+   "后者是参数量"
+  ],
+  "answer": 0,
+  "explain": "`LlamaForCausalLM` vs `llama`。",
+  "relatedConceptId": "c02"
+ },
+ {
+  "id": "q49",
+  "chapterId": "ch15",
+  "type": "single",
+  "question": "`num_experts` 和 `num_experts_per_tok` 的区别是？",
+  "options": [
+   "总专家数 / top-k",
+   "top-k / 总专家数",
+   "层数 / 头数",
+   "词表 / 上下文"
+  ],
+  "answer": 0,
+  "explain": "前者是全部专家，后者是每 token 选几个。",
+  "relatedConceptId": "c03"
+ },
+ {
+  "id": "q50",
+  "chapterId": "ch15",
+  "type": "single",
+  "question": "Qwen3.8-2.4T 的 95B 激活大致来自？",
+  "options": [
+   "top-10 专家 + 注意力/embedding",
+   "全部 512 专家",
+   "只 embedding",
+   "只 KV cache"
+  ],
+  "answer": 0,
+  "explain": "10 个专家×92 层≈46B，加注意力/embedding 到 95B。",
+  "relatedConceptId": "c10"
+ },
+ {
+  "id": "q51",
+  "chapterId": "ch16",
+  "type": "single",
+  "question": "本索引的收录口径是？",
+  "options": [
+   "官方公开、可下载权重的主要家族",
+   "所有微调/量化 checkpoint",
+   "所有论文",
+   "所有 API 模型"
+  ],
+  "answer": 0,
+  "explain": "家族级，不逐 checkpoint。",
+  "relatedConceptId": "c01"
+ },
+ {
+  "id": "q52",
+  "chapterId": "ch16",
+  "type": "single",
+  "question": "MoE 权重显存按哪个参数估？",
+  "options": [
+   "总参数",
+   "激活参数",
+   "KV 头数",
+   "词表"
+  ],
+  "answer": 0,
+  "explain": "全部专家都要装，按总参数；算力按激活。",
+  "relatedConceptId": "c10"
+ },
+ {
+  "id": "q53",
+  "chapterId": "ch16",
+  "type": "single",
+  "question": "选型的正确顺序是？",
+  "options": [
+   "许可证 → 显存 → 上下文 → 任务",
+   "参数 → 名字 → 排行榜",
+   "价格 → 颜色 → 品牌",
+   "上下文 → 许可证 → 参数量"
+  ],
+  "answer": 0,
+  "explain": "许可证不合格直接排除；再算显存/上下文。",
+  "relatedConceptId": "c11"
+ }
+]

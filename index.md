@@ -13,6 +13,7 @@
 | 神经网络：从一条直线推到反向传播 | 13 | 12 | 32 | 34 | [neural-networks学习伴侣.html](05-neural-networks/neural-networks学习伴侣.html) |
 | 深度学习入门：从零手写神经网络 | 8 | 2 | 21 | 38 | [deep-learning学习伴侣.html](06-deep-learning/deep-learning学习伴侣.html) |
 | DeepSeek 模型全谱 | 14 | 13 | 42 | 44 | [deepseek-family学习伴侣.html](09-deepseek-family/deepseek-family学习伴侣.html) |
+| 全球开源模型全谱 | 16 | 12 | 53 | 48 | [global-open-models学习伴侣.html](23-global-open-models/global-open-models学习伴侣.html) |
 
 ## 跨书总览
 

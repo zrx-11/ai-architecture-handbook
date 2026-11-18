@@ -1,0 +1,338 @@
+[
+ {
+  "id": "f01",
+  "chapterId": "ch01",
+  "front": "开放权重 vs 开源",
+  "back": "权重可下载 ≠ 代码/数据/商用权利都开放",
+  "tags": "边界"
+ },
+ {
+  "id": "f02",
+  "chapterId": "ch01",
+  "front": "判断顺序",
+  "back": "许可证 → 权重 → 代码 → 数据",
+  "tags": "边界"
+ },
+ {
+  "id": "f03",
+  "chapterId": "ch01",
+  "front": "本册口径",
+  "back": "官方公开、可下载权重、主要家族；不逐 checkpoint",
+  "tags": "边界"
+ },
+ {
+  "id": "f04",
+  "chapterId": "ch02",
+  "front": "六旋钮",
+  "back": "注意力、FFN、归一化、位置、激活、模态",
+  "tags": "骨架"
+ },
+ {
+  "id": "f05",
+  "chapterId": "ch02",
+  "front": "六骨架",
+  "back": "dense、MoE、encoder-decoder、线性/SSM、多模态、扩散",
+  "tags": "骨架"
+ },
+ {
+  "id": "f06",
+  "chapterId": "ch02",
+  "front": "读卡六维",
+  "back": "骨架、规模、注意力、FFN、上下文、许可证",
+  "tags": "骨架"
+ },
+ {
+  "id": "f07",
+  "chapterId": "ch03",
+  "front": "Llama 1 默认值",
+  "back": "RoPE、SwiGLU、RMSNorm、decoder-only",
+  "tags": "Llama"
+ },
+ {
+  "id": "f08",
+  "chapterId": "ch03",
+  "front": "Llama 4 激活",
+  "back": "Scout 17B/109B，Maverick 17B/400B",
+  "tags": "Llama"
+ },
+ {
+  "id": "f09",
+  "chapterId": "ch03",
+  "front": "Llama 3.3 70B KV",
+  "back": "0.3125 MiB/token；128K≈40 GiB",
+  "tags": "Llama"
+ },
+ {
+  "id": "f10",
+  "chapterId": "ch04",
+  "front": "Qwen 三条路线",
+  "back": "小 dense、大 MoE、混合线性",
+  "tags": "Qwen"
+ },
+ {
+  "id": "f11",
+  "chapterId": "ch04",
+  "front": "Qwen3.8-2.4T",
+  "back": "92 层、8192、512 专家 top-10、262K",
+  "tags": "Qwen"
+ },
+ {
+  "id": "f12",
+  "chapterId": "ch04",
+  "front": "Qwen3.8-27B KV",
+  "back": "0.25 MiB/token；262K≈64 GiB",
+  "tags": "Qwen"
+ },
+ {
+  "id": "f13",
+  "chapterId": "ch05",
+  "front": "Mistral 7B",
+  "back": "32 层、4096、GQA 8 KV、滑窗 4096",
+  "tags": "Mistral"
+ },
+ {
+  "id": "f14",
+  "chapterId": "ch05",
+  "front": "Mixtral 8x7B",
+  "back": "46.7B 总 / 12.9B 激活，8 专家 top-2",
+  "tags": "Mistral"
+ },
+ {
+  "id": "f15",
+  "chapterId": "ch05",
+  "front": "Mistral Small 4",
+  "back": "36 层、32/32 KV、128 专家 top-4、1M",
+  "tags": "Mistral"
+ },
+ {
+  "id": "f16",
+  "chapterId": "ch06",
+  "front": "Gemma 3",
+  "back": "5:1 局部/全局、QK-Norm、128K",
+  "tags": "Gemma"
+ },
+ {
+  "id": "f17",
+  "chapterId": "ch06",
+  "front": "Gemma 4 12B",
+  "back": "48 层、3840、16/8、262K、any-to-any",
+  "tags": "Gemma"
+ },
+ {
+  "id": "f18",
+  "chapterId": "ch06",
+  "front": "Gemma 3 27B KV",
+  "back": "16 KV、128 维；128K≈62 GiB",
+  "tags": "Gemma"
+ },
+ {
+  "id": "f19",
+  "chapterId": "ch07",
+  "front": "Phi-4",
+  "back": "40 层、5120、40/10、16K、14B",
+  "tags": "Phi"
+ },
+ {
+  "id": "f20",
+  "chapterId": "ch07",
+  "front": "Phi-4-mini",
+  "back": "32 层、3072、24/8、128K、3.8B",
+  "tags": "Phi"
+ },
+ {
+  "id": "f21",
+  "chapterId": "ch07",
+  "front": "Phi 核心",
+  "back": "数据课程 + 小模型 + 长训练",
+  "tags": "Phi"
+ },
+ {
+  "id": "f22",
+  "chapterId": "ch08",
+  "front": "Falcon",
+  "back": "MQA、多语言；H1 混合",
+  "tags": "北美"
+ },
+ {
+  "id": "f23",
+  "chapterId": "ch08",
+  "front": "BLOOM",
+  "back": "70 层、14336、112 头、2048",
+  "tags": "北美"
+ },
+ {
+  "id": "f24",
+  "chapterId": "ch08",
+  "front": "OLMo",
+  "back": "开放数据/代码/日志",
+  "tags": "北美"
+ },
+ {
+  "id": "f25",
+  "chapterId": "ch09",
+  "front": "GLM-5.3",
+  "back": "78 层、6144、64/64、256 专家 top-8、1M",
+  "tags": "中国"
+ },
+ {
+  "id": "f26",
+  "chapterId": "ch09",
+  "front": "Kimi K3",
+  "back": "93 层、7168、96/96、896 专家、1M",
+  "tags": "中国"
+ },
+ {
+  "id": "f27",
+  "chapterId": "ch09",
+  "front": "MiniMax M3",
+  "back": "60 层、6144、64/4、top-4+1、1M",
+  "tags": "中国"
+ },
+ {
+  "id": "f28",
+  "chapterId": "ch10",
+  "front": "SSM",
+  "back": "h_t=A h_{t-1}+B x_t；y_t=C h_t",
+  "tags": "非 Transformer"
+ },
+ {
+  "id": "f29",
+  "chapterId": "ch10",
+  "front": "Jamba",
+  "back": "Transformer + Mamba 混合",
+  "tags": "非 Transformer"
+ },
+ {
+  "id": "f30",
+  "chapterId": "ch10",
+  "front": "混合注意力",
+  "back": "大部分线性 + 少量全注意力",
+  "tags": "非 Transformer"
+ },
+ {
+  "id": "f31",
+  "chapterId": "ch11",
+  "front": "总参/激活",
+  "back": "总参=显存；激活=每 token 算力",
+  "tags": "MoE"
+ },
+ {
+  "id": "f32",
+  "chapterId": "ch11",
+  "front": "Qwen3.8-2.4T",
+  "back": "2.4T 总 / 95B 激活，512 专家 top-10",
+  "tags": "MoE"
+ },
+ {
+  "id": "f33",
+  "chapterId": "ch11",
+  "front": "共享专家",
+  "back": "所有 token 都走，学通用能力",
+  "tags": "MoE"
+ },
+ {
+  "id": "f34",
+  "chapterId": "ch12",
+  "front": "图像 token",
+  "back": "448/14=32，32²=1024；2×2 合并=256",
+  "tags": "多模态"
+ },
+ {
+  "id": "f35",
+  "chapterId": "ch12",
+  "front": "多模态三段式",
+  "back": "ViT → 连接器 → LLM",
+  "tags": "多模态"
+ },
+ {
+  "id": "f36",
+  "chapterId": "ch12",
+  "front": "Janus",
+  "back": "理解头 + 生成头双系统",
+  "tags": "多模态"
+ },
+ {
+  "id": "f37",
+  "chapterId": "ch13",
+  "front": "GQA 公式",
+  "back": "2 × L × H_kv × d_head × b",
+  "tags": "注意力"
+ },
+ {
+  "id": "f38",
+  "chapterId": "ch13",
+  "front": "1M KV",
+  "back": "朴素可达数百 GiB，必须稀疏/压缩",
+  "tags": "注意力"
+ },
+ {
+  "id": "f39",
+  "chapterId": "ch13",
+  "front": "YaRN",
+  "back": "factor 外推倍数；original 原训练长度",
+  "tags": "注意力"
+ },
+ {
+  "id": "f40",
+  "chapterId": "ch14",
+  "front": "许可证",
+  "back": "Apache/MIT 宽松；Llama/Gemma 有条件；CC-BY-NC 禁商用",
+  "tags": "合规"
+ },
+ {
+  "id": "f41",
+  "chapterId": "ch14",
+  "front": "开放数据",
+  "back": "OLMo/Pythia/DCLM 可复现",
+  "tags": "合规"
+ },
+ {
+  "id": "f42",
+  "chapterId": "ch14",
+  "front": "污染检测",
+  "back": "改写题目/换数字重测",
+  "tags": "合规"
+ },
+ {
+  "id": "f43",
+  "chapterId": "ch15",
+  "front": "config 字段",
+  "back": "architectures/model_type/层数/hidden/QKV/专家/上下文",
+  "tags": "工具"
+ },
+ {
+  "id": "f44",
+  "chapterId": "ch15",
+  "front": "MoE 参数估算",
+  "back": "E × 3 × H × F_exp × L",
+  "tags": "工具"
+ },
+ {
+  "id": "f45",
+  "chapterId": "ch15",
+  "front": "KV 估算",
+  "back": "2 × L × H_kv × d_head × b",
+  "tags": "工具"
+ },
+ {
+  "id": "f46",
+  "chapterId": "ch16",
+  "front": "选型顺序",
+  "back": "许可证 → 显存 → 上下文 → 任务",
+  "tags": "索引"
+ },
+ {
+  "id": "f47",
+  "chapterId": "ch16",
+  "front": "MoE 显存",
+  "back": "按总参数，不按激活参数",
+  "tags": "索引"
+ },
+ {
+  "id": "f48",
+  "chapterId": "ch16",
+  "front": "索引口径",
+  "back": "家族级，不逐 checkpoint",
+  "tags": "索引"
+ }
+]

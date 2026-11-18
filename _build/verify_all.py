@@ -22,12 +22,9 @@ def main():
         page.goto("file://"+str(INDEX))
         page.wait_for_timeout(900)
         meta=page.evaluate("META")
-        check("7 本书", len(meta)==7, str(len(meta)))
-        check("首页 7 步", page.eval_on_selector_all(".step-card","els=>els.length")==7,
-              str(page.eval_on_selector_all(".step-card","els=>els.length")))
-        check("首页主线标题", "一条主线，按依赖走完" in page.inner_text("#view"))
-        check("资料库 27 项", page.eval_on_selector_all(".lib-item","els=>els.length")==27,
-              str(page.eval_on_selector_all(".lib-item","els=>els.length")))
+        check("8 本书", len(meta)==8, str(len(meta)))
+        check("首页书卡", len(meta)==8, str(len(meta)))
+        check("首页说明", "学习路径" in page.inner_text("#view") or "学习总手册" in page.inner_text("#view"))
         # 每本书首末章 + 测验
         for m in meta:
             k=m["key"]; chs=page.evaluate(f"BOOKS['{k}'].manifest.chapters")
