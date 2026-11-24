@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""把总入口首页换成一条 7 步主线，资料库按需展开。"""
+"""把总入口首页换成一条 8 步主线，资料库按需展开。"""
 from pathlib import Path
 import re
 import sys
@@ -33,17 +33,18 @@ NEW_BLOCK = r"""  let pre='';
       {n:'04',t:'Transformer 与论文阅读',d:'Q/K/V、多头、残差、LayerNorm、FFN；用 shape 变化读懂一层 Transformer，再按“问题—方法—数据—实验—局限”拆 DeepSeek R1/V4/V4.1 三篇样例论文。',p:'#/book/deepseek-foundations/path',pl:'基础篇 6 章',x:[['07-transformer-deep/index.html','Transformer 深潜 15 节'],['#/book/deepseek-papers/path','论文拆解 5 章']]},
       {n:'05',t:'案例架构：DeepSeek 三代',d:'把 DeepSeek 当作第一个完整案例：MoE、MLA、MTP、DSA、CSA/HCA、mHC/Muon、Engram/DSpark；从 dense 走到 V4.1，再看 VL/Janus/OCR 多模态分支。',p:'19-deepseek-arch-deep/index.html',pl:'架构深潜 13 节',x:[['#/book/deepseek-architecture/path','架构阐释 5 章'],['#/book/deepseek-family/path','模型全谱 14 章'],['20-multimodal-deep/index.html','多模态 9 节']]},
       {n:'06',t:'全球开放模型对照',d:'把同一套读法用到 Llama、Qwen、Mistral、Gemma、Phi、GLM、Kimi、MiniMax、InternLM 等家族；读 config、算参数与 KV、看许可证，知道 DeepSeek 之外还有什么路线。',p:'#/book/global-open-models/path',pl:'全球分册 16 章',x:[['11-moe-mla-deep/index.html','MoE/MLA 10 节'],['#/book/global-open-models/chapter/ch16','101 行模型索引'],['#/book/global-open-models/chapter/ch14','许可证与评测']]},
-      {n:'07',t:'训练、评测与部署',d:'MDP、策略梯度、PPO/GRPO；再算 FLOPs、KV、并行和量化，做 pass@k、裁判偏差、幻觉与红队，最后到 PagedAttention、continuous batching 与 SLA。',p:'22-serving-deep/index.html',pl:'推理部署 9 节',x:[['18-rl-grpo-deep/index.html','强化学习 10 节'],['#/book/rl-sutton/path','Sutton 强化学习 17 章'],['13-train-infer-deep/index.html','训练账本 9 节'],['21-eval-safety-deep/index.html','评测安全 9 节'],['#/book/ai-mechanisms-formulas/path','机制公式总库 11 章']]},
+      {n:'07',t:'从零实现一次 LLM',d:'把 tokenizer、tiny GPT、预训练、SFT、LoRA、偏好对齐、KV cache、RAG 与评测串成一条可验收的链路。先跑 CPU 小实验，再按单卡/云选择路线；每章都有形状账本和检查点。',p:'#/book/llm-from-scratch/path',pl:'LLM 从零实现 14 章',x:[['13-train-infer-deep/index.html','训练账本 9 节'],['18-rl-grpo-deep/index.html','RL/GRPO 10 节'],['22-serving-deep/index.html','推理部署 9 节']]},
+      {n:'08',t:'训练、评测与部署',d:'MDP、策略梯度、PPO/GRPO；再算 FLOPs、KV、并行和量化，做 pass@k、裁判偏差、幻觉与红队，最后到 PagedAttention、continuous batching 与 SLA。',p:'22-serving-deep/index.html',pl:'推理部署 9 节',x:[['18-rl-grpo-deep/index.html','强化学习 10 节'],['#/book/rl-sutton/path','Sutton 强化学习 17 章'],['13-train-infer-deep/index.html','训练账本 9 节'],['21-eval-safety-deep/index.html','评测安全 9 节'],['#/book/ai-mechanisms-formulas/path','机制公式总库 11 章']]},
     ];
-    pre='<div class="hero"><div class="hero-kicker">AI 架构学习手册 · 全栈课程 · 13 本分册 + 15 套深潜课 + 7 个资料馆</div>'
+    pre='<div class="hero"><div class="hero-kicker">AI 架构学习手册 · 全栈课程 · 14 本分册 + 15 套深潜课 + 7 个资料馆</div>'
       +'<h1>从数学基础，到主流大模型架构</h1>'
-      +'<p>数学和代码接近零基础也能走。主线只有 7 步：先补数学与 Python，再经过机器学习、神经网络、深度学习、Transformer 与论文阅读；DeepSeek 是第一个完整案例，全球开放模型是扩展对照。</p>'
-      +'<div class="hero-stats"><span><b>13</b> 本分册</span><span><b>15</b> 套深潜课</span><span><b>164</b> 节单点推导</span><span><b>170</b> 章系统课</span></div></div>'
+      +'<p>数学和代码接近零基础也能走。主线只有 8 步：先补数学与 Python，再经过机器学习、神经网络、深度学习、Transformer 与论文阅读；DeepSeek 是第一个完整案例，全球开放模型是扩展对照，最后从零跑通一次 tiny LLM。</p>'
+      +'<div class="hero-stats"><span><b>14</b> 本分册</span><span><b>15</b> 套深潜课</span><span><b>164</b> 节单点推导</span><span><b>184</b> 章系统课</span></div></div>'
       +'<div class="path-head"><h2>学习路径</h2><p>按顺序点。每步先读主入口，再用右侧小标签补缺口。</p></div>'
       +'<div class="simple-path">'
       + steps.map(s=>`<div class="step-card"><div class="step-num">${s.n}</div><div><h3>${esc(s.t)}</h3><p>${esc(s.d)}</p><div class="step-links"><a class="primary" href="${encodeURI(s.p)}">${esc(s.pl)} →</a>${s.x.map(x=>`<a href="${encodeURI(x[0])}">${esc(x[1])}</a>`).join('')}</div></div></div>`).join('')
       +'</div>'
-      +'<details class="library"><summary><span>资料库</span><em>13 本分册 · 15 套深潜课 · 专题页</em></summary>'
+      +'<details class="library"><summary><span>资料库</span><em>14 本分册 · 15 套深潜课 · 专题页</em></summary>'
       +'<p class="lib-note">主线卡住时按关键词回来查。分册负责广度、依赖顺序和诊断；深潜课负责单点推到底。</p>'
       +'<h3>分册</h3><div class="lib-grid">'
       + META.map(m=>`<a class="lib-item book-card" href="#/book/${m.key}/path"><b>${esc(m.title)}</b><span>${m.chapters} 章 · ${m.quizzes} 测验</span></a>`).join('')
@@ -51,10 +52,12 @@ NEW_BLOCK = r"""  let pre='';
       + deep.map(d=>`<a class="lib-item" href="${encodeURI(d[0]+'/index.html')}" target="_blank"><b>${esc(d[1])}</b><span>${esc(d[2])} · ${esc(d[3])}</span></a>`).join('')
       +'</div><h3>专题</h3><div class="lib-grid topics">'
       + `<a class="lib-item" href="#/cross/doc7"><b>知识覆盖地图</b><span>哪些节点覆盖了、哪些还是缺口</span></a>`
-      + `<a class="lib-item" href="#/cross/doc4"><b>学习节点地图</b><span>依赖主线与 12 周推进表</span></a>`
+      + `<a class="lib-item" href="#/cross/doc4"><b>学习节点地图</b><span>依赖主线与三条路线推进表</span></a>`
       + `<a class="lib-item" href="#/cross/doc6"><b>深潜专题</b><span>15 套课怎么选、怎么配主线</span></a>`
       + `<a class="lib-item" href="#/cross/doc2"><b>跨书概念映射</b><span>同一概念在不同分册的讲法</span></a>`
       + `<a class="lib-item" href="#/cross/doc3"><b>综合检验</b><span>跨书任务与进阶路线</span></a>`
+      + `<a class="lib-item" href="#/cross/doc8"><b>三条学习路线</b><span>零基础 24 周 / 工程师 12 周 / 研究 16 周</span></a>`
+      + `<a class="lib-item" href="#/cross/doc9"><b>开源项目地图</b><span>该读、该跑、只该看的 14 个项目</span></a>`
       +'</div></details>'
       +'<details class="library"><summary><span>同源资料馆</span><em>7 个扩展库</em></summary>'
       +'<p class="lib-note">从你名下的重合项目里挑出来的扩展材料。它们保留原有单文件结构，不挤占主线；需要查机理、课程地图、模型清单或数学先修时再打开。</p>'
@@ -135,7 +138,7 @@ def main():
         "<span class=\"brand\">AI 架构学习手册<span>从数学与编程基础到主流大模型架构</span></span>", 1)
     text = text.replace("<h1>学习总手册</h1>", "<h1>AI 架构学习手册</h1>", 1)
     INDEX.write_text(text, encoding="utf-8")
-    print("✓ 首页改为全栈 7 步主线 + 可展开资料库")
+    print("✓ 首页改为全栈 8 步主线 + 可展开资料库")
     return 0
 
 if __name__ == "__main__":

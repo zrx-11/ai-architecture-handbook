@@ -118,7 +118,7 @@ else:
 
 NEW_HERO = r'''    pre='<div class="hero"><div class="hero-copy">'
       +'<h1>一条主线，按依赖走完</h1>'
-      +'<p class="hero-lede">数学和代码接近零基础也能走。这份学习总手册用七步主线，每步一个主入口；卡住再从资料库补。</p>'
+      +'<p class="hero-lede">数学和代码接近零基础也能走。这份学习总手册用八步主线，每步一个主入口；卡住再从资料库补。</p>'
       +'<div class="hero-actions"><a class="btn-primary" href="14-math-deep/index.html">从数学基础开始</a><a class="btn-ghost" href="#/cross/doc7">看知识覆盖地图</a></div>'
       +'<div class="hero-stats"><span><b>7</b> 本分册</span><span><b>15</b> 套深潜课</span><span><b>164</b> 节单点推导</span><span><b>67</b> 章系统课</span></div></div>'
       +'<div class="hero-stack" aria-label="DeepSeek 模型总参数与激活参数对比">'

@@ -1,0 +1,107 @@
+PASS 14 本书 | 14
+PASS 首页书卡 | 14
+PASS 首页说明
+PASS deepseek-foundations 章节数 | 6
+PASS deepseek-foundations 首章 | 3594 字
+PASS deepseek-foundations 末章 | 4755 字
+PASS deepseek-foundations 测验 | 15 题
+PASS deepseek-foundations 作答反馈
+PASS deepseek-papers 章节数 | 5
+PASS deepseek-papers 首章 | 4154 字
+PASS deepseek-papers 末章 | 3850 字
+PASS deepseek-papers 测验 | 12 题
+PASS deepseek-papers 作答反馈
+PASS deepseek-architecture 章节数 | 5
+PASS deepseek-architecture 首章 | 3737 字
+PASS deepseek-architecture 末章 | 2490 字
+PASS deepseek-architecture 测验 | 12 题
+PASS deepseek-architecture 作答反馈
+PASS machine-learning 章节数 | 16
+PASS machine-learning 首章 | 1479 字
+PASS machine-learning 末章 | 1875 字
+PASS machine-learning 测验 | 47 题
+PASS machine-learning 作答反馈
+PASS neural-networks 章节数 | 13
+PASS neural-networks 首章 | 2726 字
+PASS neural-networks 末章 | 3933 字
+PASS neural-networks 测验 | 61 题
+PASS neural-networks 作答反馈
+PASS deep-learning-scratch 章节数 | 8
+PASS deep-learning-scratch 首章 | 2092 字
+PASS deep-learning-scratch 末章 | 1703 字
+PASS deep-learning-scratch 测验 | 21 题
+PASS deep-learning-scratch 作答反馈
+PASS deepseek-family 章节数 | 14
+PASS deepseek-family 首章 | 4696 字
+PASS deepseek-family 末章 | 5480 字
+PASS deepseek-family 测验 | 42 题
+PASS deepseek-family 作答反馈
+PASS llm-from-scratch 章节数 | 14
+PASS llm-from-scratch 首章 | 1425 字
+PASS llm-from-scratch 末章 | 1447 字
+PASS llm-from-scratch 测验 | 28 题
+PASS llm-from-scratch 作答反馈
+PASS global-open-models 章节数 | 16
+PASS global-open-models 首章 | 3332 字
+PASS global-open-models 末章 | 8692 字
+PASS global-open-models 测验 | 53 题
+PASS global-open-models 作答反馈
+PASS ai-mechanisms-formulas 章节数 | 11
+PASS ai-mechanisms-formulas 首章 | 1736 字
+PASS ai-mechanisms-formulas 末章 | 1983 字
+PASS ai-mechanisms-formulas 测验 | 23 题
+PASS ai-mechanisms-formulas 作答反馈
+PASS hello-ai 章节数 | 20
+PASS hello-ai 首章 | 2622 字
+PASS hello-ai 末章 | 1979 字
+PASS hello-ai 测验 | 60 题
+PASS hello-ai 作答反馈
+PASS aima4 章节数 | 28
+PASS aima4 首章 | 1240 字
+PASS aima4 末章 | 987 字
+PASS aima4 测验 | 56 题
+PASS aima4 作答反馈
+PASS d2l 章节数 | 11
+PASS d2l 首章 | 1163 字
+PASS d2l 末章 | 1029 字
+PASS d2l 测验 | 29 题
+PASS d2l 作答反馈
+PASS rl-sutton 章节数 | 17
+PASS rl-sutton 首章 | 1428 字
+PASS rl-sutton 末章 | 1012 字
+PASS rl-sutton 测验 | 46 题
+PASS rl-sutton 作答反馈
+PASS 09 chapter/ch01 | 4696 字
+PASS 09 chapter/ch04 | 3261 字
+PASS 09 chapter/ch09 | 4948 字
+PASS 09 chapter/ch11 | 3790 字
+PASS 09 chapter/ch13 | 6637 字
+PASS 09 chapter/ch14 | 5480 字
+PASS 09 concept/c04 | 791 字
+PASS 09 concept/c11 | 726 字
+PASS 09 抽认卡
+PASS 09 术语表 68 | 68
+PASS 09 诊断页
+PASS LLM 从零实现 RoPE | 1337 字
+PASS LLM 从零实现表单公式 | 1
+PASS LLM 从零实现 6ND
+PASS LLM 从零实现测验 28 | 28
+PASS 跨书路线总表
+PASS 跨书项目地图
+PASS 机制总库 第 2 章 | 2219 字
+PASS 公式总库 KaTeX | 33
+PASS 公式总库 第 10 章
+PASS 机制总库术语 25 | 25
+PASS 路径进度 6 步 | 3/6 步
+PASS 搜索 MLA | 40 条
+PASS 桌面主栏宽度 | [290, 923.96875, 633.96875]
+PASS 移动端无横向溢出 | [0, 390, 390]
+PASS 移动端导航限高 | 388.24px
+PASS 09 伴侣打开
+PASS 09 伴侣 14 章 | 14
+PASS 09 伴侣测验 42 | 42
+PASS 09 伴侣 KaTeX | 16
+PASS 09 伴侣 Mermaid | 1
+PASS 控制台无错误
+
+=== 105/105 通过 ===

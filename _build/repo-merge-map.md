@@ -78,7 +78,7 @@
 
 ## 结论
 
-- 实际并入 7 个本地资料/分册来源，形成 13 本分册 + 7 个同源资料馆。
+- 实际并入 7 个本地资料/分册来源，形成 14 本分册 + 7 个同源资料馆。
 - `transformer`、`SVM`、`neural-net-zero` 三个单点站的内容已被现有分册覆盖，不重复建书。
 - `ai-enlighten` 与 Hello AI / AIMA / AI 简史重复，未重复建书。
 - `AI-courses`、`ai-history-site` 体积过大，保留为线上入口。

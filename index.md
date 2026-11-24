@@ -13,6 +13,7 @@
 | 神经网络：从一条直线推到反向传播 | 13 | 12 | 32 | 34 | [neural-networks学习伴侣.html](05-neural-networks/neural-networks学习伴侣.html) |
 | 深度学习入门：从零手写神经网络 | 8 | 2 | 21 | 38 | [deep-learning学习伴侣.html](06-deep-learning/deep-learning学习伴侣.html) |
 | 案例全谱：DeepSeek 一代到 V4.1 | 14 | 13 | 42 | 44 | [deepseek-family学习伴侣.html](09-deepseek-family/deepseek-family学习伴侣.html) |
+| LLM 从零实现：训练、对齐与部署 | 14 | 14 | 28 | 28 | [llm-from-scratch学习伴侣.html](14-llm-from-scratch/llm-from-scratch学习伴侣.html) |
 | 全球开放模型全谱：从 Llama 到 Qwen | 16 | 12 | 53 | 48 | [global-open-models学习伴侣.html](23-global-open-models/global-open-models学习伴侣.html) |
 | AI 机制与公式总库 | 11 | 8 | 23 | 22 | [ai-mechanisms-formulas学习伴侣.html](24-ai-mechanisms-formulas/ai-mechanisms-formulas学习伴侣.html) |
 | AI 导论：Hello, AI | 20 | 50 | 60 | 70 | [hello-ai学习伴侣.html](25-hello-ai/hello-ai学习伴侣.html) |
@@ -29,6 +30,8 @@
 - [跨书术语总表](00-跨书总览/术语总表.md)
 - [深潜专题：15 套单文件课](00-跨书总览/深潜专题.md)
 - [知识覆盖地图](00-跨书总览/知识覆盖地图.md)
+- [三条学习路线：零基础、工程师、研究/竞赛](00-跨书总览/路线总表.md)
+- [开源项目地图：哪些该读、该跑、只该看](00-跨书总览/项目地图.md)
 
 ## 使用方法
 

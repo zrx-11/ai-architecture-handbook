@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""本轮交付的端到端验证：全栈 7 步首页、13 本分册、机制公式总库、移动端/桌面端、搜索、测验。"""
+"""本轮交付的端到端验证：全栈 8 步首页、14 本分册、机制公式总库、移动端/桌面端、搜索、测验。"""
 import json, os, re, sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -22,8 +22,8 @@ def main():
         page.goto("file://"+str(INDEX))
         page.wait_for_timeout(900)
         meta=page.evaluate("META")
-        check("13 本书", len(meta)==13, str(len(meta)))
-        check("首页书卡", len(meta)==13, str(len(meta)))
+        check("14 本书", len(meta)==14, str(len(meta)))
+        check("首页书卡", len(meta)==14, str(len(meta)))
         check("首页说明", "从数学基础" in page.inner_text("#view") and "主流大模型架构" in page.inner_text("#view"))
         # 每本书首末章 + 测验
         for m in meta:
@@ -56,6 +56,21 @@ def main():
               str(page.eval_on_selector_all("#glossary-list li","els=>els.length")))
         page.evaluate("location.hash='#/book/deepseek-family/diagnosis'"); page.wait_for_timeout(450)
         check("09 诊断页", "诊断" in page.inner_text("#view"))
+        # 第 14 本：LLM 从零实现
+        page.evaluate("location.hash='#/book/llm-from-scratch/chapter/ch04'"); page.wait_for_timeout(800)
+        txt=page.inner_text("#view")
+        check("LLM 从零实现 RoPE", "RoPE" in txt, f"{len(txt)} 字")
+        check("LLM 从零实现表单公式", page.eval_on_selector_all(".katex","els=>els.length")>=1,
+              str(page.eval_on_selector_all(".katex","els=>els.length")))
+        page.evaluate("location.hash='#/book/llm-from-scratch/chapter/ch07'"); page.wait_for_timeout(500)
+        check("LLM 从零实现 6ND", "6ND" in page.inner_text("#view"))
+        page.evaluate("location.hash='#/book/llm-from-scratch/quiz/all'"); page.wait_for_timeout(500)
+        check("LLM 从零实现测验 28", page.eval_on_selector_all(".quiz-item","els=>els.length")==28,
+              str(page.eval_on_selector_all(".quiz-item","els=>els.length")))
+        page.evaluate("location.hash='#/cross/doc8'"); page.wait_for_timeout(500)
+        check("跨书路线总表", "三条学习路线" in page.inner_text("#view"))
+        page.evaluate("location.hash='#/cross/doc9'"); page.wait_for_timeout(500)
+        check("跨书项目地图", "开源项目地图" in page.inner_text("#view"))
         # 第九本：机制与公式总库
         page.evaluate("location.hash='#/book/ai-mechanisms-formulas/chapter/ch02'"); page.wait_for_timeout(600)
         txt=page.inner_text("#view")
