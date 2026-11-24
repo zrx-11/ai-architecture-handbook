@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""汇总六本分册的术语表，生成跨书术语总表。"""
+"""汇总全部分册的术语表，生成跨书术语总表。"""
 import json
 from pathlib import Path
 

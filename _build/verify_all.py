@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""本轮交付的端到端验证：全栈 7 步首页、9 本分册、机制公式总库、移动端/桌面端、搜索、测验。"""
+"""本轮交付的端到端验证：全栈 7 步首页、13 本分册、机制公式总库、移动端/桌面端、搜索、测验。"""
 import json, os, re, sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright
