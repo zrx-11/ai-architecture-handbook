@@ -18,7 +18,7 @@ with sync_playwright() as p:
  for slug,secs,new in COURSES:
   pg=b.new_page(viewport={'width':1440,'height':900})
   errs=[]; pg.on('pageerror',lambda e:errs.append(str(e)))
-  pg.goto('file://'+str(ROOT/slug/'index.html'),timeout=60000); pg.wait_for_timeout(1200)
+  pg.goto('file://'+str(ROOT/slug/'index.html'),timeout=60000); pg.wait_for_timeout(4000)
   ck(f'{slug} 打开', ('深潜课' in pg.title()) if new else ('交互式学习' in pg.title()), pg.title())
   ck(f'{slug} 节数', pg.eval_on_selector_all('section','e=>e.length')==secs, str(pg.eval_on_selector_all('section','e=>e.length')))
   ck(f'{slug} 目录', pg.eval_on_selector_all('.nav-item','e=>e.length')==secs, str(pg.eval_on_selector_all('.nav-item','e=>e.length')))
