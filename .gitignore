@@ -9,3 +9,7 @@ _build/shots/
 __pycache__/
 _build/screenshots/
 _backup/
+
+# 交付包校验和与清单留本地，不进入公开仓库
+AI架构学习手册-全栈版.sha256
+AI架构学习手册-全栈版-文件清单.txt
