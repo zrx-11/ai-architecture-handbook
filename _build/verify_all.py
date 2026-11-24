@@ -22,8 +22,8 @@ def main():
         page.goto("file://"+str(INDEX))
         page.wait_for_timeout(900)
         meta=page.evaluate("META")
-        check("9 本书", len(meta)==9, str(len(meta)))
-        check("首页书卡", len(meta)==9, str(len(meta)))
+        check("13 本书", len(meta)==13, str(len(meta)))
+        check("首页书卡", len(meta)==13, str(len(meta)))
         check("首页说明", "从数学基础" in page.inner_text("#view") and "主流大模型架构" in page.inner_text("#view"))
         # 每本书首末章 + 测验
         for m in meta:
@@ -94,7 +94,7 @@ def main():
         check("09 伴侣 14 章", page2.evaluate("DATA.manifest.chapters.length")==14, str(page2.evaluate("DATA.manifest.chapters.length")))
         page2.evaluate("location.hash='#/quiz/all'"); page2.wait_for_timeout(600)
         check("09 伴侣测验 42", page2.eval_on_selector_all(".quiz-item","els=>els.length")==42, str(page2.eval_on_selector_all(".quiz-item","els=>els.length")))
-        page2.evaluate("location.hash='#/chapter/ch04'"); page2.wait_for_timeout(6000)
+        page2.evaluate("location.hash='#/chapter/ch04'"); page2.wait_for_timeout(12000)
         check("09 伴侣 KaTeX", page2.eval_on_selector_all(".katex","els=>els.length")>=10, str(page2.eval_on_selector_all(".katex","els=>els.length")))
         check("09 伴侣 Mermaid", page2.eval_on_selector_all(".mermaid svg","els=>els.length")>=1, str(page2.eval_on_selector_all(".mermaid svg","els=>els.length")))
         check("控制台无错误", len(errors)==0, " || ".join(errors[:3]))

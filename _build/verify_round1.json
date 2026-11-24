@@ -1,13 +1,13 @@
 [
  {
-  "check": "9 本书",
+  "check": "13 本书",
   "pass": true,
-  "extra": "9"
+  "extra": "13"
  },
  {
   "check": "首页书卡",
   "pass": true,
-  "extra": "9"
+  "extra": "13"
  },
  {
   "check": "首页说明",
@@ -72,7 +72,7 @@
  {
   "check": "deepseek-architecture 首章",
   "pass": true,
-  "extra": "3737 字"
+  "extra": "3955 字"
  },
  {
   "check": "deepseek-architecture 末章",
@@ -97,12 +97,12 @@
  {
   "check": "machine-learning 首章",
   "pass": true,
-  "extra": "1479 字"
+  "extra": "1547 字"
  },
  {
   "check": "machine-learning 末章",
   "pass": true,
-  "extra": "1875 字"
+  "extra": "1953 字"
  },
  {
   "check": "machine-learning 测验",
@@ -236,6 +236,106 @@
  },
  {
   "check": "ai-mechanisms-formulas 作答反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "hello-ai 章节数",
+  "pass": true,
+  "extra": "20"
+ },
+ {
+  "check": "hello-ai 首章",
+  "pass": true,
+  "extra": "2622 字"
+ },
+ {
+  "check": "hello-ai 末章",
+  "pass": true,
+  "extra": "1979 字"
+ },
+ {
+  "check": "hello-ai 测验",
+  "pass": true,
+  "extra": "120 题"
+ },
+ {
+  "check": "hello-ai 作答反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "aima4 章节数",
+  "pass": true,
+  "extra": "28"
+ },
+ {
+  "check": "aima4 首章",
+  "pass": true,
+  "extra": "1240 字"
+ },
+ {
+  "check": "aima4 末章",
+  "pass": true,
+  "extra": "987 字"
+ },
+ {
+  "check": "aima4 测验",
+  "pass": true,
+  "extra": "112 题"
+ },
+ {
+  "check": "aima4 作答反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "d2l 章节数",
+  "pass": true,
+  "extra": "11"
+ },
+ {
+  "check": "d2l 首章",
+  "pass": true,
+  "extra": "1163 字"
+ },
+ {
+  "check": "d2l 末章",
+  "pass": true,
+  "extra": "1029 字"
+ },
+ {
+  "check": "d2l 测验",
+  "pass": true,
+  "extra": "58 题"
+ },
+ {
+  "check": "d2l 作答反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "rl-sutton 章节数",
+  "pass": true,
+  "extra": "17"
+ },
+ {
+  "check": "rl-sutton 首章",
+  "pass": true,
+  "extra": "1428 字"
+ },
+ {
+  "check": "rl-sutton 末章",
+  "pass": true,
+  "extra": "1012 字"
+ },
+ {
+  "check": "rl-sutton 测验",
+  "pass": true,
+  "extra": "92 题"
+ },
+ {
+  "check": "rl-sutton 作答反馈",
   "pass": true,
   "extra": ""
  },

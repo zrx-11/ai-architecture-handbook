@@ -36,3 +36,7 @@ python3 ../<zhishu>/scripts/apply_visual_theme.py --file global-open-models学�
 ```
 
 `manifest.json` 是唯一数据源；改章节、测验、卡片、术语后重新构建，不要手改 HTML。
+
+## 完整模型清单（306 个）
+
+本分册的 101 行是“代表性家族索引”，不是穷举。完整 306 个模型/版本、25 家厂商的交互清单见 `../30-llm-model-catalog/index.html`；字段含发布时间、参数、上下文、模态、许可证与状态。

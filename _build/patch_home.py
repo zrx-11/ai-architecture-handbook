@@ -28,22 +28,22 @@ NEW_BLOCK = r"""  let pre='';
     ];
     const steps=[
       {n:'01',t:'数学与编程工具',d:'先补到能算、能写：向量、矩阵、导数、链式法则、概率；再到 Python/NumPy 的形状、广播和手写梯度。每节都有可手算例子，不要求先学完整本数学。',p:'14-math-deep/index.html',pl:'数学基础 12 节',x:[['15-python-deep/index.html','Python 10 节'],['#/book/machine-learning/chapter/ch01','机器学习第 1 章']]},
-      {n:'02',t:'机器学习与神经网络',d:'线性回归、逻辑回归、树、聚类、偏差方差；再从一条直线推到神经元、损失、反向传播。学完能解释“模型到底在优化什么”。',p:'16-classical-ml-deep/index.html',pl:'经典机器学习 12 节',x:[['#/book/machine-learning/path','机器学习 16 章'],['#/book/neural-networks/path','神经网络 13 章'],['10-backprop-deep/index.html','反向传播 10 节']]},
-      {n:'03',t:'深度学习与序列模型',d:'从感知机、两层网络到正则化与 CNN；再用 RNN/LSTM/seq2seq 对照，理解为什么序列建模最终转向注意力。',p:'#/book/deep-learning-scratch/path',pl:'深度学习入门 8 章',x:[['17-cnn-rnn-deep/index.html','CNN/RNN 10 节'],['#/book/deepseek-foundations/path','Transformer 基础 6 章']]},
+      {n:'02',t:'AI 全景与机器学习',d:'先用 Hello AI 建立 AI 全景，再用 AIMA 补搜索、知识、不确定性与决策；回到周志华和神经网络，理解模型到底在优化什么。',p:'#/book/hello-ai/path',pl:'AI 导论 20 章',x:[['#/book/aima4/path','AIMA 28 章'],['#/book/machine-learning/path','机器学习 16 章'],['#/book/neural-networks/path','神经网络 13 章'],['10-backprop-deep/index.html','反向传播 10 节']]},
+      {n:'03',t:'深度学习与序列模型',d:'从感知机、两层网络到正则化与 CNN；再用 RNN/LSTM/seq2seq 对照，理解为什么序列建模最终转向注意力。',p:'#/book/deep-learning-scratch/path',pl:'深度学习入门 8 章',x:[['17-cnn-rnn-deep/index.html','CNN/RNN 10 节'],['#/book/d2l/path','动手学深度学习 11 章'],['#/book/deepseek-foundations/path','Transformer 基础 6 章']]},
       {n:'04',t:'Transformer 与论文阅读',d:'Q/K/V、多头、残差、LayerNorm、FFN；用 shape 变化读懂一层 Transformer，再按“问题—方法—数据—实验—局限”拆 DeepSeek R1/V4/V4.1 三篇样例论文。',p:'#/book/deepseek-foundations/path',pl:'基础篇 6 章',x:[['07-transformer-deep/index.html','Transformer 深潜 15 节'],['#/book/deepseek-papers/path','论文拆解 5 章']]},
       {n:'05',t:'案例架构：DeepSeek 三代',d:'把 DeepSeek 当作第一个完整案例：MoE、MLA、MTP、DSA、CSA/HCA、mHC/Muon、Engram/DSpark；从 dense 走到 V4.1，再看 VL/Janus/OCR 多模态分支。',p:'19-deepseek-arch-deep/index.html',pl:'架构深潜 13 节',x:[['#/book/deepseek-architecture/path','架构阐释 5 章'],['#/book/deepseek-family/path','模型全谱 14 章'],['20-multimodal-deep/index.html','多模态 9 节']]},
       {n:'06',t:'全球开放模型对照',d:'把同一套读法用到 Llama、Qwen、Mistral、Gemma、Phi、GLM、Kimi、MiniMax、InternLM 等家族；读 config、算参数与 KV、看许可证，知道 DeepSeek 之外还有什么路线。',p:'#/book/global-open-models/path',pl:'全球分册 16 章',x:[['11-moe-mla-deep/index.html','MoE/MLA 10 节'],['#/book/global-open-models/chapter/ch16','101 行模型索引'],['#/book/global-open-models/chapter/ch14','许可证与评测']]},
-      {n:'07',t:'训练、评测与部署',d:'MDP、策略梯度、PPO/GRPO；再算 FLOPs、KV、并行和量化，做 pass@k、裁判偏差、幻觉与红队，最后到 PagedAttention、continuous batching 与 SLA。',p:'22-serving-deep/index.html',pl:'推理部署 9 节',x:[['18-rl-grpo-deep/index.html','强化学习 10 节'],['13-train-infer-deep/index.html','训练账本 9 节'],['21-eval-safety-deep/index.html','评测安全 9 节'],['#/book/ai-mechanisms-formulas/path','机制公式总库 11 章']]},
+      {n:'07',t:'训练、评测与部署',d:'MDP、策略梯度、PPO/GRPO；再算 FLOPs、KV、并行和量化，做 pass@k、裁判偏差、幻觉与红队，最后到 PagedAttention、continuous batching 与 SLA。',p:'22-serving-deep/index.html',pl:'推理部署 9 节',x:[['18-rl-grpo-deep/index.html','强化学习 10 节'],['#/book/rl-sutton/path','Sutton 强化学习 17 章'],['13-train-infer-deep/index.html','训练账本 9 节'],['21-eval-safety-deep/index.html','评测安全 9 节'],['#/book/ai-mechanisms-formulas/path','机制公式总库 11 章']]},
     ];
-    pre='<div class="hero"><div class="hero-kicker">AI 架构学习手册 · 全栈课程 · 9 本分册 + 15 套深潜课</div>'
+    pre='<div class="hero"><div class="hero-kicker">AI 架构学习手册 · 全栈课程 · 13 本分册 + 15 套深潜课 + 7 个资料馆</div>'
       +'<h1>从数学基础，到主流大模型架构</h1>'
       +'<p>数学和代码接近零基础也能走。主线只有 7 步：先补数学与 Python，再经过机器学习、神经网络、深度学习、Transformer 与论文阅读；DeepSeek 是第一个完整案例，全球开放模型是扩展对照。</p>'
-      +'<div class="hero-stats"><span><b>9</b> 本分册</span><span><b>15</b> 套深潜课</span><span><b>164</b> 节单点推导</span><span><b>94</b> 章系统课</span></div></div>'
+      +'<div class="hero-stats"><span><b>13</b> 本分册</span><span><b>15</b> 套深潜课</span><span><b>164</b> 节单点推导</span><span><b>170</b> 章系统课</span></div></div>'
       +'<div class="path-head"><h2>学习路径</h2><p>按顺序点。每步先读主入口，再用右侧小标签补缺口。</p></div>'
       +'<div class="simple-path">'
       + steps.map(s=>`<div class="step-card"><div class="step-num">${s.n}</div><div><h3>${esc(s.t)}</h3><p>${esc(s.d)}</p><div class="step-links"><a class="primary" href="${encodeURI(s.p)}">${esc(s.pl)} →</a>${s.x.map(x=>`<a href="${encodeURI(x[0])}">${esc(x[1])}</a>`).join('')}</div></div></div>`).join('')
       +'</div>'
-      +'<details class="library"><summary><span>资料库</span><em>9 本分册 · 15 套深潜课 · 专题页</em></summary>'
+      +'<details class="library"><summary><span>资料库</span><em>13 本分册 · 15 套深潜课 · 专题页</em></summary>'
       +'<p class="lib-note">主线卡住时按关键词回来查。分册负责广度、依赖顺序和诊断；深潜课负责单点推到底。</p>'
       +'<h3>分册</h3><div class="lib-grid">'
       + META.map(m=>`<a class="lib-item book-card" href="#/book/${m.key}/path"><b>${esc(m.title)}</b><span>${m.chapters} 章 · ${m.quizzes} 测验</span></a>`).join('')
@@ -55,6 +55,17 @@ NEW_BLOCK = r"""  let pre='';
       + `<a class="lib-item" href="#/cross/doc6"><b>深潜专题</b><span>15 套课怎么选、怎么配主线</span></a>`
       + `<a class="lib-item" href="#/cross/doc2"><b>跨书概念映射</b><span>同一概念在不同分册的讲法</span></a>`
       + `<a class="lib-item" href="#/cross/doc3"><b>综合检验</b><span>跨书任务与进阶路线</span></a>`
+      +'</div></details>'
+      +'<details class="library"><summary><span>同源资料馆</span><em>7 个扩展库</em></summary>'
+      +'<p class="lib-note">从你名下的重合项目里挑出来的扩展材料。它们保留原有单文件结构，不挤占主线；需要查机理、课程地图、模型清单或数学先修时再打开。</p>'
+      +'<div class="lib-grid topics">'
+      + `<a class="lib-item" href="${encodeURI('29-ai-study-notes/HTML版/AI机理深度研习系列.html')}" target="_blank"><b>AI 机理深研 126 讲</b><span>Transformer 30 讲 / 信息论 / Agent / 运筹</span></a>`
+      + `<a class="lib-item" href="${encodeURI('30-llm-model-catalog/index.html')}" target="_blank"><b>全球大模型清单 306 个</b><span>25 家厂商 / 2026-11 / 参数与许可证</span></a>`
+      + `<a class="lib-item" href="${encodeURI('31-probability-statistics/概率统计从零推导.html')}" target="_blank"><b>概率统计从零推导 27 章</b><span>从初中概率到假设检验</span></a>`
+      + `<a class="lib-item" href="${encodeURI('32-math-basics/index.html')}" target="_blank"><b>数学基础知识丛书 24 本</b><span>有理数到微积分的先修库</span></a>`
+      + `<a class="lib-item" href="${encodeURI('33-agentic-design-patterns/index.html')}" target="_blank"><b>智能体设计模式 26 章</b><span>Agent 模式 / RAG / 反思 / 多智能体</span></a>`
+      + `<a class="lib-item" href="https://zrx-11.github.io/AI-courses/" target="_blank"><b>AI 课程地图 20 门</b><span>课程选课导航与术语词典</span></a>`
+      + `<a class="lib-item" href="https://zrx-11.github.io/ai-history-site/" target="_blank"><b>AI 简史 500+ 板块</b><span>24 个历史节点 / 论文与人物</span></a>`
       +'</div></details>';
   }
 """

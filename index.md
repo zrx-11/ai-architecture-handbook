@@ -1,4 +1,4 @@
-# AI 架构学习手册：从数学与编程基础到主流大模型架构
+# 学习总手册
 
 **[打开总学习手册（index.html）](index.html)** —— 统一入口，单文件可离线；顶部切换书籍，左侧按学习路径/章节/概念/测验/抽认卡/术语/模式/速查浏览，进度自动保存。
 
@@ -15,6 +15,10 @@
 | 案例全谱：DeepSeek 一代到 V4.1 | 14 | 13 | 42 | 44 | [deepseek-family学习伴侣.html](09-deepseek-family/deepseek-family学习伴侣.html) |
 | 全球开放模型全谱：从 Llama 到 Qwen | 16 | 12 | 53 | 48 | [global-open-models学习伴侣.html](23-global-open-models/global-open-models学习伴侣.html) |
 | AI 机制与公式总库 | 11 | 8 | 23 | 22 | [ai-mechanisms-formulas学习伴侣.html](24-ai-mechanisms-formulas/ai-mechanisms-formulas学习伴侣.html) |
+| AI 导论：Hello, AI | 20 | 50 | 60 | 70 | [hello-ai学习伴侣.html](25-hello-ai/hello-ai学习伴侣.html) |
+| AI 现代方法：完整地图 | 28 | 2 | 56 | 92 | [aima4学习伴侣.html](26-ai-modern-methods/aima4学习伴侣.html) |
+| 动手学深度学习：原理与代码 | 11 | 2 | 29 | 42 | [d2l学习伴侣.html](27-d2l/d2l学习伴侣.html) |
+| 强化学习：Sutton & Barto | 17 | 2 | 46 | 64 | [rl-sutton学习伴侣.html](28-rl-sutton/rl-sutton学习伴侣.html) |
 
 ## 跨书总览
 
