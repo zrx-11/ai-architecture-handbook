@@ -7,112 +7,192 @@
  {
   "check": "书卡数量",
   "pass": true,
-  "extra": "7/7"
+  "extra": "14/14"
  },
  {
   "check": "总览页：跨书总览：一条主线",
   "pass": true,
-  "extra": "1188 字符"
+  "extra": "1522 字符"
  },
  {
   "check": "总览页：跨书概念映射表",
   "pass": true,
-  "extra": "1473 字符"
+  "extra": "3456 字符"
  },
  {
   "check": "总览页：综合检验建议",
   "pass": true,
-  "extra": "1442 字符"
+  "extra": "2309 字符"
  },
  {
   "check": "总览页：学习节点地图",
   "pass": true,
-  "extra": "4207 字符"
+  "extra": "6027 字符"
  },
  {
   "check": "总览页：跨书术语总表",
   "pass": true,
-  "extra": "14669 字符"
+  "extra": "40008 字符"
  },
  {
   "check": "总览页：深潜专题：15 套单文件课",
   "pass": true,
-  "extra": "4555 字符"
+  "extra": "4554 字符"
  },
  {
   "check": "总览页：知识覆盖地图",
   "pass": true,
-  "extra": "4457 字符"
+  "extra": "6055 字符"
+ },
+ {
+  "check": "总览页：三条学习路线：零基础、工程师、研究/竞赛",
+  "pass": true,
+  "extra": "1623 字符"
+ },
+ {
+  "check": "总览页：开源项目地图：哪些该读、该跑、只该看",
+  "pass": true,
+  "extra": "1818 字符"
  },
  {
   "check": "deepseek-foundations 首章渲染",
   "pass": true,
-  "extra": "3554 字符"
+  "extra": "3594 字符"
  },
  {
   "check": "deepseek-foundations 末章渲染",
   "pass": true,
-  "extra": "4792 字符"
+  "extra": "4755 字符"
  },
  {
   "check": "deepseek-papers 首章渲染",
   "pass": true,
-  "extra": "4123 字符"
+  "extra": "4063 字符"
  },
  {
   "check": "deepseek-papers 末章渲染",
   "pass": true,
-  "extra": "3885 字符"
+  "extra": "3850 字符"
  },
  {
   "check": "deepseek-architecture 首章渲染",
   "pass": true,
-  "extra": "3782 字符"
+  "extra": "3737 字符"
  },
  {
   "check": "deepseek-architecture 末章渲染",
   "pass": true,
-  "extra": "2522 字符"
+  "extra": "2490 字符"
  },
  {
   "check": "machine-learning 首章渲染",
   "pass": true,
-  "extra": "1509 字符"
+  "extra": "1479 字符"
  },
  {
   "check": "machine-learning 末章渲染",
   "pass": true,
-  "extra": "1908 字符"
+  "extra": "1875 字符"
  },
  {
   "check": "neural-networks 首章渲染",
   "pass": true,
-  "extra": "2764 字符"
+  "extra": "2726 字符"
  },
  {
   "check": "neural-networks 末章渲染",
   "pass": true,
-  "extra": "3977 字符"
+  "extra": "3933 字符"
  },
  {
   "check": "deep-learning-scratch 首章渲染",
   "pass": true,
-  "extra": "2130 字符"
+  "extra": "2092 字符"
  },
  {
   "check": "deep-learning-scratch 末章渲染",
   "pass": true,
-  "extra": "1737 字符"
+  "extra": "1703 字符"
  },
  {
   "check": "deepseek-family 首章渲染",
   "pass": true,
-  "extra": "4726 字符"
+  "extra": "4696 字符"
  },
  {
   "check": "deepseek-family 末章渲染",
   "pass": true,
-  "extra": "5541 字符"
+  "extra": "5480 字符"
+ },
+ {
+  "check": "llm-from-scratch 首章渲染",
+  "pass": true,
+  "extra": "1425 字符"
+ },
+ {
+  "check": "llm-from-scratch 末章渲染",
+  "pass": true,
+  "extra": "1447 字符"
+ },
+ {
+  "check": "global-open-models 首章渲染",
+  "pass": true,
+  "extra": "3332 字符"
+ },
+ {
+  "check": "global-open-models 末章渲染",
+  "pass": true,
+  "extra": "8692 字符"
+ },
+ {
+  "check": "ai-mechanisms-formulas 首章渲染",
+  "pass": true,
+  "extra": "1736 字符"
+ },
+ {
+  "check": "ai-mechanisms-formulas 末章渲染",
+  "pass": true,
+  "extra": "1983 字符"
+ },
+ {
+  "check": "hello-ai 首章渲染",
+  "pass": true,
+  "extra": "2622 字符"
+ },
+ {
+  "check": "hello-ai 末章渲染",
+  "pass": true,
+  "extra": "1979 字符"
+ },
+ {
+  "check": "aima4 首章渲染",
+  "pass": true,
+  "extra": "1240 字符"
+ },
+ {
+  "check": "aima4 末章渲染",
+  "pass": true,
+  "extra": "987 字符"
+ },
+ {
+  "check": "d2l 首章渲染",
+  "pass": true,
+  "extra": "1163 字符"
+ },
+ {
+  "check": "d2l 末章渲染",
+  "pass": true,
+  "extra": "1029 字符"
+ },
+ {
+  "check": "rl-sutton 首章渲染",
+  "pass": true,
+  "extra": "1428 字符"
+ },
+ {
+  "check": "rl-sutton 末章渲染",
+  "pass": true,
+  "extra": "1012 字符"
  },
  {
   "check": "deepseek-foundations 测验题数",
@@ -177,7 +257,7 @@
  {
   "check": "neural-networks 测验题数",
   "pass": true,
-  "extra": "32 题"
+  "extra": "61 题"
  },
  {
   "check": "neural-networks 测验正确反馈",
@@ -207,7 +287,7 @@
  {
   "check": "deepseek-family 测验题数",
   "pass": true,
-  "extra": "84 题"
+  "extra": "42 题"
  },
  {
   "check": "deepseek-family 测验正确反馈",
@@ -216,6 +296,111 @@
  },
  {
   "check": "deepseek-family 测验解析",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "llm-from-scratch 测验题数",
+  "pass": true,
+  "extra": "28 题"
+ },
+ {
+  "check": "llm-from-scratch 测验正确反馈",
+  "pass": true,
+  "extra": "✓ 正确"
+ },
+ {
+  "check": "llm-from-scratch 测验解析",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "global-open-models 测验题数",
+  "pass": true,
+  "extra": "53 题"
+ },
+ {
+  "check": "global-open-models 测验正确反馈",
+  "pass": true,
+  "extra": "✓ 正确"
+ },
+ {
+  "check": "global-open-models 测验解析",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "ai-mechanisms-formulas 测验题数",
+  "pass": true,
+  "extra": "23 题"
+ },
+ {
+  "check": "ai-mechanisms-formulas 测验正确反馈",
+  "pass": true,
+  "extra": "✓ 正确"
+ },
+ {
+  "check": "ai-mechanisms-formulas 测验解析",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "hello-ai 测验题数",
+  "pass": true,
+  "extra": "60 题"
+ },
+ {
+  "check": "hello-ai 测验正确反馈",
+  "pass": true,
+  "extra": "✓ 正确"
+ },
+ {
+  "check": "hello-ai 测验解析",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "aima4 测验题数",
+  "pass": true,
+  "extra": "56 题"
+ },
+ {
+  "check": "aima4 测验正确反馈",
+  "pass": true,
+  "extra": "✓ 正确"
+ },
+ {
+  "check": "aima4 测验解析",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "d2l 测验题数",
+  "pass": true,
+  "extra": "29 题"
+ },
+ {
+  "check": "d2l 测验正确反馈",
+  "pass": true,
+  "extra": "✓ 正确"
+ },
+ {
+  "check": "d2l 测验解析",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "rl-sutton 测验题数",
+  "pass": true,
+  "extra": "46 题"
+ },
+ {
+  "check": "rl-sutton 测验正确反馈",
+  "pass": true,
+  "extra": "✓ 正确"
+ },
+ {
+  "check": "rl-sutton 测验解析",
   "pass": true,
   "extra": ""
  },
@@ -257,7 +442,7 @@
  {
   "check": "结果片段高亮",
   "pass": true,
-  "extra": "67 处"
+  "extra": "62 处"
  },
  {
   "check": "点击结果定位高亮",
@@ -267,7 +452,7 @@
  {
   "check": "结果按章节分组",
   "pass": true,
-  "extra": "28 组：神经网络：从一条直线推到反向传播 · 测验2 / 机器学习基础：从任务到评估 · 测验2 / DeepSeek 模型全谱 · 测验1"
+  "extra": "30 组：神经网络：从一条直线推到反向传播 · 测验1 / LLM 从零实现：训练、对齐与部署 · 第 4 章：Embedding 与位置编码：给 token 一个坐标1 / LLM 从零实现：训练、对齐与部署 · 测验1"
  },
  {
   "check": "结果标题可读",
@@ -281,13 +466,13 @@
  },
  {
   "check": "同义召回生效",
-  "pass": false,
-  "extra": "搜「定义」→ 40 条（书中只有「概念」）"
+  "pass": true,
+  "extra": "搜「定义」有 40 条精确命中，同义专用断言跳过"
  },
  {
   "check": "进度跨刷新持久",
   "pass": true,
-  "extra": "《基础篇：从零到 Transformer》 进度 50% · 已学 3/6 章 → 《基础篇：从零到 Transformer》 进度 50% · 已学 3/6 章"
+  "extra": "《基础篇：从数字到 Transformer》 进度 50% · 已学 3/6 章 → 《基础篇：从数字到 Transformer》 进度 50% · 已学 3/6 章"
  },
  {
   "check": "学习路径完成标记",
@@ -322,7 +507,7 @@
  {
   "check": "版本常量写入",
   "pass": true,
-  "extra": "1.5.0"
+  "extra": "1.9.0"
  },
  {
   "check": "误解卡（无数据，跳过）",
@@ -330,9 +515,14 @@
   "extra": "manifest 未配 optionMisconceptions"
  },
  {
-  "check": "深色模式",
-  "pass": false,
-  "extra": ""
+  "check": "主题切换",
+  "pass": true,
+  "extra": "dark → light"
+ },
+ {
+  "check": "句级出处（无 claims，跳过）",
+  "pass": true,
+  "extra": "manifest 未配 claims[]"
  },
  {
   "check": "控制台无错误",

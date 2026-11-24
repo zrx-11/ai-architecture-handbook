@@ -72,7 +72,7 @@
  {
   "check": "deepseek-architecture 首章",
   "pass": true,
-  "extra": "3737 字"
+  "extra": "3955 字"
  },
  {
   "check": "deepseek-architecture 末章",
@@ -97,12 +97,12 @@
  {
   "check": "machine-learning 首章",
   "pass": true,
-  "extra": "1479 字"
+  "extra": "1547 字"
  },
  {
   "check": "machine-learning 末章",
   "pass": true,
-  "extra": "1875 字"
+  "extra": "1953 字"
  },
  {
   "check": "machine-learning 测验",
@@ -482,12 +482,42 @@
  {
   "check": "桌面主栏宽度",
   "pass": true,
-  "extra": "[290, 923.96875, 633.96875]"
+  "extra": "[315, 1415, 1100]"
+ },
+ {
+  "check": "桌面头部高度",
+  "pass": true,
+  "extra": "98.7px"
+ },
+ {
+  "check": "章节阅读宽度 780",
+  "pass": true,
+  "extra": "780.0px"
+ },
+ {
+  "check": "章节标题字号 32",
+  "pass": true,
+  "extra": "32px"
+ },
+ {
+  "check": "章节正文字号 16.5",
+  "pass": true,
+  "extra": "16.5px"
  },
  {
   "check": "移动端无横向溢出",
   "pass": true,
   "extra": "[0, 390, 390]"
+ },
+ {
+  "check": "移动端头部高度",
+  "pass": true,
+  "extra": "132.1px"
+ },
+ {
+  "check": "移动端工具区右边界",
+  "pass": true,
+  "extra": "376.0px"
  },
  {
   "check": "移动端导航限高",

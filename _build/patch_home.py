@@ -36,7 +36,7 @@ NEW_BLOCK = r"""  let pre='';
       {n:'07',t:'从零实现一次 LLM',d:'把 tokenizer、tiny GPT、预训练、SFT、LoRA、偏好对齐、KV cache、RAG 与评测串成一条可验收的链路。先跑 CPU 小实验，再按单卡/云选择路线；每章都有形状账本和检查点。',p:'#/book/llm-from-scratch/path',pl:'LLM 从零实现 14 章',x:[['13-train-infer-deep/index.html','训练账本 9 节'],['18-rl-grpo-deep/index.html','RL/GRPO 10 节'],['22-serving-deep/index.html','推理部署 9 节']]},
       {n:'08',t:'训练、评测与部署',d:'MDP、策略梯度、PPO/GRPO；再算 FLOPs、KV、并行和量化，做 pass@k、裁判偏差、幻觉与红队，最后到 PagedAttention、continuous batching 与 SLA。',p:'22-serving-deep/index.html',pl:'推理部署 9 节',x:[['18-rl-grpo-deep/index.html','强化学习 10 节'],['#/book/rl-sutton/path','Sutton 强化学习 17 章'],['13-train-infer-deep/index.html','训练账本 9 节'],['21-eval-safety-deep/index.html','评测安全 9 节'],['#/book/ai-mechanisms-formulas/path','机制公式总库 11 章']]},
     ];
-    pre='<div class="hero"><div class="hero-kicker">AI 架构学习手册 · 全栈课程 · 14 本分册 + 15 套深潜课 + 7 个资料馆</div>'
+    pre='<div class="hero"><div class="hero-kicker">AI 架构学习手册 · 14 本分册 · 15 套深潜课 · 7 个资料馆</div>'
       +'<h1>从数学基础，到主流大模型架构</h1>'
       +'<p>数学和代码接近零基础也能走。主线只有 8 步：先补数学与 Python，再经过机器学习、神经网络、深度学习、Transformer 与论文阅读；DeepSeek 是第一个完整案例，全球开放模型是扩展对照，最后从零跑通一次 tiny LLM。</p>'
       +'<div class="hero-stats"><span><b>14</b> 本分册</span><span><b>15</b> 套深潜课</span><span><b>164</b> 节单点推导</span><span><b>184</b> 章系统课</span></div></div>'

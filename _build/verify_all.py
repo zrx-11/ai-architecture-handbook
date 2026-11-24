@@ -93,12 +93,25 @@ def main():
         check("搜索 MLA", hits>0, f"{hits} 条")
         # 桌面布局
         box=page.eval_on_selector(".main","el=>{const r=el.getBoundingClientRect();return [r.left,r.right,r.width]}")
-        check("桌面主栏宽度", box[2]<=940 and box[0]>=100, str(box))
+        check("桌面主栏宽度", 1080<=box[2]<=1120 and box[0]>=100, str(box))
+        hh=page.eval_on_selector("header","el=>el.getBoundingClientRect().height")
+        check("桌面头部高度", hh<=110, f"{hh:.1f}px")
+        page.evaluate("location.hash='#/book/llm-from-scratch/chapter/ch04'"); page.wait_for_timeout(500)
+        pw=page.eval_on_selector("#view.page","el=>el.getBoundingClientRect().width")
+        check("章节阅读宽度 780", 760<=pw<=800, f"{pw:.1f}px")
+        fs=page.eval_on_selector("#view.page h1","el=>parseFloat(getComputedStyle(el).fontSize)")
+        check("章节标题字号 32", 31<=fs<=33, f"{fs}px")
+        bf=page.eval_on_selector("#view.page p","el=>parseFloat(getComputedStyle(el).fontSize)")
+        check("章节正文字号 16.5", 16<=bf<=17, f"{bf}px")
         # 移动端
         page.set_viewport_size({"width":390,"height":844})
         page.evaluate("location.hash='#/book/deepseek-family/chapter/ch09'"); page.wait_for_timeout(500)
         m=page.eval_on_selector(".main","el=>{const r=el.getBoundingClientRect();return [r.left,r.right,el.scrollWidth]}")
         check("移动端无横向溢出", m[1]<=392 and m[2]<=390, str(m))
+        mh=page.eval_on_selector("header","el=>el.getBoundingClientRect().height")
+        check("移动端头部高度", mh<=140, f"{mh:.1f}px")
+        tools=page.eval_on_selector(".hdr-right","el=>el.getBoundingClientRect().right")
+        check("移动端工具区右边界", tools<=380, f"{tools:.1f}px")
         nav=page.eval_on_selector("#nav","el=>getComputedStyle(el).maxHeight") if page.query_selector("#nav") else "none"
         check("移动端导航限高", nav in ("46vh","none") or "px" in nav, nav)
         # 09 独立伴侣
