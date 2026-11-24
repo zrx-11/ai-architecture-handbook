@@ -1,5 +1,7 @@
 .gitignore
 .nojekyll
+AI架构学习手册-全栈版-文件清单.txt
+AI架构学习手册-全栈版.sha256
 README.md
 index.html
 index.md
