@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""本轮交付的端到端验证：7 步首页、09 分册、移动端/桌面端、搜索、测验。"""
+"""本轮交付的端到端验证：全栈 7 步首页、9 本分册、机制公式总库、移动端/桌面端、搜索、测验。"""
 import json, os, re, sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -22,9 +22,9 @@ def main():
         page.goto("file://"+str(INDEX))
         page.wait_for_timeout(900)
         meta=page.evaluate("META")
-        check("8 本书", len(meta)==8, str(len(meta)))
-        check("首页书卡", len(meta)==8, str(len(meta)))
-        check("首页说明", "学习路径" in page.inner_text("#view") or "学习总手册" in page.inner_text("#view"))
+        check("9 本书", len(meta)==9, str(len(meta)))
+        check("首页书卡", len(meta)==9, str(len(meta)))
+        check("首页说明", "从数学基础" in page.inner_text("#view") and "主流大模型架构" in page.inner_text("#view"))
         # 每本书首末章 + 测验
         for m in meta:
             k=m["key"]; chs=page.evaluate(f"BOOKS['{k}'].manifest.chapters")
@@ -56,6 +56,21 @@ def main():
               str(page.eval_on_selector_all("#glossary-list li","els=>els.length")))
         page.evaluate("location.hash='#/book/deepseek-family/diagnosis'"); page.wait_for_timeout(450)
         check("09 诊断页", "诊断" in page.inner_text("#view"))
+        # 第九本：机制与公式总库
+        page.evaluate("location.hash='#/book/ai-mechanisms-formulas/chapter/ch02'"); page.wait_for_timeout(600)
+        txt=page.inner_text("#view")
+        check("机制总库 第 2 章", "BPE 分词" in txt and "Attention Sink" in txt, f"{len(txt)} 字")
+        page.evaluate("location.hash='#/book/ai-mechanisms-formulas/chapter/ch07'"); page.wait_for_timeout(900)
+        check("公式总库 KaTeX", page.eval_on_selector_all(".katex","els=>els.length")>=5,
+              str(page.eval_on_selector_all(".katex","els=>els.length")))
+        page.evaluate("location.hash='#/book/ai-mechanisms-formulas/chapter/ch10'"); page.wait_for_timeout(600)
+        check("公式总库 第 10 章", "104" in page.inner_text("#view"))
+        page.evaluate("location.hash='#/book/ai-mechanisms-formulas/glossary'"); page.wait_for_timeout(500)
+        check("机制总库术语 25", page.eval_on_selector_all("#glossary-list li","els=>els.length")==25,
+              str(page.eval_on_selector_all("#glossary-list li","els=>els.length")))
+        page.evaluate("location.hash='#/'"); page.wait_for_timeout(500)
+        page.evaluate("location.hash='#/book/ai-mechanisms-formulas/path'"); page.wait_for_timeout(500)
+        check("路径进度 6 步", "/6 步" in page.inner_text("#path-progress-label"), page.inner_text("#path-progress-label"))
         # 搜索
         page.evaluate("location.hash='#/cross/doc1'"); page.wait_for_timeout(400)
         page.fill("#q","MLA"); page.wait_for_timeout(500)
@@ -79,7 +94,7 @@ def main():
         check("09 伴侣 14 章", page2.evaluate("DATA.manifest.chapters.length")==14, str(page2.evaluate("DATA.manifest.chapters.length")))
         page2.evaluate("location.hash='#/quiz/all'"); page2.wait_for_timeout(600)
         check("09 伴侣测验 42", page2.eval_on_selector_all(".quiz-item","els=>els.length")==42, str(page2.eval_on_selector_all(".quiz-item","els=>els.length")))
-        page2.evaluate("location.hash='#/chapter/ch04'"); page2.wait_for_timeout(2500)
+        page2.evaluate("location.hash='#/chapter/ch04'"); page2.wait_for_timeout(6000)
         check("09 伴侣 KaTeX", page2.eval_on_selector_all(".katex","els=>els.length")>=10, str(page2.eval_on_selector_all(".katex","els=>els.length")))
         check("09 伴侣 Mermaid", page2.eval_on_selector_all(".mermaid svg","els=>els.length")>=1, str(page2.eval_on_selector_all(".mermaid svg","els=>els.length")))
         check("控制台无错误", len(errors)==0, " || ".join(errors[:3]))

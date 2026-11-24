@@ -7,3 +7,5 @@ _work/
 _build/shots/
 
 __pycache__/
+_build/screenshots/
+_backup/

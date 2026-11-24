@@ -27,23 +27,23 @@ NEW_BLOCK = r"""  let pre='';
       ['13-train-infer-deep','训练与推理账本','9 节','6ND / KV / prefill-decode / 量化'],
     ];
     const steps=[
-      {n:'01',t:'数学与 Python 工具',d:'先补到能算：向量、矩阵、导数与链式法则、概率、NumPy 的形状和广播。每节都有可手算的例子，不要求先学完整本数学。',p:'14-math-deep/index.html',pl:'数学基础 12 节',x:[['15-python-deep/index.html','Python 10 节'],['#/book/machine-learning/chapter/ch01','机器学习第 1 章']]},
-      {n:'02',t:'机器学习与神经网络',d:'线性回归、逻辑回归、树、聚类、偏差方差；再从一条直线推到神经元、损失、反向传播。学完能解释“模型到底在优化什么”。',p:'16-classical-ml-deep/index.html',pl:'经典机器学习 12 节',x:[['#/book/machine-learning/path','机器学习 16 章'],['#/book/neural-networks/path','神经网络 13 章']]},
-      {n:'03',t:'Transformer 与序列模型',d:'Q/K/V、多头、残差、LayerNorm、FFN；用 CNN/RNN 对照，理解为什么注意力替代了循环。目标：能手画一层 Transformer 的 shape 变化。',p:'#/book/deepseek-foundations/path',pl:'基础篇 6 章',x:[['17-cnn-rnn-deep/index.html','CNN/RNN 10 节'],['07-transformer-deep/index.html','Transformer 深潜 15 节']]},
-      {n:'04',t:'读三篇论文',d:'R1、V4、V4.1 按“问题—方法—数据—实验—局限”拆。不背结论，先能说出每篇在解决哪个瓶颈、代价是什么。',p:'#/book/deepseek-papers/path',pl:'论文拆解 5 章',x:[['#/book/deepseek-papers/chapter/ch06','先读 GRPO'],['#/book/deepseek-papers/chapter/ch08','再读 V4']]},
-      {n:'05',t:'三代架构与全家族',d:'MoE、MLA、MTP、DSA、CSA/HCA、mHC/Muon、Engram/DSpark；从 dense 走到 V4.1，再看 VL/Janus/OCR 这些多模态分支。每代只记一个结构件。',p:'19-deepseek-arch-deep/index.html',pl:'架构深潜 13 节',x:[['#/book/deepseek-architecture/path','架构阐释 5 章'],['#/book/deepseek-family/path','模型全谱 14 章'],['20-multimodal-deep/index.html','多模态 9 节']]},
-      {n:'06',t:'训练、强化学习与账本',d:'MDP、策略梯度、PPO、奖励模型、GRPO 的组内优势；再算 FLOPs、KV cache、并行和量化。这一步行完，你能判断一个训练/推理方案大概要多少卡。',p:'18-rl-grpo-deep/index.html',pl:'强化学习 10 节',x:[['13-train-infer-deep/index.html','训练推理账本 9 节'],['12-probability-eval-deep/index.html','概率与评估 10 节']]},
-      {n:'07',t:'评测、安全与上线',d:'pass@k、LLM 裁判偏差、幻觉、拒答、红队、数据污染；再到 PagedAttention、continuous batching、TP/PP/EP、FP8 和容量规划。最后做一次选型。',p:'22-serving-deep/index.html',pl:'推理部署 9 节',x:[['21-eval-safety-deep/index.html','评测与安全 9 节'],['#/book/deepseek-family/chapter/ch11','选型表'],['#/cross/doc7','知识覆盖地图']]},
+      {n:'01',t:'数学与编程工具',d:'先补到能算、能写：向量、矩阵、导数、链式法则、概率；再到 Python/NumPy 的形状、广播和手写梯度。每节都有可手算例子，不要求先学完整本数学。',p:'14-math-deep/index.html',pl:'数学基础 12 节',x:[['15-python-deep/index.html','Python 10 节'],['#/book/machine-learning/chapter/ch01','机器学习第 1 章']]},
+      {n:'02',t:'机器学习与神经网络',d:'线性回归、逻辑回归、树、聚类、偏差方差；再从一条直线推到神经元、损失、反向传播。学完能解释“模型到底在优化什么”。',p:'16-classical-ml-deep/index.html',pl:'经典机器学习 12 节',x:[['#/book/machine-learning/path','机器学习 16 章'],['#/book/neural-networks/path','神经网络 13 章'],['10-backprop-deep/index.html','反向传播 10 节']]},
+      {n:'03',t:'深度学习与序列模型',d:'从感知机、两层网络到正则化与 CNN；再用 RNN/LSTM/seq2seq 对照，理解为什么序列建模最终转向注意力。',p:'#/book/deep-learning-scratch/path',pl:'深度学习入门 8 章',x:[['17-cnn-rnn-deep/index.html','CNN/RNN 10 节'],['#/book/deepseek-foundations/path','Transformer 基础 6 章']]},
+      {n:'04',t:'Transformer 与论文阅读',d:'Q/K/V、多头、残差、LayerNorm、FFN；用 shape 变化读懂一层 Transformer，再按“问题—方法—数据—实验—局限”拆 DeepSeek R1/V4/V4.1 三篇样例论文。',p:'#/book/deepseek-foundations/path',pl:'基础篇 6 章',x:[['07-transformer-deep/index.html','Transformer 深潜 15 节'],['#/book/deepseek-papers/path','论文拆解 5 章']]},
+      {n:'05',t:'案例架构：DeepSeek 三代',d:'把 DeepSeek 当作第一个完整案例：MoE、MLA、MTP、DSA、CSA/HCA、mHC/Muon、Engram/DSpark；从 dense 走到 V4.1，再看 VL/Janus/OCR 多模态分支。',p:'19-deepseek-arch-deep/index.html',pl:'架构深潜 13 节',x:[['#/book/deepseek-architecture/path','架构阐释 5 章'],['#/book/deepseek-family/path','模型全谱 14 章'],['20-multimodal-deep/index.html','多模态 9 节']]},
+      {n:'06',t:'全球开放模型对照',d:'把同一套读法用到 Llama、Qwen、Mistral、Gemma、Phi、GLM、Kimi、MiniMax、InternLM 等家族；读 config、算参数与 KV、看许可证，知道 DeepSeek 之外还有什么路线。',p:'#/book/global-open-models/path',pl:'全球分册 16 章',x:[['11-moe-mla-deep/index.html','MoE/MLA 10 节'],['#/book/global-open-models/chapter/ch16','101 行模型索引'],['#/book/global-open-models/chapter/ch14','许可证与评测']]},
+      {n:'07',t:'训练、评测与部署',d:'MDP、策略梯度、PPO/GRPO；再算 FLOPs、KV、并行和量化，做 pass@k、裁判偏差、幻觉与红队，最后到 PagedAttention、continuous batching 与 SLA。',p:'22-serving-deep/index.html',pl:'推理部署 9 节',x:[['18-rl-grpo-deep/index.html','强化学习 10 节'],['13-train-infer-deep/index.html','训练账本 9 节'],['21-eval-safety-deep/index.html','评测安全 9 节'],['#/book/ai-mechanisms-formulas/path','机制公式总库 11 章']]},
     ];
-    pre='<div class="hero"><div class="hero-kicker">AI 架构学习系统 · 学习总手册 · 7 本分册 + 15 套深潜课</div>'
-      +'<h1>一条主线，按依赖走完</h1>'
-      +'<p>数学和代码接近零基础也能走。主线只有 7 步，每步给一个主入口；卡住再从下面资料库补，不必一次开很多。</p>'
-      +'<div class="hero-stats"><span><b>7</b> 本分册</span><span><b>15</b> 套深潜课</span><span><b>164</b> 节单点推导</span><span><b>67</b> 章系统课</span></div></div>'
+    pre='<div class="hero"><div class="hero-kicker">AI 架构学习手册 · 全栈课程 · 9 本分册 + 15 套深潜课</div>'
+      +'<h1>从数学基础，到主流大模型架构</h1>'
+      +'<p>数学和代码接近零基础也能走。主线只有 7 步：先补数学与 Python，再经过机器学习、神经网络、深度学习、Transformer 与论文阅读；DeepSeek 是第一个完整案例，全球开放模型是扩展对照。</p>'
+      +'<div class="hero-stats"><span><b>9</b> 本分册</span><span><b>15</b> 套深潜课</span><span><b>164</b> 节单点推导</span><span><b>94</b> 章系统课</span></div></div>'
       +'<div class="path-head"><h2>学习路径</h2><p>按顺序点。每步先读主入口，再用右侧小标签补缺口。</p></div>'
       +'<div class="simple-path">'
       + steps.map(s=>`<div class="step-card"><div class="step-num">${s.n}</div><div><h3>${esc(s.t)}</h3><p>${esc(s.d)}</p><div class="step-links"><a class="primary" href="${encodeURI(s.p)}">${esc(s.pl)} →</a>${s.x.map(x=>`<a href="${encodeURI(x[0])}">${esc(x[1])}</a>`).join('')}</div></div></div>`).join('')
       +'</div>'
-      +'<details class="library"><summary><span>资料库</span><em>7 本分册 · 15 套深潜课 · 专题页</em></summary>'
+      +'<details class="library"><summary><span>资料库</span><em>9 本分册 · 15 套深潜课 · 专题页</em></summary>'
       +'<p class="lib-note">主线卡住时按关键词回来查。分册负责广度、依赖顺序和诊断；深潜课负责单点推到底。</p>'
       +'<h3>分册</h3><div class="lib-grid">'
       + META.map(m=>`<a class="lib-item book-card" href="#/book/${m.key}/path"><b>${esc(m.title)}</b><span>${m.chapters} 章 · ${m.quizzes} 测验</span></a>`).join('')
@@ -76,7 +76,7 @@ CSS = r"""
 .step-card p{margin:0 0 10px;color:var(--muted);line-height:1.68;font-size:.95rem}
 .step-links{display:flex;flex-wrap:wrap;gap:8px}
 .step-links a{font-size:.88rem;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--accent-soft);color:var(--text);text-decoration:none}
-.step-links a.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.step-links a.primary{background:var(--accent);color:#fff!important;border-color:var(--accent);font-weight:600}
 .step-links a:hover{border-color:var(--accent);text-decoration:none}
 .library{margin-top:6px;border-top:1px solid var(--border);padding-top:16px}
 .library summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px}
@@ -118,8 +118,13 @@ def main():
             print("未找到 CSS 插入点")
             return 1
         text = text.replace(marker, CSS + "\n" + marker, 1)
+    text = text.replace("<title>学习总手册</title>",
+        "<title>AI 架构学习手册 · 从数学与编程基础到主流大模型架构</title>", 1)
+    text = text.replace("<span class=\"brand\">学习总手册<span>点化学习系统 · 统一入口</span></span>",
+        "<span class=\"brand\">AI 架构学习手册<span>从数学与编程基础到主流大模型架构</span></span>", 1)
+    text = text.replace("<h1>学习总手册</h1>", "<h1>AI 架构学习手册</h1>", 1)
     INDEX.write_text(text, encoding="utf-8")
-    print("✓ 首页改为 7 步主线 + 可展开资料库")
+    print("✓ 首页改为全栈 7 步主线 + 可展开资料库")
     return 0
 
 if __name__ == "__main__":

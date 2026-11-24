@@ -1,9 +1,9 @@
 {
   "slug": "deepseek-foundations",
-  "title": "基础篇：从零到 Transformer",
-  "subtitle": "读懂 DeepSeek 论文之前，先把数字、注意力与 V3 地基补齐",
+  "title": "基础篇：从数字到 Transformer",
+  "subtitle": "零基础先修：向量、矩阵、梯度、注意力与一层 Transformer；DeepSeek-V3 只作为第一个案例",
   "book": {
-    "title": "基础篇：从零到 Transformer",
+    "title": "基础篇：从数字到 Transformer",
     "author": "本课程整理",
     "source": [
       "DeepSeek-V3 技术报告（arXiv:2412.19437）",

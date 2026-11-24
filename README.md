@@ -1,9 +1,9 @@
-# AI 架构学习系统：从机器学习到全球开放模型
+# AI 架构学习手册：从数学与编程基础到主流大模型架构
 
-**在线访问**：<https://zrx-11.github.io/deepseek-architecture-learning/>  
-**仓库**：<https://github.com/zrx-11/deepseek-architecture-learning>
+**在线访问**：<https://zrx-11.github.io/ai-architecture-handbook/>  
+**仓库**：<https://github.com/zrx-11/ai-architecture-handbook>
 
-给数学和代码接近零基础的学习者，把“数学 → Python → 经典机器学习 → 神经网络 → 深度学习 → Transformer / SVM → 强化学习 → DeepSeek R1/V4/V4.1 → 全球开放模型全谱 → 多模态 → 评测 → 部署”连成一条可以按依赖顺序走的学习路径。不是只讲 Transformer，也不是只有论文摘要。
+给数学和代码接近零基础的学习者，把“数学 → Python → 经典机器学习 → 神经网络 → 深度学习 → Transformer → 论文阅读 → DeepSeek 三代案例 → 全球开放模型 → 多模态 → 评测 → 部署”连成一条可以按依赖顺序走的学习路径。DeepSeek 是第一个完整案例，不是课程终点；这套材料的主干是主流大模型架构分析。
 
 ## 界面
 
@@ -11,26 +11,27 @@
 
 视觉方向与改动清单见 [`视觉重构说明.md`](视觉重构说明.md)。
 
-## 先说明一个事实
+## DeepSeek 在本课程里的位置
 
-DeepSeek 更准确的说法是**开放权重**，不是“全部开源”：模型权重、技术报告、部分推理与训练框架代码公开；完整训练数据、数据清洗流程和端到端训练流水线没有公开。架构层面（`modeling_deepseek.py`、`configuration_deepseek.py` 里的 MLA、DeepSeekMoE、MTP 等结构）是公开且可复现的，但“架构开源”不等于“整个模型全流程开源”。
+DeepSeek 是主线上的“完整案例”，用来练三件事：读论文、拆架构、算账。它不是唯一内容，后面还有全球开放模型对照。DeepSeek 更准确的说法是**开放权重**，不是“全部开源”：权重、技术报告、部分推理与训练框架代码公开；完整训练数据、数据清洗流程和端到端训练流水线没有公开。
 
 V4 / V4.1 的论文口径以公开技术报告为准；报告没有展开的 kernel 级细节、`num_hash_layers` 等，正文标“待确认”，不把二手解读补成事实。
 
 ## 这套材料有什么
 
-### 8 本分册
+### 9 本分册
 
 | 分册 | 内容 | 规模 |
 |---|---|---|
-| 基础篇：从零到 Transformer | 向量、矩阵、softmax、参数与梯度、注意力、Transformer 一层楼、V3 的 MLA/MoE/MTP、形状与手算附录 | 6 章 / 16 概念 / 15 测验 / 20 卡片 / 23 术语 |
-| 论文拆解：R1 / V4 / V4.1 | 按“问题—方法—数据—实验—局限”逐篇拆三篇报告，附公式逐项拆解 | 5 章 / 15 概念 / 12 测验 / 16 卡片 / 26 术语 |
-| 架构阐释：三代模型的设计逻辑 | 瓶颈迁移、组件演进、训练路线、选型与取舍，附 1M 上下文选型算例 | 5 章 / 5 概念 / 12 测验 / 16 卡片 / 20 术语 |
+| 基础篇：从数字到 Transformer | 向量、矩阵、softmax、参数与梯度、注意力、Transformer 一层楼、V3 的 MLA/MoE/MTP、形状与手算附录 | 6 章 / 16 概念 / 15 测验 / 20 卡片 / 23 术语 |
+| 案例论文拆解：DeepSeek R1 / V4 / V4.1 | 按“问题—方法—数据—实验—局限”逐篇拆三篇报告，附公式逐项拆解 | 5 章 / 15 概念 / 12 测验 / 16 卡片 / 26 术语 |
+| 案例架构：DeepSeek 三代设计逻辑 | 瓶颈迁移、组件演进、训练路线、选型与取舍，附 1M 上下文选型算例 | 5 章 / 5 概念 / 12 测验 / 16 卡片 / 20 术语 |
 | 机器学习基础：从任务到评估 | 周志华《机器学习》导读：评估、线性模型、决策树、神经网络、SVM、贝叶斯、集成、聚类、降维、半监督、概率图、强化学习 | 16 章 / 2 概念 / 47 测验 / 68 卡片 / 72 术语 |
 | 神经网络：从一条直线推到反向传播 | 函数、导数、链式法则、点积、神经元、激活、前向、损失、梯度下降、反向传播、过拟合 | 13 章 / 12 概念 / 32 测验 / 34 卡片 / 55 术语 |
 | 深度学习入门：从零手写神经网络 | Python、感知机、两层网络、反向传播、正则化、CNN | 8 章 / 2 概念 / 21 测验 / 38 卡片 / 38 术语 |
-| DeepSeek 模型全谱 | dense → DeepSeekMoE → V2/MLA → V3/MTP → R1/GRPO → V3.1/V3.2/DSA → V4/CSA/HCA/mHC/Muon → V4.1/CED/CSA2/Engram/DSpark，以及 VL/VL2、Janus、OCR/OCR2、Prover-V2、Math-V2 | 14 章 / 13 概念 / 42 测验 / 44 卡片 / 68 术语 |
-| 全球开源模型全谱 | Llama / Qwen / Mistral / Gemma / Phi / Falcon / OLMo / GLM / Kimi / MiniMax / InternLM / MiniCPM / Step / ERNIE / Ling / MiMo，以及 MoE、非 Transformer、多模态、许可证、config 与 101 行模型索引 | 16 章 / 12 概念 / 53 测验 / 48 卡片 / 70 术语 |
+| 案例全谱：DeepSeek 一代到 V4.1 | dense → DeepSeekMoE → V2/MLA → V3/MTP → R1/GRPO → V3.1/V3.2/DSA → V4/CSA/HCA/mHC/Muon → V4.1/CED/CSA2/Engram/DSpark，以及 VL/VL2、Janus、OCR/OCR2、Prover-V2、Math-V2 | 14 章 / 13 概念 / 42 测验 / 44 卡片 / 68 术语 |
+| 全球开放模型全谱 | Llama / Qwen / Mistral / Gemma / Phi / Falcon / OLMo / GLM / Kimi / MiniMax / InternLM / MiniCPM / Step / ERNIE / Ling / MiMo，以及 MoE、非 Transformer、多模态、许可证、config 与 101 行模型索引 | 16 章 / 12 概念 / 53 测验 / 48 卡片 / 70 术语 |
+| AI 机制与公式总库 | 114 个机制 + 104 个公式，覆盖架构、训练、对齐、推理、生成、应用与安全；每条给“是什么、代价、回哪章” | 11 章 / 8 概念 / 23 测验 / 22 卡片 / 25 术语 |
 
 ### 15 套深潜课（164 节）
 
@@ -52,25 +53,25 @@ V4 / V4.1 的论文口径以公开技术报告为准；报告没有展开的 ker
 | 安全 | 评测与安全 | 9 | pass@k、LLM 裁判偏差、幻觉、对齐/拒答、红队、数据污染 |
 | 部署 | 推理部署 | 9 | KV cache、PagedAttention、continuous batching、并行、SLA |
 
-合计 **83 个分册章节、77 个概念页、234 道测验、284 张抽认卡、372 条分册术语、15 套 164 节深潜课**。另有跨书术语总表、学习节点地图、跨书概念映射、深潜专题、知识覆盖地图和综合检验。
+合计 **94 个分册章节、85 个概念页、257 道测验、306 张抽认卡、397 条分册术语、15 套 164 节深潜课**。另有跨书术语总表、学习节点地图、跨书概念映射、深潜专题、知识覆盖地图和综合检验。
 
 ## 七步主线
 
 首页只给一条主线，不按顺序堆料：
 
-1. **数学与 Python 工具**：数学基础 + Python/NumPy。
-2. **机器学习与神经网络**：经典 ML + 机器学习分册 + 神经网络分册。
-3. **Transformer 与序列模型**：基础篇 + CNN/RNN + Transformer 深潜。
-4. **读三篇论文**：R1、V4、V4.1 按固定五问拆。
-5. **三代架构与全家族**：架构阐释 + 架构深潜 + 模型全谱 + 多模态。
-6. **训练、强化学习与账本**：强化学习/GRPO + 训练推理账本 + 概率评估。
-7. **评测、安全与上线**：评测与安全 + 推理部署 + 选型表。
+1. **数学与编程工具**：数学基础 + Python/NumPy；先补到能算、能写。
+2. **机器学习与神经网络**：经典 ML + 机器学习分册 + 神经网络分册 + 反向传播。
+3. **深度学习与序列模型**：深度学习入门 + CNN/RNN + Transformer 基础。
+4. **Transformer 与论文阅读**：基础篇 + Transformer 深潜 + 论文拆解；DeepSeek 三篇作为阅读样例。
+5. **案例架构：DeepSeek 三代**：架构阐释 + 架构深潜 + 模型全谱 + 多模态；学“瓶颈—机制—代价”的分析方法。
+6. **全球开放模型对照**：全球分册 + MoE/MLA + 101 行模型索引；把同一套读法用到 Llama/Qwen/Mistral 等家族。
+7. **训练、评测与部署**：强化学习/GRPO + 训练推理账本 + 评测安全 + 推理部署；最后做选型。
 
-每一步先读主入口，卡住再从资料库补；资料库默认折叠，避免首页一次铺 22 个入口。
+每一步先读主入口，卡住再从资料库补；资料库默认折叠。第 9 本“AI 机制与公式总库”是回查书，不占主线步数。
 
-### 全球对照线（第八本书）
+### 全球对照线（第六步，第八本书）
 
-全球分册不塞进 DeepSeek 主线，单独走 7 步：边界与地图 → Llama/Qwen → Mistral/Gemma/Phi → 北美/中国其他 → 非 Transformer/MoE → 多模态/注意力 → 许可证/评测/config/索引。它回答的是“Llama 之外还有什么、同一件事别的家族怎么做、拿到一个开放模型怎么读”。
+全球分册作为主线的第 6 步，也可单独走 7 步：边界与地图 → Llama/Qwen → Mistral/Gemma/Phi → 北美/中国其他 → 非 Transformer/MoE → 多模态/注意力 → 许可证/评测/config/索引。它回答的是“Llama 之外还有什么、同一件事别的家族怎么做、拿到一个开放模型怎么读”。
 
 ## 怎么用
 
@@ -109,7 +110,8 @@ index.md                   Markdown 导航
 20-multimodal-deep/        多模态模型（深潜，自包含）
 21-eval-safety-deep/       评测与安全（深潜，自包含）
 22-serving-deep/           推理部署（深潜，自包含）
-23-global-open-models/     全球开源模型全谱：16 章 + 101 行家族索引
+23-global-open-models/     全球开放模型全谱：16 章 + 101 行家族索引
+24-ai-mechanisms-formulas/ AI 机制与公式总库：114 机制 + 104 公式（回查书）
 _build/                    合并、生成、CDN 修补、验证脚本
 _work/                     论文 PDF 与过程数据（不推送公开仓库）
 _merge_sources/            合并前的原仓库副本（只留在本地交付包，不推送公开仓库）
@@ -123,7 +125,7 @@ _merge_sources/            合并前的原仓库副本（只留在本地交付�
 
 ```bash
 git add -A
-git commit -m "AI 架构学习系统：15 套深潜课 + 知识覆盖地图"
+git commit -m "AI 架构学习手册：全栈课程 + 机制公式总库"
 git push origin main
 ```
 
@@ -134,7 +136,7 @@ git push origin main
 ```bash
 git init
 git add -A
-git commit -m "AI 架构学习系统"
+git commit -m "AI 架构学习手册"
 git branch -M main
 git remote add origin https://github.com/<用户名>/<仓库名>.git
 git push -u origin main
@@ -143,8 +145,8 @@ git push -u origin main
 ## 验证结论
 
 - `_build/verify_deep_courses.py`：**144/144 通过**。覆盖 15 套深潜课的标题、节数、目录、公式渲染、5 道测验的正确/错误反馈、下一节切换、390px 无横向滚动、控制台零错误。
-- `_build/verify_all.py`：**60/60 通过**。覆盖 7 本书首末章、测验、抽认卡、术语、搜索、移动端/桌面端布局、09 独立伴侣 42 题综合测验、KaTeX/Mermaid、控制台错误。
-- 知枢自带 `verify_handbook.py`：67/68 通过；唯一未过项是“同义召回”启发式断言在精确命中时误判，不是页面功能失败。
+- `_build/verify_all.py`：**74/74 通过**。覆盖 9 本书首末章、测验、抽认卡、术语、搜索、移动端/桌面端布局、09 独立伴侣 42 题综合测验、机制公式总库 33 处 KaTeX、Mermaid、控制台错误。
+- 知枢自带 `verify_handbook.py`：**79/79 通过**。覆盖 9 本书书卡、首末章、测验、抽认卡、术语、搜索、诊断、主题切换、控制台零错误。
 - 打包后需解压到独立目录冒烟：首页、15 套深潜课各一节、测验、390px/1440px 布局。
 
 ## 已知边界

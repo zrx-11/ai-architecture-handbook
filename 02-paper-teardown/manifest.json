@@ -1,9 +1,9 @@
 {
   "slug": "deepseek-papers",
-  "title": "论文拆解：R1 / V4 / V4.1",
-  "subtitle": "按“问题—方法—数据—实验—局限”逐篇拆三篇 DeepSeek 论文",
+  "title": "案例论文拆解：DeepSeek R1 / V4 / V4.1",
+  "subtitle": "把三篇 DeepSeek 报告当作论文阅读样例；方法可迁移到其他模型报告",
   "book": {
-    "title": "论文拆解：R1 / V4 / V4.1",
+    "title": "案例论文拆解：DeepSeek R1 / V4 / V4.1",
     "author": "本课程整理",
     "source": [
       "DeepSeek-R1（arXiv:2501.12948）",

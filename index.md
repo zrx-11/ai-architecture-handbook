@@ -1,4 +1,4 @@
-# 学习总手册
+# AI 架构学习手册：从数学与编程基础到主流大模型架构
 
 **[打开总学习手册（index.html）](index.html)** —— 统一入口，单文件可离线；顶部切换书籍，左侧按学习路径/章节/概念/测验/抽认卡/术语/模式/速查浏览，进度自动保存。
 
@@ -6,14 +6,15 @@
 
 | 书 | 章节 | 概念 | 测验 | 抽认卡 | 学习伴侣 |
 |---|---|---|---|---|---|
-| 基础篇：从零到 Transformer | 6 | 16 | 15 | 20 | [deepseek-foundations学习伴侣.html](01-foundations/deepseek-foundations学习伴侣.html) |
-| 论文拆解：R1 / V4 / V4.1 | 5 | 15 | 12 | 16 | [deepseek-papers学习伴侣.html](02-paper-teardown/deepseek-papers学习伴侣.html) |
-| 架构阐释：三代模型的设计逻辑 | 5 | 5 | 12 | 16 | [deepseek-architecture学习伴侣.html](03-architecture/deepseek-architecture学习伴侣.html) |
+| 基础篇：从数字到 Transformer | 6 | 16 | 15 | 20 | [deepseek-foundations学习伴侣.html](01-foundations/deepseek-foundations学习伴侣.html) |
+| 案例论文拆解：DeepSeek R1 / V4 / V4.1 | 5 | 15 | 12 | 16 | [deepseek-papers学习伴侣.html](02-paper-teardown/deepseek-papers学习伴侣.html) |
+| 案例架构：DeepSeek 三代设计逻辑 | 5 | 5 | 12 | 16 | [deepseek-architecture学习伴侣.html](03-architecture/deepseek-architecture学习伴侣.html) |
 | 机器学习基础：从任务到评估 | 16 | 2 | 47 | 68 | [machine-learning学习伴侣.html](04-machine-learning/machine-learning学习伴侣.html) |
 | 神经网络：从一条直线推到反向传播 | 13 | 12 | 32 | 34 | [neural-networks学习伴侣.html](05-neural-networks/neural-networks学习伴侣.html) |
 | 深度学习入门：从零手写神经网络 | 8 | 2 | 21 | 38 | [deep-learning学习伴侣.html](06-deep-learning/deep-learning学习伴侣.html) |
-| DeepSeek 模型全谱 | 14 | 13 | 42 | 44 | [deepseek-family学习伴侣.html](09-deepseek-family/deepseek-family学习伴侣.html) |
-| 全球开源模型全谱 | 16 | 12 | 53 | 48 | [global-open-models学习伴侣.html](23-global-open-models/global-open-models学习伴侣.html) |
+| 案例全谱：DeepSeek 一代到 V4.1 | 14 | 13 | 42 | 44 | [deepseek-family学习伴侣.html](09-deepseek-family/deepseek-family学习伴侣.html) |
+| 全球开放模型全谱：从 Llama 到 Qwen | 16 | 12 | 53 | 48 | [global-open-models学习伴侣.html](23-global-open-models/global-open-models学习伴侣.html) |
+| AI 机制与公式总库 | 11 | 8 | 23 | 22 | [ai-mechanisms-formulas学习伴侣.html](24-ai-mechanisms-formulas/ai-mechanisms-formulas学习伴侣.html) |
 
 ## 跨书总览
 
