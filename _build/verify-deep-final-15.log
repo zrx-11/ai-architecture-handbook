@@ -1,0 +1,146 @@
+PASS 07-transformer-deep 打开 | Transformer · 从零推导交互式学习
+PASS 07-transformer-deep 节数 | 15
+PASS 07-transformer-deep 目录 | 15
+PASS 07-transformer-deep 公式 | 391
+PASS 07-transformer-deep 目录切换
+PASS 07-transformer-deep 移动端 | 390
+PASS 07-transformer-deep 控制台
+PASS 08-svm-deep 打开 | 支持向量机 · 从零推导交互式学习
+PASS 08-svm-deep 节数 | 16
+PASS 08-svm-deep 目录 | 16
+PASS 08-svm-deep 公式 | 1355
+PASS 08-svm-deep 目录切换
+PASS 08-svm-deep 移动端 | 390
+PASS 08-svm-deep 控制台
+PASS 10-backprop-deep 打开 | 反向传播与优化器 · 深潜课
+PASS 10-backprop-deep 节数 | 10
+PASS 10-backprop-deep 目录 | 10
+PASS 10-backprop-deep 公式 | 146
+PASS 10-backprop-deep 测验 | 5
+PASS 10-backprop-deep 正确反馈 | 正确。 L=(a−y)2L=(a-y)^2L=(a−y)2，对 aaa 的导数是
+PASS 10-backprop-deep 错误反馈
+PASS 10-backprop-deep 下一节 | 1
+PASS 10-backprop-deep 移动端 | 390
+PASS 10-backprop-deep 控制台
+PASS 11-moe-mla-deep 打开 | MoE 与 MLA · 深潜课
+PASS 11-moe-mla-deep 节数 | 10
+PASS 11-moe-mla-deep 目录 | 10
+PASS 11-moe-mla-deep 公式 | 67
+PASS 11-moe-mla-deep 测验 | 5
+PASS 11-moe-mla-deep 正确反馈 | 正确。 只激活 top-k 个专家，总参数可以远大于激活参数。
+PASS 11-moe-mla-deep 错误反馈
+PASS 11-moe-mla-deep 下一节 | 1
+PASS 11-moe-mla-deep 移动端 | 390
+PASS 11-moe-mla-deep 控制台
+PASS 12-probability-eval-deep 打开 | 概率、损失与评估 · 深潜课
+PASS 12-probability-eval-deep 节数 | 10
+PASS 12-probability-eval-deep 目录 | 10
+PASS 12-probability-eval-deep 公式 | 40
+PASS 12-probability-eval-deep 测验 | 5
+PASS 12-probability-eval-deep 正确反馈 | 正确。 贝叶斯：P(A∣B)=P(B∣A)P(A)/P(B)P(A|B)=P(B
+PASS 12-probability-eval-deep 错误反馈
+PASS 12-probability-eval-deep 下一节 | 1
+PASS 12-probability-eval-deep 移动端 | 390
+PASS 12-probability-eval-deep 控制台
+PASS 13-train-infer-deep 打开 | 训练与推理账本 · 深潜课
+PASS 13-train-infer-deep 节数 | 9
+PASS 13-train-infer-deep 目录 | 9
+PASS 13-train-infer-deep 公式 | 30
+PASS 13-train-infer-deep 测验 | 5
+PASS 13-train-infer-deep 正确反馈 | 正确。 6ND=6cdot7e9cdot1e9=4.2e196ND=6\\cdo
+PASS 13-train-infer-deep 错误反馈
+PASS 13-train-infer-deep 下一节 | 1
+PASS 13-train-infer-deep 移动端 | 390
+PASS 13-train-infer-deep 控制台
+PASS 14-math-deep 打开 | 数学基础 · 深潜课
+PASS 14-math-deep 节数 | 12
+PASS 14-math-deep 目录 | 12
+PASS 14-math-deep 公式 | 159
+PASS 14-math-deep 测验 | 5
+PASS 14-math-deep 正确反馈 | 正确。 g(f(2))=(2⋅2+1)2=25g(f(2))=(2\cdot2+
+PASS 14-math-deep 错误反馈
+PASS 14-math-deep 下一节 | 1
+PASS 14-math-deep 移动端 | 390
+PASS 14-math-deep 控制台
+PASS 15-python-deep 打开 | Python 与 NumPy · 深潜课
+PASS 15-python-deep 节数 | 10
+PASS 15-python-deep 目录 | 10
+PASS 15-python-deep 公式 | 14
+PASS 15-python-deep 测验 | 5
+PASS 15-python-deep 正确反馈 | 正确。 `7 / 2` 是普通除法，返回 3.5；`7 // 2` 才是 3。
+PASS 15-python-deep 错误反馈
+PASS 15-python-deep 下一节 | 1
+PASS 15-python-deep 移动端 | 390
+PASS 15-python-deep 控制台
+PASS 16-classical-ml-deep 打开 | 经典机器学习 · 深潜课
+PASS 16-classical-ml-deep 节数 | 12
+PASS 16-classical-ml-deep 目录 | 12
+PASS 16-classical-ml-deep 公式 | 22
+PASS 16-classical-ml-deep 测验 | 5
+PASS 16-classical-ml-deep 正确反馈 | 正确。 逻辑回归先算线性分数，再经 sigmoid 输出 0–1 的概率。
+PASS 16-classical-ml-deep 错误反馈
+PASS 16-classical-ml-deep 下一节 | 1
+PASS 16-classical-ml-deep 移动端 | 390
+PASS 16-classical-ml-deep 控制台
+PASS 17-cnn-rnn-deep 打开 | CNN 与 RNN · 深潜课
+PASS 17-cnn-rnn-deep 节数 | 10
+PASS 17-cnn-rnn-deep 目录 | 10
+PASS 17-cnn-rnn-deep 公式 | 32
+PASS 17-cnn-rnn-deep 测验 | 5
+PASS 17-cnn-rnn-deep 正确反馈 | 正确。 输出尺寸 (5−3+1)/1=3(5-3+1)/1=3(5−3+1)/1
+PASS 17-cnn-rnn-deep 错误反馈
+PASS 17-cnn-rnn-deep 下一节 | 1
+PASS 17-cnn-rnn-deep 移动端 | 390
+PASS 17-cnn-rnn-deep 控制台
+PASS 18-rl-grpo-deep 打开 | 强化学习与 GRPO · 深潜课
+PASS 18-rl-grpo-deep 节数 | 10
+PASS 18-rl-grpo-deep 目录 | 10
+PASS 18-rl-grpo-deep 公式 | 53
+PASS 18-rl-grpo-deep 测验 | 5
+PASS 18-rl-grpo-deep 正确反馈 | 正确。 优势 A=Q−VA=Q-VA=Q−V，表示动作比平均水平好多少；为正就提
+PASS 18-rl-grpo-deep 错误反馈
+PASS 18-rl-grpo-deep 下一节 | 1
+PASS 18-rl-grpo-deep 移动端 | 390
+PASS 18-rl-grpo-deep 控制台
+PASS 19-deepseek-arch-deep 打开 | DeepSeek 架构深潜 · 深潜课
+PASS 19-deepseek-arch-deep 节数 | 13
+PASS 19-deepseek-arch-deep 目录 | 13
+PASS 19-deepseek-arch-deep 公式 | 14
+PASS 19-deepseek-arch-deep 测验 | 5
+PASS 19-deepseek-arch-deep 正确反馈 | 正确。 V3 是 671B 总参数、37B 激活，61 层，256 路由 + 1
+PASS 19-deepseek-arch-deep 错误反馈
+PASS 19-deepseek-arch-deep 下一节 | 1
+PASS 19-deepseek-arch-deep 移动端 | 390
+PASS 19-deepseek-arch-deep 控制台
+PASS 20-multimodal-deep 打开 | 多模态模型 · 深潜课
+PASS 20-multimodal-deep 节数 | 9
+PASS 20-multimodal-deep 目录 | 9
+PASS 20-multimodal-deep 公式 | 8
+PASS 20-multimodal-deep 测验 | 5
+PASS 20-multimodal-deep 正确反馈 | 正确。 224/16=14，14×14=196 个 patch。
+PASS 20-multimodal-deep 错误反馈
+PASS 20-multimodal-deep 下一节 | 1
+PASS 20-multimodal-deep 移动端 | 390
+PASS 20-multimodal-deep 控制台
+PASS 21-eval-safety-deep 打开 | 大模型评测与安全 · 深潜课
+PASS 21-eval-safety-deep 节数 | 9
+PASS 21-eval-safety-deep 目录 | 9
+PASS 21-eval-safety-deep 公式 | 3
+PASS 21-eval-safety-deep 测验 | 5
+PASS 21-eval-safety-deep 正确反馈 | 正确。 pass@k 衡量采样 k 次至少一次通过，k 越大分数越高。
+PASS 21-eval-safety-deep 错误反馈
+PASS 21-eval-safety-deep 下一节 | 1
+PASS 21-eval-safety-deep 移动端 | 390
+PASS 21-eval-safety-deep 控制台
+PASS 22-serving-deep 打开 | 推理部署 · 深潜课
+PASS 22-serving-deep 节数 | 9
+PASS 22-serving-deep 目录 | 9
+PASS 22-serving-deep 公式 | 2
+PASS 22-serving-deep 测验 | 5
+PASS 22-serving-deep 正确反馈 | 正确。 prefill 一次处理整段 prompt，计算密集；decode 逐 
+PASS 22-serving-deep 错误反馈
+PASS 22-serving-deep 下一节 | 1
+PASS 22-serving-deep 移动端 | 390
+PASS 22-serving-deep 控制台
+
+=== 144/144 通过 ===

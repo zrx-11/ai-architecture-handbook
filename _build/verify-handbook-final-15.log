@@ -1,0 +1,114 @@
+PASS 首页渲染
+PASS 书卡数量 | 15/15
+PASS 总览页：跨书总览：一条主线 | 1536 字符
+PASS 总览页：跨书概念映射表 | 3456 字符
+PASS 总览页：综合检验建议 | 2309 字符
+PASS 总览页：学习节点地图 | 6027 字符
+PASS 总览页：跨书术语总表 | 40008 字符
+PASS 总览页：深潜专题：15 套单文件课 | 4554 字符
+PASS 总览页：知识覆盖地图 | 6055 字符
+PASS 总览页：三条学习路线：零基础、工程师、研究/竞赛 | 1623 字符
+PASS 总览页：开源项目地图：哪些该读、该跑、只该看 | 1818 字符
+PASS deepseek-foundations 首章渲染 | 3594 字符
+PASS deepseek-foundations 末章渲染 | 4755 字符
+PASS deepseek-papers 首章渲染 | 4154 字符
+PASS deepseek-papers 末章渲染 | 3850 字符
+PASS deepseek-architecture 首章渲染 | 3737 字符
+PASS deepseek-architecture 末章渲染 | 2490 字符
+PASS machine-learning 首章渲染 | 1479 字符
+PASS machine-learning 末章渲染 | 1875 字符
+PASS neural-networks 首章渲染 | 2726 字符
+PASS neural-networks 末章渲染 | 3933 字符
+PASS deep-learning-scratch 首章渲染 | 2092 字符
+PASS deep-learning-scratch 末章渲染 | 1703 字符
+PASS deepseek-family 首章渲染 | 4696 字符
+PASS deepseek-family 末章渲染 | 5480 字符
+PASS llm-from-scratch 首章渲染 | 1425 字符
+PASS llm-from-scratch 末章渲染 | 1447 字符
+PASS global-open-models 首章渲染 | 3332 字符
+PASS global-open-models 末章渲染 | 8692 字符
+PASS ai-mechanisms-formulas 首章渲染 | 1736 字符
+PASS ai-mechanisms-formulas 末章渲染 | 1983 字符
+PASS hello-ai 首章渲染 | 2622 字符
+PASS hello-ai 末章渲染 | 1979 字符
+PASS aima4 首章渲染 | 1240 字符
+PASS aima4 末章渲染 | 987 字符
+PASS d2l 首章渲染 | 1163 字符
+PASS d2l 末章渲染 | 1029 字符
+PASS rl-sutton 首章渲染 | 1428 字符
+PASS rl-sutton 末章渲染 | 1012 字符
+PASS understanding-deep-learning 首章渲染 | 864 字符
+PASS understanding-deep-learning 末章渲染 | 646 字符
+PASS deepseek-foundations 测验题数 | 15 题
+PASS deepseek-foundations 测验正确反馈 | ✓ 正确
+PASS deepseek-foundations 测验解析
+PASS deepseek-papers 测验题数 | 12 题
+PASS deepseek-papers 测验正确反馈 | ✓ 正确
+PASS deepseek-papers 测验解析
+PASS deepseek-architecture 测验题数 | 12 题
+PASS deepseek-architecture 测验正确反馈 | ✓ 正确
+PASS deepseek-architecture 测验解析
+PASS machine-learning 测验题数 | 47 题
+PASS machine-learning 测验正确反馈 | ✓ 正确
+PASS machine-learning 测验解析
+PASS neural-networks 测验题数 | 61 题
+PASS neural-networks 测验正确反馈 | ✓ 正确
+PASS neural-networks 测验解析
+PASS deep-learning-scratch 测验题数 | 21 题
+PASS deep-learning-scratch 测验正确反馈 | ✓ 正确
+PASS deep-learning-scratch 测验解析
+PASS deepseek-family 测验题数 | 42 题
+PASS deepseek-family 测验正确反馈 | ✓ 正确
+PASS deepseek-family 测验解析
+PASS llm-from-scratch 测验题数 | 28 题
+PASS llm-from-scratch 测验正确反馈 | ✓ 正确
+PASS llm-from-scratch 测验解析
+PASS global-open-models 测验题数 | 53 题
+PASS global-open-models 测验正确反馈 | ✓ 正确
+PASS global-open-models 测验解析
+PASS ai-mechanisms-formulas 测验题数 | 23 题
+PASS ai-mechanisms-formulas 测验正确反馈 | ✓ 正确
+PASS ai-mechanisms-formulas 测验解析
+PASS hello-ai 测验题数 | 60 题
+PASS hello-ai 测验正确反馈 | ✓ 正确
+PASS hello-ai 测验解析
+PASS aima4 测验题数 | 56 题
+PASS aima4 测验正确反馈 | ✓ 正确
+PASS aima4 测验解析
+PASS d2l 测验题数 | 29 题
+PASS d2l 测验正确反馈 | ✓ 正确
+PASS d2l 测验解析
+PASS rl-sutton 测验题数 | 46 题
+PASS rl-sutton 测验正确反馈 | ✓ 正确
+PASS rl-sutton 测验解析
+PASS understanding-deep-learning 测验题数 | 42 题
+PASS understanding-deep-learning 测验正确反馈 | ✓ 正确
+PASS understanding-deep-learning 测验解析
+PASS 抽认卡正面有内容 | 向量在模型里是什么？
+PASS 抽认卡翻转
+PASS 认识计数增加 | 1
+PASS 术语表过滤 | 共23 过滤后1（向量）
+PASS 全局搜索命中 | 40 条
+PASS 分词搜索（含停用词） | 40 条
+PASS 多词搜索命中 | 40 条
+PASS 结果片段高亮 | 61 处
+PASS 点击结果定位高亮 | 1 处
+PASS 结果按章节分组 | 30 组：神经网络：从一条直线推到反向传播 · 测验1 / LLM 从零实现：训练、对齐与部署 · 第 4 章：Embedding 与位置编码：给 token 一个坐标1 / LLM 从零实现：训练、对齐与部署 · 测验1
+PASS 结果标题可读 | 例：测验
+PASS 同义词表已注入 | 16 组
+PASS 同义召回生效 | 搜「定义」有 40 条精确命中，同义专用断言跳过
+PASS 进度跨刷新持久 | 《基础篇：从数字到 Transformer》 进度 50% · 已学 3/6 章 → 《基础篇：从数字到 Transformer》 进度 50% · 已学 3/6 章
+PASS 学习路径完成标记
+PASS 诊断页可打开
+PASS 深度片段（本书无，跳过） | 本书无深度片段
+PASS 出处脚注存在 | 1 处
+PASS 总入口有导出/导入按钮
+PASS 进度导出函数可用
+PASS 版本常量写入 | 1.9.0
+PASS 误解卡（无数据，跳过） | manifest 未配 optionMisconceptions
+PASS 主题切换 | light → dark
+PASS 句级出处（无 claims，跳过） | manifest 未配 claims[]
+PASS 控制台无错误
+
+=== 111/111 通过 ===
+报告：/home/user/Doubao/chats/38454307882185474/deepseek-architecture-learning/_build/verify_report.json

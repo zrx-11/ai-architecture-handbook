@@ -67,7 +67,7 @@
  {
   "check": "deepseek-papers 首章渲染",
   "pass": true,
-  "extra": "4063 字符"
+  "extra": "4154 字符"
  },
  {
   "check": "deepseek-papers 末章渲染",
