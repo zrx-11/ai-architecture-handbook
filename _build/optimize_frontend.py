@@ -233,7 +233,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{
 @media (max-width:820px){
   html{--header-h:0px}
   header{
-    grid-template-columns:1fr;
+    grid-template-columns:minmax(0,1fr);
     grid-template-areas:"brand" "tabs" "tools";
     gap:8px;
     padding:10px 14px!important;
@@ -244,6 +244,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{
     flex-wrap:nowrap;
     gap:6px;
     width:100%;
+    min-width:0;
     justify-content:stretch;
   }
   header #q{flex:1 1 auto;width:auto;min-width:0}

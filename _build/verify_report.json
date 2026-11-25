@@ -7,12 +7,12 @@
  {
   "check": "书卡数量",
   "pass": true,
-  "extra": "14/14"
+  "extra": "15/15"
  },
  {
   "check": "总览页：跨书总览：一条主线",
   "pass": true,
-  "extra": "1522 字符"
+  "extra": "1536 字符"
  },
  {
   "check": "总览页：跨书概念映射表",
@@ -193,6 +193,16 @@
   "check": "rl-sutton 末章渲染",
   "pass": true,
   "extra": "1012 字符"
+ },
+ {
+  "check": "understanding-deep-learning 首章渲染",
+  "pass": true,
+  "extra": "864 字符"
+ },
+ {
+  "check": "understanding-deep-learning 末章渲染",
+  "pass": true,
+  "extra": "646 字符"
  },
  {
   "check": "deepseek-foundations 测验题数",
@@ -405,6 +415,21 @@
   "extra": ""
  },
  {
+  "check": "understanding-deep-learning 测验题数",
+  "pass": true,
+  "extra": "42 题"
+ },
+ {
+  "check": "understanding-deep-learning 测验正确反馈",
+  "pass": true,
+  "extra": "✓ 正确"
+ },
+ {
+  "check": "understanding-deep-learning 测验解析",
+  "pass": true,
+  "extra": ""
+ },
+ {
   "check": "抽认卡正面有内容",
   "pass": true,
   "extra": "向量在模型里是什么？"
@@ -442,7 +467,7 @@
  {
   "check": "结果片段高亮",
   "pass": true,
-  "extra": "62 处"
+  "extra": "61 处"
  },
  {
   "check": "点击结果定位高亮",
@@ -517,7 +542,7 @@
  {
   "check": "主题切换",
   "pass": true,
-  "extra": "dark → light"
+  "extra": "light → dark"
  },
  {
   "check": "句级出处（无 claims，跳过）",

@@ -1,0 +1,1924 @@
+{
+  "slug": "understanding-deep-learning",
+  "title": "理解深度学习：Prince 教材导读",
+  "subtitle": "按 UDL 的 21 章重排：从浅层网络、损失与优化，到 CNN、Transformer、生成模型、强化学习与伦理",
+  "book": {
+    "title": "理解深度学习（Understanding Deep Learning）",
+    "author": "Simon J.D. Prince（原著）；本手册编写组（中文导读）",
+    "source": [
+      "Understanding Deep Learning, MIT Press, 2023",
+      "https://udlbook.github.io/udlbook/"
+    ]
+  },
+  "audience": "学完《神经网络》或《深度学习入门》更稳；会矩阵乘法、偏导和概率基础",
+  "goal": "能把 UDL 的 21 章讲成一条“模型—损失—优化—架构—生成—决策”的因果链，并说清每章的边界",
+  "learningPath": [
+    {
+      "step": "01",
+      "title": "引言：三种学习范式与全书路线",
+      "chapterIds": [
+        "ch01"
+      ],
+      "prereq": "无",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "02",
+      "title": "监督学习：从线性回归到风险最小化",
+      "chapterIds": [
+        "ch02"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "03",
+      "title": "浅层神经网络：分段线性函数与通用近似",
+      "chapterIds": [
+        "ch03"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "04",
+      "title": "深度神经网络：组合、矩阵与深度收益",
+      "chapterIds": [
+        "ch04"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "05",
+      "title": "损失函数：最大似然与交叉熵",
+      "chapterIds": [
+        "ch05"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "06",
+      "title": "拟合模型：梯度下降、SGD 与超参数",
+      "chapterIds": [
+        "ch06"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "07",
+      "title": "梯度与初始化：反向传播与训练稳定性",
+      "chapterIds": [
+        "ch07"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "08",
+      "title": "衡量性能：误差分解、双下降与高维",
+      "chapterIds": [
+        "ch08"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "09",
+      "title": "正则化：显式、隐式与数据先验",
+      "chapterIds": [
+        "ch09"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "10",
+      "title": "卷积网络：平移等变与局部连接",
+      "chapterIds": [
+        "ch10"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "11",
+      "title": "残差网络：恒等路径与深度退化",
+      "chapterIds": [
+        "ch11"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "12",
+      "title": "Transformer：自注意力与序列建模",
+      "chapterIds": [
+        "ch12"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "13",
+      "title": "图神经网络：消息传递与置换等变",
+      "chapterIds": [
+        "ch13"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "14",
+      "title": "无监督学习：生成模型的统一地图",
+      "chapterIds": [
+        "ch14"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "15",
+      "title": "生成对抗网络：对抗博弈与模式崩塌",
+      "chapterIds": [
+        "ch15"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "16",
+      "title": "归一化流：可逆变换与精确似然",
+      "chapterIds": [
+        "ch16"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "17",
+      "title": "变分自编码器：ELBO 与重参数化",
+      "chapterIds": [
+        "ch17"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "18",
+      "title": "扩散模型：加噪、去噪与采样",
+      "chapterIds": [
+        "ch18"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "19",
+      "title": "强化学习：MDP、Q 学习与策略梯度",
+      "chapterIds": [
+        "ch19"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "20",
+      "title": "为什么深度学习有效：过参数化与泛化",
+      "chapterIds": [
+        "ch20"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    },
+    {
+      "step": "21",
+      "title": "深度学习与伦理：偏见、隐私与责任",
+      "chapterIds": [
+        "ch21"
+      ],
+      "prereq": "上一章",
+      "checkpoint": "完成本章检查点",
+      "goal": "掌握本章的核心公式与一个反例"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ch01",
+      "title": "第 1 章：引言：三种学习范式与全书路线",
+      "file": "chapters/ch01.md",
+      "difficulty": 1
+    },
+    {
+      "id": "ch02",
+      "title": "第 2 章：监督学习：从线性回归到风险最小化",
+      "file": "chapters/ch02.md",
+      "difficulty": 1
+    },
+    {
+      "id": "ch03",
+      "title": "第 3 章：浅层神经网络：分段线性函数与通用近似",
+      "file": "chapters/ch03.md",
+      "difficulty": 2
+    },
+    {
+      "id": "ch04",
+      "title": "第 4 章：深度神经网络：组合、矩阵与深度收益",
+      "file": "chapters/ch04.md",
+      "difficulty": 2
+    },
+    {
+      "id": "ch05",
+      "title": "第 5 章：损失函数：最大似然与交叉熵",
+      "file": "chapters/ch05.md",
+      "difficulty": 2
+    },
+    {
+      "id": "ch06",
+      "title": "第 6 章：拟合模型：梯度下降、SGD 与超参数",
+      "file": "chapters/ch06.md",
+      "difficulty": 2
+    },
+    {
+      "id": "ch07",
+      "title": "第 7 章：梯度与初始化：反向传播与训练稳定性",
+      "file": "chapters/ch07.md",
+      "difficulty": 2
+    },
+    {
+      "id": "ch08",
+      "title": "第 8 章：衡量性能：误差分解、双下降与高维",
+      "file": "chapters/ch08.md",
+      "difficulty": 2
+    },
+    {
+      "id": "ch09",
+      "title": "第 9 章：正则化：显式、隐式与数据先验",
+      "file": "chapters/ch09.md",
+      "difficulty": 2
+    },
+    {
+      "id": "ch10",
+      "title": "第 10 章：卷积网络：平移等变与局部连接",
+      "file": "chapters/ch10.md",
+      "difficulty": 2
+    },
+    {
+      "id": "ch11",
+      "title": "第 11 章：残差网络：恒等路径与深度退化",
+      "file": "chapters/ch11.md",
+      "difficulty": 2
+    },
+    {
+      "id": "ch12",
+      "title": "第 12 章：Transformer：自注意力与序列建模",
+      "file": "chapters/ch12.md",
+      "difficulty": 2
+    },
+    {
+      "id": "ch13",
+      "title": "第 13 章：图神经网络：消息传递与置换等变",
+      "file": "chapters/ch13.md",
+      "difficulty": 2
+    },
+    {
+      "id": "ch14",
+      "title": "第 14 章：无监督学习：生成模型的统一地图",
+      "file": "chapters/ch14.md",
+      "difficulty": 2
+    },
+    {
+      "id": "ch15",
+      "title": "第 15 章：生成对抗网络：对抗博弈与模式崩塌",
+      "file": "chapters/ch15.md",
+      "difficulty": 3
+    },
+    {
+      "id": "ch16",
+      "title": "第 16 章：归一化流：可逆变换与精确似然",
+      "file": "chapters/ch16.md",
+      "difficulty": 3
+    },
+    {
+      "id": "ch17",
+      "title": "第 17 章：变分自编码器：ELBO 与重参数化",
+      "file": "chapters/ch17.md",
+      "difficulty": 3
+    },
+    {
+      "id": "ch18",
+      "title": "第 18 章：扩散模型：加噪、去噪与采样",
+      "file": "chapters/ch18.md",
+      "difficulty": 3
+    },
+    {
+      "id": "ch19",
+      "title": "第 19 章：强化学习：MDP、Q 学习与策略梯度",
+      "file": "chapters/ch19.md",
+      "difficulty": 3
+    },
+    {
+      "id": "ch20",
+      "title": "第 20 章：为什么深度学习有效：过参数化与泛化",
+      "file": "chapters/ch20.md",
+      "difficulty": 3
+    },
+    {
+      "id": "ch21",
+      "title": "第 21 章：深度学习与伦理：偏见、隐私与责任",
+      "file": "chapters/ch21.md",
+      "difficulty": 3
+    }
+  ],
+  "concepts": [
+    {
+      "id": "c01",
+      "title": "三种学习范式",
+      "file": "concepts/c01.md",
+      "chapterIds": [
+        "ch01"
+      ]
+    },
+    {
+      "id": "c02",
+      "title": "经验风险最小化",
+      "file": "concepts/c02.md",
+      "chapterIds": [
+        "ch02"
+      ]
+    },
+    {
+      "id": "c03",
+      "title": "通用近似定理",
+      "file": "concepts/c03.md",
+      "chapterIds": [
+        "ch03"
+      ]
+    },
+    {
+      "id": "c04",
+      "title": "深度组合",
+      "file": "concepts/c04.md",
+      "chapterIds": [
+        "ch04"
+      ]
+    },
+    {
+      "id": "c05",
+      "title": "最大似然",
+      "file": "concepts/c05.md",
+      "chapterIds": [
+        "ch05"
+      ]
+    },
+    {
+      "id": "c06",
+      "title": "随机梯度下降",
+      "file": "concepts/c06.md",
+      "chapterIds": [
+        "ch06"
+      ]
+    },
+    {
+      "id": "c07",
+      "title": "反向传播",
+      "file": "concepts/c07.md",
+      "chapterIds": [
+        "ch07"
+      ]
+    },
+    {
+      "id": "c08",
+      "title": "双下降",
+      "file": "concepts/c08.md",
+      "chapterIds": [
+        "ch08"
+      ]
+    },
+    {
+      "id": "c09",
+      "title": "隐式正则化",
+      "file": "concepts/c09.md",
+      "chapterIds": [
+        "ch09"
+      ]
+    },
+    {
+      "id": "c10",
+      "title": "平移等变",
+      "file": "concepts/c10.md",
+      "chapterIds": [
+        "ch10"
+      ]
+    },
+    {
+      "id": "c11",
+      "title": "残差连接",
+      "file": "concepts/c11.md",
+      "chapterIds": [
+        "ch11"
+      ]
+    },
+    {
+      "id": "c12",
+      "title": "自注意力",
+      "file": "concepts/c12.md",
+      "chapterIds": [
+        "ch12"
+      ]
+    },
+    {
+      "id": "c13",
+      "title": "消息传递",
+      "file": "concepts/c13.md",
+      "chapterIds": [
+        "ch13"
+      ]
+    },
+    {
+      "id": "c14",
+      "title": "潜变量生成模型",
+      "file": "concepts/c14.md",
+      "chapterIds": [
+        "ch14"
+      ]
+    },
+    {
+      "id": "c15",
+      "title": "对抗训练",
+      "file": "concepts/c15.md",
+      "chapterIds": [
+        "ch15"
+      ]
+    },
+    {
+      "id": "c16",
+      "title": "变量替换",
+      "file": "concepts/c16.md",
+      "chapterIds": [
+        "ch16"
+      ]
+    },
+    {
+      "id": "c17",
+      "title": "ELBO",
+      "file": "concepts/c17.md",
+      "chapterIds": [
+        "ch17"
+      ]
+    },
+    {
+      "id": "c18",
+      "title": "扩散去噪",
+      "file": "concepts/c18.md",
+      "chapterIds": [
+        "ch18"
+      ]
+    },
+    {
+      "id": "c19",
+      "title": "贝尔曼方程",
+      "file": "concepts/c19.md",
+      "chapterIds": [
+        "ch19"
+      ]
+    },
+    {
+      "id": "c20",
+      "title": "过参数化",
+      "file": "concepts/c20.md",
+      "chapterIds": [
+        "ch20"
+      ]
+    },
+    {
+      "id": "c21",
+      "title": "算法偏见",
+      "file": "concepts/c21.md",
+      "chapterIds": [
+        "ch21"
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "监督学习",
+      "def": "有输入与目标对的训练",
+      "chapterId": "ch01"
+    },
+    {
+      "term": "无监督学习",
+      "def": "只有输入，学习分布或结构",
+      "chapterId": "ch01"
+    },
+    {
+      "term": "强化学习",
+      "def": "用延迟奖励学习策略",
+      "chapterId": "ch01"
+    },
+    {
+      "term": "函数族",
+      "def": "参数化的一组候选映射",
+      "chapterId": "ch01"
+    },
+    {
+      "term": "真实风险",
+      "def": "数据分布上的期望损失",
+      "chapterId": "ch02"
+    },
+    {
+      "term": "经验风险",
+      "def": "训练集上的平均损失",
+      "chapterId": "ch02"
+    },
+    {
+      "term": "线性回归",
+      "def": "线性函数加平方损失的基线",
+      "chapterId": "ch02"
+    },
+    {
+      "term": "泛化差距",
+      "def": "测试误差与训练误差的差",
+      "chapterId": "ch02"
+    },
+    {
+      "term": "隐藏单元",
+      "def": "网络中间层的非线性单元",
+      "chapterId": "ch03"
+    },
+    {
+      "term": "ReLU",
+      "def": "max(0,x) 激活",
+      "chapterId": "ch03"
+    },
+    {
+      "term": "通用近似",
+      "def": "足够宽网络可逼近连续函数",
+      "chapterId": "ch03"
+    },
+    {
+      "term": "分段线性",
+      "def": "固定激活模式下由折线组成",
+      "chapterId": "ch03"
+    },
+    {
+      "term": "复合函数",
+      "def": "多层函数依次作用",
+      "chapterId": "ch04"
+    },
+    {
+      "term": "参数账",
+      "def": "每层权重与偏置的数量",
+      "chapterId": "ch04"
+    },
+    {
+      "term": "非线性",
+      "def": "使多层不等于单层线性变换",
+      "chapterId": "ch04"
+    },
+    {
+      "term": "深度收益",
+      "def": "复用低层特征的表达能力",
+      "chapterId": "ch04"
+    },
+    {
+      "term": "最大似然",
+      "def": "最大化数据在模型下的概率",
+      "chapterId": "ch05"
+    },
+    {
+      "term": "交叉熵",
+      "def": "负对数似然在分类中的形式",
+      "chapterId": "ch05"
+    },
+    {
+      "term": "Softmax",
+      "def": "把 logits 变类别概率",
+      "chapterId": "ch05"
+    },
+    {
+      "term": "平方损失",
+      "def": "高斯似然推出的回归损失",
+      "chapterId": "ch05"
+    },
+    {
+      "term": "梯度下降",
+      "def": "沿负梯度更新参数",
+      "chapterId": "ch06"
+    },
+    {
+      "term": "小批量",
+      "def": "每次用一小批样本估计梯度",
+      "chapterId": "ch06"
+    },
+    {
+      "term": "学习率",
+      "def": "每次更新的步长",
+      "chapterId": "ch06"
+    },
+    {
+      "term": "动量",
+      "def": "累积历史梯度方向",
+      "chapterId": "ch06"
+    },
+    {
+      "term": "反向传播",
+      "def": "链式法则在计算图上的反向模式",
+      "chapterId": "ch07"
+    },
+    {
+      "term": "计算图",
+      "def": "记录运算与依赖的有向图",
+      "chapterId": "ch07"
+    },
+    {
+      "term": "梯度消失",
+      "def": "长连乘导致梯度指数衰减",
+      "chapterId": "ch07"
+    },
+    {
+      "term": "初始化",
+      "def": "训练开始时参数尺度的选择",
+      "chapterId": "ch07"
+    },
+    {
+      "term": "双下降",
+      "def": "测试误差随容量先升后降",
+      "chapterId": "ch08"
+    },
+    {
+      "term": "偏差",
+      "def": "模型族表达能力的限制",
+      "chapterId": "ch08"
+    },
+    {
+      "term": "方差",
+      "def": "模型对训练样本波动的敏感",
+      "chapterId": "ch08"
+    },
+    {
+      "term": "插值阈值",
+      "def": "模型刚好能拟合训练集的容量点",
+      "chapterId": "ch08"
+    },
+    {
+      "term": "L2 正则",
+      "def": "惩罚权重平方和",
+      "chapterId": "ch09"
+    },
+    {
+      "term": "隐式正则",
+      "def": "优化过程带入的偏好",
+      "chapterId": "ch09"
+    },
+    {
+      "term": "早停",
+      "def": "按验证集停止训练",
+      "chapterId": "ch09"
+    },
+    {
+      "term": "数据增强",
+      "def": "用保持标签的变换扩充样本",
+      "chapterId": "ch09"
+    },
+    {
+      "term": "卷积",
+      "def": "局部核在空间上共享权重",
+      "chapterId": "ch10"
+    },
+    {
+      "term": "平移等变",
+      "def": "输入平移导致输出平移",
+      "chapterId": "ch10"
+    },
+    {
+      "term": "池化",
+      "def": "聚合局部区域、降低分辨率",
+      "chapterId": "ch10"
+    },
+    {
+      "term": "感受野",
+      "def": "一个输出位置看到的输入范围",
+      "chapterId": "ch10"
+    },
+    {
+      "term": "残差连接",
+      "def": "y=x+F(x) 的短路径",
+      "chapterId": "ch11"
+    },
+    {
+      "term": "深度退化",
+      "def": "加深后训练误差反而变差",
+      "chapterId": "ch11"
+    },
+    {
+      "term": "恒等映射",
+      "def": "输出等于输入的映射",
+      "chapterId": "ch11"
+    },
+    {
+      "term": "瓶颈块",
+      "def": "先降维再升维的残差块",
+      "chapterId": "ch11"
+    },
+    {
+      "term": "自注意力",
+      "def": "用 QK 相似度加权 V",
+      "chapterId": "ch12"
+    },
+    {
+      "term": "多头",
+      "def": "多个子空间并行注意力",
+      "chapterId": "ch12"
+    },
+    {
+      "term": "位置编码",
+      "def": "给序列位置提供顺序信息",
+      "chapterId": "ch12"
+    },
+    {
+      "term": "因果 mask",
+      "def": "禁止看未来 token",
+      "chapterId": "ch12"
+    },
+    {
+      "term": "邻接矩阵",
+      "def": "表示节点连接关系的矩阵",
+      "chapterId": "ch13"
+    },
+    {
+      "term": "消息传递",
+      "def": "节点聚合邻居特征",
+      "chapterId": "ch13"
+    },
+    {
+      "term": "置换等变",
+      "def": "节点重排时输出相应重排",
+      "chapterId": "ch13"
+    },
+    {
+      "term": "过平滑",
+      "def": "深层 GNN 节点表示趋同",
+      "chapterId": "ch13"
+    },
+    {
+      "term": "生成模型",
+      "def": "学习数据分布的模型",
+      "chapterId": "ch14"
+    },
+    {
+      "term": "潜变量",
+      "def": "未观测的中间变量 z",
+      "chapterId": "ch14"
+    },
+    {
+      "term": "精确似然",
+      "def": "可计算的 p(x)",
+      "chapterId": "ch14"
+    },
+    {
+      "term": "FID",
+      "def": "基于特征距离的生成质量指标",
+      "chapterId": "ch14"
+    },
+    {
+      "term": "生成器",
+      "def": "把噪声映射成样本",
+      "chapterId": "ch15"
+    },
+    {
+      "term": "判别器",
+      "def": "区分真实与生成样本",
+      "chapterId": "ch15"
+    },
+    {
+      "term": "模式崩塌",
+      "def": "只覆盖少数数据模式",
+      "chapterId": "ch15"
+    },
+    {
+      "term": "条件 GAN",
+      "def": "用标签或文本控制生成",
+      "chapterId": "ch15"
+    },
+    {
+      "term": "归一化流",
+      "def": "用可逆变换建模密度",
+      "chapterId": "ch16"
+    },
+    {
+      "term": "变量替换",
+      "def": "密度按雅可比行列式缩放",
+      "chapterId": "ch16"
+    },
+    {
+      "term": "雅可比",
+      "def": "变换的局部线性化矩阵",
+      "chapterId": "ch16"
+    },
+    {
+      "term": "耦合层",
+      "def": "三角雅可比的可逆层",
+      "chapterId": "ch16"
+    },
+    {
+      "term": "ELBO",
+      "def": "证据下界，重建项减 KL",
+      "chapterId": "ch17"
+    },
+    {
+      "term": "重参数化",
+      "def": "把采样随机性移出参数路径",
+      "chapterId": "ch17"
+    },
+    {
+      "term": "后验崩塌",
+      "def": "编码器忽略输入",
+      "chapterId": "ch17"
+    },
+    {
+      "term": "β-VAE",
+      "def": "调大 KL 权重的 VAE 变体",
+      "chapterId": "ch17"
+    },
+    {
+      "term": "前向扩散",
+      "def": "固定逐步加噪",
+      "chapterId": "ch18"
+    },
+    {
+      "term": "反向去噪",
+      "def": "学习从噪声恢复数据",
+      "chapterId": "ch18"
+    },
+    {
+      "term": "噪声预测",
+      "def": "网络估计加入的 ε",
+      "chapterId": "ch18"
+    },
+    {
+      "term": "latent diffusion",
+      "def": "在潜空间做扩散",
+      "chapterId": "ch18"
+    },
+    {
+      "term": "MDP",
+      "def": "状态、动作、转移、奖励、折扣",
+      "chapterId": "ch19"
+    },
+    {
+      "term": "折扣回报",
+      "def": "未来奖励按 γ 衰减求和",
+      "chapterId": "ch19"
+    },
+    {
+      "term": "Q 学习",
+      "def": "学习动作价值函数",
+      "chapterId": "ch19"
+    },
+    {
+      "term": "策略梯度",
+      "def": "直接优化策略参数",
+      "chapterId": "ch19"
+    },
+    {
+      "term": "过参数化",
+      "def": "参数多于样本仍训练",
+      "chapterId": "ch20"
+    },
+    {
+      "term": "插值",
+      "def": "训练误差降到零",
+      "chapterId": "ch20"
+    },
+    {
+      "term": "隐式偏好",
+      "def": "优化偏向某些解",
+      "chapterId": "ch20"
+    },
+    {
+      "term": "泛化",
+      "def": "在未见数据上的表现",
+      "chapterId": "ch20"
+    },
+    {
+      "term": "算法偏见",
+      "def": "数据不平等被模型放大",
+      "chapterId": "ch21"
+    },
+    {
+      "term": "差分隐私",
+      "def": "限制单个样本对输出的影响",
+      "chapterId": "ch21"
+    },
+    {
+      "term": "监控",
+      "def": "系统性观察与推断个人行为",
+      "chapterId": "ch21"
+    },
+    {
+      "term": "责任链",
+      "def": "数据、训练、部署与复核的责任分配",
+      "chapterId": "ch21"
+    }
+  ],
+  "patterns": {
+    "file": "patterns.md"
+  },
+  "cheatsheet": {
+    "file": "cheatsheet.md"
+  },
+  "quizzes": [
+    {
+      "id": "q01",
+      "chapterId": "ch01",
+      "type": "single",
+      "question": "哪一种范式使用延迟的标量奖励作为主要反馈？",
+      "options": [
+        "监督学习",
+        "无监督学习",
+        "强化学习",
+        "半监督学习"
+      ],
+      "answer": 2,
+      "explain": "强化学习在动作—环境—奖励循环中用延迟奖励学习策略。"
+    },
+    {
+      "id": "q02",
+      "chapterId": "ch01",
+      "type": "single",
+      "question": "“模型是一个函数族，训练是在其中选函数”最准确的含义是？",
+      "options": [
+        "模型参数越少越好",
+        "训练数据直接存进模型",
+        "用数据从候选函数中选出映射",
+        "网络层数固定不变"
+      ],
+      "answer": 2,
+      "explain": "训练通过损失与优化从参数化函数族中选择一个映射。"
+    },
+    {
+      "id": "q03",
+      "chapterId": "ch02",
+      "type": "single",
+      "question": "高斯似然下的负对数似然（忽略常数）对应哪种损失？",
+      "options": [
+        "平方误差",
+        "绝对值误差",
+        "Hinge loss",
+        "KL 散度"
+      ],
+      "answer": 0,
+      "explain": "高斯负对数似然去掉常数后是平方误差。"
+    },
+    {
+      "id": "q04",
+      "chapterId": "ch02",
+      "type": "single",
+      "question": "训练误差很低但测试误差很高，最可能说明什么？",
+      "options": [
+        "模型没有参数",
+        "经验风险不等于真实风险",
+        "数据没有标签",
+        "梯度一定为零"
+      ],
+      "answer": 1,
+      "explain": "训练集只是真实分布的有限样本，经验风险低不代表泛化好。"
+    },
+    {
+      "id": "q05",
+      "chapterId": "ch03",
+      "type": "single",
+      "question": "ReLU 浅层网络在固定激活模式下是什么函数？",
+      "options": [
+        "分段线性函数",
+        "纯二次函数",
+        "常数函数",
+        "周期函数"
+      ],
+      "answer": 0,
+      "explain": "ReLU 的折线结构使网络在激活区域固定时呈分段线性。"
+    },
+    {
+      "id": "q06",
+      "chapterId": "ch03",
+      "type": "single",
+      "question": "通用近似定理没有保证下列哪一项？",
+      "options": [
+        "存在足够宽的 network 逼近连续函数",
+        "训练一定能找到该网络",
+        "紧集上可以任意精度",
+        "连续函数可被逼近"
+      ],
+      "answer": 1,
+      "explain": "定理只保证存在性，不保证优化可找到或泛化。"
+    },
+    {
+      "id": "q07",
+      "chapterId": "ch04",
+      "type": "single",
+      "question": "如果多层网络全部使用线性激活，会发生什么？",
+      "options": [
+        "表达力指数增长",
+        "等价于一个线性变换",
+        "自动变成卷积",
+        "梯度一定消失"
+      ],
+      "answer": 1,
+      "explain": "线性变换的复合仍是线性变换，深度不增加表达力。"
+    },
+    {
+      "id": "q08",
+      "chapterId": "ch04",
+      "type": "single",
+      "question": "深度网络相对浅层网络的一个典型优势是？",
+      "options": [
+        "一定需要更多数据",
+        "可复用低层特征并组合它们",
+        "不需要损失函数",
+        "没有梯度问题"
+      ],
+      "answer": 1,
+      "explain": "层级组合可以复用特征，但也会带来优化困难。"
+    },
+    {
+      "id": "q09",
+      "chapterId": "ch05",
+      "type": "single",
+      "question": "二分类中与伯努利似然对应的损失是？",
+      "options": [
+        "平方损失",
+        "二元交叉熵",
+        "Hinge loss",
+        "L2 正则"
+      ],
+      "answer": 1,
+      "explain": "伯努利负对数似然给出二元交叉熵。"
+    },
+    {
+      "id": "q10",
+      "chapterId": "ch05",
+      "type": "single",
+      "question": "多分类交叉熵通常与哪个输出层搭配？",
+      "options": [
+        "Linear",
+        "Sigmoid",
+        "Softmax",
+        "ReLU"
+      ],
+      "answer": 2,
+      "explain": "Softmax 把 logits 变成类别概率，交叉熵再衡量目标类别概率。"
+    },
+    {
+      "id": "q11",
+      "chapterId": "ch06",
+      "type": "single",
+      "question": "小批量 SGD 的梯度是什么？",
+      "options": [
+        "真实梯度的无偏估计",
+        "真实梯度的精确值",
+        "与损失无关的常数",
+        "二阶导数"
+      ],
+      "answer": 0,
+      "explain": "小批量梯度是真实梯度的有噪声估计，通常无偏。"
+    },
+    {
+      "id": "q12",
+      "chapterId": "ch06",
+      "type": "single",
+      "question": "学习率过大会导致什么？",
+      "options": [
+        "更新过小、收敛慢",
+        "可能越过谷底、震荡或发散",
+        "梯度必然为零",
+        "模型参数变少"
+      ],
+      "answer": 1,
+      "explain": "步长过大会在损失曲面上来回跳甚至发散。"
+    },
+    {
+      "id": "q13",
+      "chapterId": "ch07",
+      "type": "single",
+      "question": "反向传播本质上是什么？",
+      "options": [
+        "一种新的网络层",
+        "链式法则在计算图上的反向模式",
+        "随机搜索",
+        "卷积的别名"
+      ],
+      "answer": 1,
+      "explain": "反向传播按链式法则从损失向输入回传梯度。"
+    },
+    {
+      "id": "q14",
+      "chapterId": "ch07",
+      "type": "single",
+      "question": "深层网络梯度消失的一个主要来源是？",
+      "options": [
+        "每层雅可比连乘使尺度指数衰减",
+        "参数太少",
+        "损失函数没有梯度",
+        "数据太多"
+      ],
+      "answer": 0,
+      "explain": "长连乘会让梯度尺度指数变小；激活饱和会加剧。"
+    },
+    {
+      "id": "q15",
+      "chapterId": "ch08",
+      "type": "single",
+      "question": "双下降曲线描述的是？",
+      "options": [
+        "测试误差随容量先升后降",
+        "训练误差永远为零",
+        "参数越少越好",
+        "数据越多越差"
+      ],
+      "answer": 0,
+      "explain": "过参数化区域测试误差可能再次下降，形成双下降。"
+    },
+    {
+      "id": "q16",
+      "chapterId": "ch08",
+      "type": "single",
+      "question": "偏差—方差分解中，方差主要来自什么？",
+      "options": [
+        "模型族表达不了真实函数",
+        "模型对训练样本随机波动敏感",
+        "数据标签噪声",
+        "不可约噪声"
+      ],
+      "answer": 1,
+      "explain": "方差反映模型在不同训练集上的波动。"
+    },
+    {
+      "id": "q17",
+      "chapterId": "ch09",
+      "type": "single",
+      "question": "L2 正则等价于哪种先验下的最大后验？",
+      "options": [
+        "均匀先验",
+        "高斯先验",
+        "拉普拉斯先验",
+        "伯努利先验"
+      ],
+      "answer": 1,
+      "explain": "L2 对应高斯先验，L1 对应拉普拉斯先验。"
+    },
+    {
+      "id": "q18",
+      "chapterId": "ch09",
+      "type": "single",
+      "question": "下列哪项属于隐式正则？",
+      "options": [
+        "显式加入 L2 项",
+        "SGD 噪声与有限步数",
+        "手动删除参数",
+        "固定学习率为 0"
+      ],
+      "answer": 1,
+      "explain": "隐式正则来自优化过程，而不是损失里的显式项。"
+    },
+    {
+      "id": "q19",
+      "chapterId": "ch10",
+      "type": "single",
+      "question": "卷积本身主要提供什么性质？",
+      "options": [
+        "平移等变",
+        "平移不变",
+        "旋转不变",
+        "全局置换等变"
+      ],
+      "answer": 0,
+      "explain": "卷积的权重共享使输入平移导致输出平移。"
+    },
+    {
+      "id": "q20",
+      "chapterId": "ch10",
+      "type": "single",
+      "question": "池化层最直接的作用是？",
+      "options": [
+        "增加参数量",
+        "降低空间分辨率并引入一定不变性",
+        "让梯度消失",
+        "把卷积变成全连接"
+      ],
+      "answer": 1,
+      "explain": "池化聚合局部区域，降低分辨率并带来一定平移不变性。"
+    },
+    {
+      "id": "q21",
+      "chapterId": "ch11",
+      "type": "single",
+      "question": "残差块 \\(y=x+F(x)\\) 中，\\(F\\) 学习的是什么？",
+      "options": [
+        "完整映射",
+        "相对输入的修正",
+        "损失函数",
+        "标签"
+      ],
+      "answer": 1,
+      "explain": "残差块让网络学习相对恒等映射的修正量。"
+    },
+    {
+      "id": "q22",
+      "chapterId": "ch11",
+      "type": "single",
+      "question": "“深度退化”指的是？",
+      "options": [
+        "训练误差随深度增加反而变差",
+        "测试集太大",
+        "参数太少",
+        "数据增强"
+      ],
+      "answer": 0,
+      "explain": "退化是优化困难，不是过拟合；更深网络训练误差反而更高。"
+    },
+    {
+      "id": "q23",
+      "chapterId": "ch12",
+      "type": "single",
+      "question": "缩放点积注意力中除以 \\(\\sqrt{d_k}\\) 的目的是？",
+      "options": [
+        "增加参数量",
+        "防止点积过大导致 Softmax 饱和",
+        "去掉位置编码",
+        "实现卷积"
+      ],
+      "answer": 1,
+      "explain": "缩放控制点积方差，避免 Softmax 进入饱和区。"
+    },
+    {
+      "id": "q24",
+      "chapterId": "ch12",
+      "type": "single",
+      "question": "causal mask 的作用是？",
+      "options": [
+        "让模型看到未来 token",
+        "禁止当前位置看未来 token",
+        "增加多头数",
+        "替代位置编码"
+      ],
+      "answer": 1,
+      "explain": "因果 mask 把未来位置分数设为负无穷，保证自回归生成不泄露。"
+    },
+    {
+      "id": "q25",
+      "chapterId": "ch13",
+      "type": "single",
+      "question": "GCN 一层主要做什么？",
+      "options": [
+        "按边聚合邻居特征",
+        "随机删除节点",
+        "把图变成图像",
+        "只更新边权"
+      ],
+      "answer": 0,
+      "explain": "GCN 用邻接矩阵聚合邻居，再乘可学习权重。"
+    },
+    {
+      "id": "q26",
+      "chapterId": "ch13",
+      "type": "single",
+      "question": "图神经网络要求置换等变，是因为？",
+      "options": [
+        "节点编号没有语义，换编号不应改变预测含义",
+        "图一定有环",
+        "节点数固定",
+        "边权必须为 1"
+      ],
+      "answer": 0,
+      "explain": "节点索引只是排列，模型应依赖结构而不是编号。"
+    },
+    {
+      "id": "q27",
+      "chapterId": "ch14",
+      "type": "single",
+      "question": "GAN 相比 VAE/流模型的一个典型特点是？",
+      "options": [
+        "能精确算似然",
+        "不直接优化似然，而用对抗信号",
+        "训练绝对稳定",
+        "只能做回归"
+      ],
+      "answer": 1,
+      "explain": "GAN 用判别器提供信号，通常不能精确算似然。"
+    },
+    {
+      "id": "q28",
+      "chapterId": "ch14",
+      "type": "single",
+      "question": "下列哪类模型可以精确计算似然？",
+      "options": [
+        "GAN",
+        "归一化流",
+        "标准 VAE 的近似后验",
+        "DDPM 的采样过程"
+      ],
+      "answer": 1,
+      "explain": "可逆变换与变量替换使流模型能精确算似然。"
+    },
+    {
+      "id": "q29",
+      "chapterId": "ch15",
+      "type": "single",
+      "question": "标准 GAN 的目标是？",
+      "options": [
+        "最小化重建误差",
+        "生成器与判别器的极小极大博弈",
+        "最大化 KL",
+        "解线性方程"
+      ],
+      "answer": 1,
+      "explain": "GAN 通过 min_G max_D 的对抗目标训练。"
+    },
+    {
+      "id": "q30",
+      "chapterId": "ch15",
+      "type": "single",
+      "question": "模式崩塌的表现是？",
+      "options": [
+        "生成器只覆盖少数模式",
+        "判别器完全不训练",
+        "似然精确可算",
+        "训练集消失"
+      ],
+      "answer": 0,
+      "explain": "生成器可能只生成少数能骗过判别器的样本。"
+    },
+    {
+      "id": "q31",
+      "chapterId": "ch16",
+      "type": "single",
+      "question": "变量替换公式中的雅可比行列式起什么作用？",
+      "options": [
+        "改变网络层数",
+        "把概率密度按变换的局部体积缩放",
+        "增加标签",
+        "替代损失"
+      ],
+      "answer": 1,
+      "explain": "可逆变换会改变体积，密度需按雅可比行列式缩放。"
+    },
+    {
+      "id": "q32",
+      "chapterId": "ch16",
+      "type": "single",
+      "question": "耦合层为什么容易算行列式？",
+      "options": [
+        "雅可比是三角矩阵",
+        "没有参数",
+        "只做加法",
+        "不需要可逆"
+      ],
+      "answer": 0,
+      "explain": "耦合层的雅可比为三角结构，行列式等于对角项乘积。"
+    },
+    {
+      "id": "q33",
+      "chapterId": "ch17",
+      "type": "single",
+      "question": "VAE 的 ELBO 包含哪两项？",
+      "options": [
+        "重建项与 KL 项",
+        "卷积与池化",
+        "Q 与 V",
+        "偏差与方差"
+      ],
+      "answer": 0,
+      "explain": "ELBO 是重建对数似然减去近似后验与先验的 KL。"
+    },
+    {
+      "id": "q34",
+      "chapterId": "ch17",
+      "type": "single",
+      "question": "重参数化技巧的作用是？",
+      "options": [
+        "让采样随机性可回传梯度",
+        "去掉编码器",
+        "让 KL 为零",
+        "增加标签"
+      ],
+      "answer": 0,
+      "explain": "把随机性移到外部噪声，使梯度能经过均值和方差。"
+    },
+    {
+      "id": "q35",
+      "chapterId": "ch18",
+      "type": "single",
+      "question": "扩散模型的前向过程做什么？",
+      "options": [
+        "逐步加高斯噪声",
+        "逐步去噪",
+        "训练判别器",
+        "做卷积"
+      ],
+      "answer": 0,
+      "explain": "前向过程固定地把数据逐步加噪到近似高斯。"
+    },
+    {
+      "id": "q36",
+      "chapterId": "ch18",
+      "type": "single",
+      "question": "DDPM 常让网络预测什么？",
+      "options": [
+        "类别标签",
+        "被加入的噪声",
+        "邻接矩阵",
+        "奖励"
+      ],
+      "answer": 1,
+      "explain": "DDPM 训练网络预测噪声，再据此估计去噪方向。"
+    },
+    {
+      "id": "q37",
+      "chapterId": "ch19",
+      "type": "single",
+      "question": "贝尔曼最优方程把 Q 写成？",
+      "options": [
+        "即时奖励加下一状态最大 Q 的折扣期望",
+        "只等于即时奖励",
+        "等于损失",
+        "等于策略概率"
+      ],
+      "answer": 0,
+      "explain": "最优 Q 满足即时奖励加折扣后的下一状态最优价值。"
+    },
+    {
+      "id": "q38",
+      "chapterId": "ch19",
+      "type": "single",
+      "question": "策略梯度方法直接优化什么？",
+      "options": [
+        "策略参数以最大化期望回报",
+        "训练集标签",
+        "图结构",
+        "卷积核"
+      ],
+      "answer": 0,
+      "explain": "策略梯度对 log 策略加权回报求梯度。"
+    },
+    {
+      "id": "q39",
+      "chapterId": "ch20",
+      "type": "single",
+      "question": "过参数化网络仍可能泛化的一个解释是？",
+      "options": [
+        "优化算法有隐式偏好",
+        "参数越多必然越好",
+        "训练集没有噪声",
+        "不需要测试集"
+      ],
+      "answer": 0,
+      "explain": "梯度下降偏向某些简单/平滑插值解，隐式正则是解释之一。"
+    },
+    {
+      "id": "q40",
+      "chapterId": "ch20",
+      "type": "single",
+      "question": "下列哪项仍是开放问题？",
+      "options": [
+        "深度网络泛化的完整理论",
+        "矩阵乘法定义",
+        "Softmax 公式",
+        "卷积核大小"
+      ],
+      "answer": 0,
+      "explain": "对深度网络泛化的紧致解释仍未闭合。"
+    },
+    {
+      "id": "q41",
+      "chapterId": "ch21",
+      "type": "single",
+      "question": "公平性定义的困难之一是？",
+      "options": [
+        "不同公平定义可能互相冲突",
+        "公平只有一个数",
+        "偏见只来自标签",
+        "隐私与公平无关"
+      ],
+      "answer": 0,
+      "explain": "人口 parity、机会均等、误差平等等目标可能冲突。"
+    },
+    {
+      "id": "q42",
+      "chapterId": "ch21",
+      "type": "single",
+      "question": "生成模型记忆训练数据的风险属于？",
+      "options": [
+        "隐私风险",
+        "卷积风险",
+        "梯度风险",
+        "学习率风险"
+      ],
+      "answer": 0,
+      "explain": "模型可能复现训练集中的个人信息，带来隐私泄露。"
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "f01",
+      "chapterId": "ch01",
+      "front": "第 1 章核心主题",
+      "back": "引言：三种学习范式与全书路线",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f02",
+      "chapterId": "ch01",
+      "front": "监督/无监督/强化学习的数据差异",
+      "back": "有标签 / 无标签 / 延迟奖励",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f03",
+      "chapterId": "ch02",
+      "front": "第 2 章核心主题",
+      "back": "监督学习：从线性回归到风险最小化",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f04",
+      "chapterId": "ch02",
+      "front": "经验风险",
+      "back": "训练集平均损失，不等于真实风险",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f05",
+      "chapterId": "ch03",
+      "front": "第 3 章核心主题",
+      "back": "浅层神经网络：分段线性函数与通用近似",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f06",
+      "chapterId": "ch03",
+      "front": "通用近似定理的边界",
+      "back": "存在性不等于可训练与泛化",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f07",
+      "chapterId": "ch04",
+      "front": "第 4 章核心主题",
+      "back": "深度神经网络：组合、矩阵与深度收益",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f08",
+      "chapterId": "ch04",
+      "front": "深度的作用",
+      "back": "复合特征、复用中间表示",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f09",
+      "chapterId": "ch05",
+      "front": "第 5 章核心主题",
+      "back": "损失函数：最大似然与交叉熵",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f10",
+      "chapterId": "ch05",
+      "front": "最大似然与损失",
+      "back": "高斯→MSE，伯努利→BCE，类别→CE",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f11",
+      "chapterId": "ch06",
+      "front": "第 6 章核心主题",
+      "back": "拟合模型：梯度下降、SGD 与超参数",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f12",
+      "chapterId": "ch06",
+      "front": "SGD 的噪声",
+      "back": "小批量梯度估计，兼顾频率与方差",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f13",
+      "chapterId": "ch07",
+      "front": "第 7 章核心主题",
+      "back": "梯度与初始化：反向传播与训练稳定性",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f14",
+      "chapterId": "ch07",
+      "front": "反向传播",
+      "back": "链式法则在计算图上的反向模式",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f15",
+      "chapterId": "ch08",
+      "front": "第 8 章核心主题",
+      "back": "衡量性能：误差分解、双下降与高维",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f16",
+      "chapterId": "ch08",
+      "front": "双下降",
+      "back": "测试误差先升后降，插值阈值附近峰值",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f17",
+      "chapterId": "ch09",
+      "front": "第 9 章核心主题",
+      "back": "正则化：显式、隐式与数据先验",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f18",
+      "chapterId": "ch09",
+      "front": "隐式正则",
+      "back": "由优化过程带入的偏好，不写在损失里",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f19",
+      "chapterId": "ch10",
+      "front": "第 10 章核心主题",
+      "back": "卷积网络：平移等变与局部连接",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f20",
+      "chapterId": "ch10",
+      "front": "平移等变",
+      "back": "输入平移→输出平移；池化才带来不变性",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f21",
+      "chapterId": "ch11",
+      "front": "第 11 章核心主题",
+      "back": "残差网络：恒等路径与深度退化",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f22",
+      "chapterId": "ch11",
+      "front": "残差连接",
+      "back": "y=x+F(x)，恒等路径改善梯度",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f23",
+      "chapterId": "ch12",
+      "front": "第 12 章核心主题",
+      "back": "Transformer：自注意力与序列建模",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f24",
+      "chapterId": "ch12",
+      "front": "自注意力",
+      "back": "QK^T 相似度加权 V，O(T^2)",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f25",
+      "chapterId": "ch13",
+      "front": "第 13 章核心主题",
+      "back": "图神经网络：消息传递与置换等变",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f26",
+      "chapterId": "ch13",
+      "front": "消息传递",
+      "back": "按边聚合邻居，要求置换等变",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f27",
+      "chapterId": "ch14",
+      "front": "第 14 章核心主题",
+      "back": "无监督学习：生成模型的统一地图",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f28",
+      "chapterId": "ch14",
+      "front": "四类生成模型",
+      "back": "GAN / VAE / Flow / Diffusion",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f29",
+      "chapterId": "ch15",
+      "front": "第 15 章核心主题",
+      "back": "生成对抗网络：对抗博弈与模式崩塌",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f30",
+      "chapterId": "ch15",
+      "front": "模式崩塌",
+      "back": "生成器只覆盖少数模式",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f31",
+      "chapterId": "ch16",
+      "front": "第 16 章核心主题",
+      "back": "归一化流：可逆变换与精确似然",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f32",
+      "chapterId": "ch16",
+      "front": "变量替换",
+      "back": "密度按雅可比行列式缩放",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f33",
+      "chapterId": "ch17",
+      "front": "第 17 章核心主题",
+      "back": "变分自编码器：ELBO 与重参数化",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f34",
+      "chapterId": "ch17",
+      "front": "ELBO",
+      "back": "重建项 − KL(q||p)",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f35",
+      "chapterId": "ch18",
+      "front": "第 18 章核心主题",
+      "back": "扩散模型：加噪、去噪与采样",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f36",
+      "chapterId": "ch18",
+      "front": "扩散前向",
+      "back": "固定加噪到近似高斯",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f37",
+      "chapterId": "ch19",
+      "front": "第 19 章核心主题",
+      "back": "强化学习：MDP、Q 学习与策略梯度",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f38",
+      "chapterId": "ch19",
+      "front": "贝尔曼方程",
+      "back": "Q*=R+γE[max Q*]",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f39",
+      "chapterId": "ch20",
+      "front": "第 20 章核心主题",
+      "back": "为什么深度学习有效：过参数化与泛化",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f40",
+      "chapterId": "ch20",
+      "front": "过参数化",
+      "back": "参数多于样本仍可能泛化",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f41",
+      "chapterId": "ch21",
+      "front": "第 21 章核心主题",
+      "back": "深度学习与伦理：偏见、隐私与责任",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    },
+    {
+      "id": "f42",
+      "chapterId": "ch21",
+      "front": "算法偏见",
+      "back": "历史数据不平等被学习并放大",
+      "tags": [
+        "understanding-deep-learning"
+      ]
+    }
+  ],
+  "companion": "udl学习伴侣.html"
+}

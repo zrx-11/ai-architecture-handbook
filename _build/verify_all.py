@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""本轮交付的端到端验证：全栈 8 步首页、14 本分册、机制公式总库、移动端/桌面端、搜索、测验。"""
+"""本轮交付的端到端验证：全栈 8 步首页、15 本分册（含 UDL）、机制公式总库、移动端/桌面端、搜索、测验。"""
 import json, os, re, sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -22,8 +22,8 @@ def main():
         page.goto("file://"+str(INDEX))
         page.wait_for_timeout(900)
         meta=page.evaluate("META")
-        check("14 本书", len(meta)==14, str(len(meta)))
-        check("首页书卡", len(meta)==14, str(len(meta)))
+        check("15 本书", len(meta)==15, str(len(meta)))
+        check("首页书卡", len(meta)==15, str(len(meta)))
         check("首页说明", "从数学基础" in page.inner_text("#view") and "主流大模型架构" in page.inner_text("#view"))
         # 每本书首末章 + 测验
         for m in meta:
@@ -67,6 +67,29 @@ def main():
         page.evaluate("location.hash='#/book/llm-from-scratch/quiz/all'"); page.wait_for_timeout(500)
         check("LLM 从零实现测验 28", page.eval_on_selector_all(".quiz-item","els=>els.length")==28,
               str(page.eval_on_selector_all(".quiz-item","els=>els.length")))
+        # 第 15 本：理解深度学习（Prince 导读）
+        page.evaluate("location.hash='#/book/understanding-deep-learning/path'"); page.wait_for_timeout(700)
+        u=page.evaluate("BOOKS['understanding-deep-learning'].manifest")
+        check("UDL 21 章", len(u["chapters"])==21, str(len(u["chapters"])))
+        check("UDL 21 概念", len(u["concepts"])==21, str(len(u["concepts"])))
+        check("UDL 42 测验", len(u["quizzes"])==42, str(len(u["quizzes"])))
+        check("UDL 42 卡片", len(u["flashcards"])==42, str(len(u["flashcards"])))
+        check("UDL 84 术语", len(u["glossary"])==84, str(len(u["glossary"])))
+        page.evaluate("location.hash='#/book/understanding-deep-learning/chapter/ch06'"); page.wait_for_timeout(600)
+        check("UDL 第 6 章 SGD", "SGD" in page.inner_text("#view"), f"{len(page.inner_text('#view'))} 字")
+        page.evaluate("location.hash='#/book/understanding-deep-learning/chapter/ch08'"); page.wait_for_timeout(600)
+        check("UDL 第 8 章双下降", "双下降" in page.inner_text("#view"), f"{len(page.inner_text('#view'))} 字")
+        page.evaluate("location.hash='#/book/understanding-deep-learning/chapter/ch12'"); page.wait_for_timeout(900)
+        check("UDL 第 12 章注意力", "缩放点积" in page.inner_text("#view"))
+        check("UDL 索引页 KaTeX", page.eval_on_selector_all(".katex","els=>els.length")>=5,
+              str(page.eval_on_selector_all(".katex","els=>els.length")))
+        page.evaluate("location.hash='#/book/understanding-deep-learning/glossary'"); page.wait_for_timeout(600)
+        check("UDL 术语表 84", page.eval_on_selector_all("#glossary-list li","els=>els.length")==84,
+              str(page.eval_on_selector_all("#glossary-list li","els=>els.length")))
+        page.evaluate("location.hash='#/book/understanding-deep-learning/cards'"); page.wait_for_timeout(600)
+        check("UDL 卡片可打开", page.eval_on_selector_all(".flashcard","els=>els.length")>=1,
+              str(page.eval_on_selector_all(".flashcard","els=>els.length")))
+
         page.evaluate("location.hash='#/cross/doc8'"); page.wait_for_timeout(500)
         check("跨书路线总表", "三条学习路线" in page.inner_text("#view"))
         page.evaluate("location.hash='#/cross/doc9'"); page.wait_for_timeout(500)
@@ -125,6 +148,15 @@ def main():
         page2.evaluate("location.hash='#/chapter/ch04'"); page2.wait_for_timeout(12000)
         check("09 伴侣 KaTeX", page2.eval_on_selector_all(".katex","els=>els.length")>=10, str(page2.eval_on_selector_all(".katex","els=>els.length")))
         check("09 伴侣 Mermaid", page2.eval_on_selector_all(".mermaid svg","els=>els.length")>=1, str(page2.eval_on_selector_all(".mermaid svg","els=>els.length")))
+        page3=browser.new_page(viewport={"width":1440,"height":900})
+        page3.goto("file://"+str(ROOT/"34-understanding-deep-learning/udl学习伴侣.html")); page3.wait_for_timeout(700)
+        check("UDL 伴侣打开", page3.evaluate("DATA.manifest.chapters.length")==21, str(page3.evaluate("DATA.manifest.chapters.length")))
+        page3.evaluate("location.hash='#/chapter/ch12'"); page3.wait_for_timeout(800)
+        check("UDL 伴侣 KaTeX", page3.eval_on_selector_all(".katex","els=>els.length")>=5,
+              str(page3.eval_on_selector_all(".katex","els=>els.length")))
+        page3.evaluate("location.hash='#/quiz/all'"); page3.wait_for_timeout(500)
+        check("UDL 伴侣测验 42", page3.eval_on_selector_all(".quiz-item","els=>els.length")==42,
+              str(page3.eval_on_selector_all(".quiz-item","els=>els.length")))
         check("控制台无错误", len(errors)==0, " || ".join(errors[:3]))
         browser.close()
     ok=sum(1 for r in results if r["pass"])

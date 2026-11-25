@@ -1,4 +1,4 @@
-# 学习总手册
+# AI 架构学习手册
 
 **[打开总学习手册（index.html）](index.html)** —— 统一入口，单文件可离线；顶部切换书籍，左侧按学习路径/章节/概念/测验/抽认卡/术语/模式/速查浏览，进度自动保存。
 
@@ -20,6 +20,7 @@
 | AI 现代方法：完整地图 | 28 | 2 | 56 | 92 | [aima4学习伴侣.html](26-ai-modern-methods/aima4学习伴侣.html) |
 | 动手学深度学习：原理与代码 | 11 | 2 | 29 | 42 | [d2l学习伴侣.html](27-d2l/d2l学习伴侣.html) |
 | 强化学习：Sutton & Barto | 17 | 2 | 46 | 64 | [rl-sutton学习伴侣.html](28-rl-sutton/rl-sutton学习伴侣.html) |
+| 理解深度学习：Prince 教材导读 | 21 | 21 | 42 | 42 | [udl学习伴侣.html](34-understanding-deep-learning/udl学习伴侣.html) |
 
 ## 跨书总览
 

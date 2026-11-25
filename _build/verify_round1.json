@@ -1,13 +1,13 @@
 [
  {
-  "check": "14 本书",
+  "check": "15 本书",
   "pass": true,
-  "extra": "14"
+  "extra": "15"
  },
  {
   "check": "首页书卡",
   "pass": true,
-  "extra": "14"
+  "extra": "15"
  },
  {
   "check": "首页说明",
@@ -365,6 +365,31 @@
   "extra": ""
  },
  {
+  "check": "understanding-deep-learning 章节数",
+  "pass": true,
+  "extra": "21"
+ },
+ {
+  "check": "understanding-deep-learning 首章",
+  "pass": true,
+  "extra": "864 字"
+ },
+ {
+  "check": "understanding-deep-learning 末章",
+  "pass": true,
+  "extra": "646 字"
+ },
+ {
+  "check": "understanding-deep-learning 测验",
+  "pass": true,
+  "extra": "42 题"
+ },
+ {
+  "check": "understanding-deep-learning 作答反馈",
+  "pass": true,
+  "extra": ""
+ },
+ {
   "check": "09 chapter/ch01",
   "pass": true,
   "extra": "4696 字"
@@ -438,6 +463,61 @@
   "check": "LLM 从零实现测验 28",
   "pass": true,
   "extra": "28"
+ },
+ {
+  "check": "UDL 21 章",
+  "pass": true,
+  "extra": "21"
+ },
+ {
+  "check": "UDL 21 概念",
+  "pass": true,
+  "extra": "21"
+ },
+ {
+  "check": "UDL 42 测验",
+  "pass": true,
+  "extra": "42"
+ },
+ {
+  "check": "UDL 42 卡片",
+  "pass": true,
+  "extra": "42"
+ },
+ {
+  "check": "UDL 84 术语",
+  "pass": true,
+  "extra": "84"
+ },
+ {
+  "check": "UDL 第 6 章 SGD",
+  "pass": true,
+  "extra": "632 字"
+ },
+ {
+  "check": "UDL 第 8 章双下降",
+  "pass": true,
+  "extra": "583 字"
+ },
+ {
+  "check": "UDL 第 12 章注意力",
+  "pass": true,
+  "extra": ""
+ },
+ {
+  "check": "UDL 索引页 KaTeX",
+  "pass": true,
+  "extra": "7"
+ },
+ {
+  "check": "UDL 术语表 84",
+  "pass": true,
+  "extra": "84"
+ },
+ {
+  "check": "UDL 卡片可打开",
+  "pass": true,
+  "extra": "1"
  },
  {
   "check": "跨书路线总表",
@@ -548,6 +628,21 @@
   "check": "09 伴侣 Mermaid",
   "pass": true,
   "extra": "1"
+ },
+ {
+  "check": "UDL 伴侣打开",
+  "pass": true,
+  "extra": "21"
+ },
+ {
+  "check": "UDL 伴侣 KaTeX",
+  "pass": true,
+  "extra": "7"
+ },
+ {
+  "check": "UDL 伴侣测验 42",
+  "pass": true,
+  "extra": "42"
  },
  {
   "check": "控制台无错误",
